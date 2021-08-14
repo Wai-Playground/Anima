@@ -11,7 +11,7 @@ export default class CustomClient extends Client {
    * @param {*} backup_prefix | Default = "-"
    */
   constructor(name: string = "Bot", token: string, uri: string) {
-    super({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_TYPING] });
+    super({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.GUILD_MEMBERS] });
 
     (this.name = name), (this.token = token), (this.uri = uri);
 
