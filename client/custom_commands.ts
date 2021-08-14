@@ -28,5 +28,13 @@ export class Commands {
     return true;
   }
 
+  async default_checks(bot, interaction) {
+
+    if (this.ownerOnly) {
+      return (interaction.user.id == process.env.OWNER_ID ? true : false)
+    }
+    return true;
+  }
+
   async formatName(this: Commands, interaction) {}
 }

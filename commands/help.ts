@@ -15,7 +15,7 @@ class Help extends Commands {
             .setRequired(false)
         ),
       dbRequired: false,
-      ownerOnly: false,
+      ownerOnly: true,
     });
   }
   async check() {
@@ -23,7 +23,7 @@ class Help extends Commands {
 
   }
 
-  async execute(bot: typeof Client, interaction) {
+  async execute(bot: Client, interaction) {
     const string = interaction.options.getString("input");
     await interaction.reply({ content: "get help nerd " + string, ephemeral: true });
   }
