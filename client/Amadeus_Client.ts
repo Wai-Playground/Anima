@@ -11,7 +11,7 @@ export default class CustomClient extends Client {
    * @param {*} backup_prefix | Default = "-"
    */
   constructor(name: string = "Bot", token: string, uri: string) {
-    super({ intents: [Intents.FLAGS.GUILDS] });
+    super({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_TYPING] });
 
     (this.name = name), (this.token = token), (this.uri = uri);
 
@@ -45,7 +45,7 @@ export default class CustomClient extends Client {
       const command = require(`.${path}/${file}`);
       const cmd = new command()
 
-      console.info( "[c] "+ this.name + " has loaded command: " + cmd.data.name);
+      console.info( "[c] "+ this.name + " has loaded command: " + cmd.data.name + ".");
       this.slashCommands.push(cmd.data.toJSON());
       this.commands.set(cmd.data.name, cmd);
     }
@@ -67,18 +67,24 @@ export default class CustomClient extends Client {
     }
   }
 
-  async eventsLoader(this: CustomClient, path: string = "./listeners") {
+  eventsLoader(this: CustomClient, path: string = "./listeners") {
+
     const eventFiles = fs
       .readdirSync(path)
       .filter((file) => file.endsWith(".js"));
 
     for (const file of eventFiles) {
       const event = require(`.${path}/${file}`);
+      
       const ev = new event()
+
+      console.log("[l]" + `${this.name} has loaded listener: ${ev.name}.` )
+
       if (ev.once) {
-        this.once(ev.name, (...args) => ev.execute(this, ...args));
+        
+        super.once(ev.name, (...args) => ev.execute(this, ...args));
       } else {
-        this.on(ev.name, (...args) => ev.execute(this, ...args));
+        super.on(ev.name, (...args) => ev.execute(this, ...args));
       }
     }
   }
@@ -123,10 +129,10 @@ export default class CustomClient extends Client {
    * @param this | Bot
    * @param token | token, should have been declared in the creation.
    */
-  async run(this: CustomClient) {
+  run(this: CustomClient) {
     this.commandLoader();
     this.eventsLoader();
     this.mangoLoader();
-    this.login(this.token);
+    super.login(this.token);
   }
 }

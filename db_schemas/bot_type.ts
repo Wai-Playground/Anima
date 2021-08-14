@@ -4,7 +4,7 @@ const botSchema = new mongoose.Schema({
     _id: Number,
     name: String,
 
-    activities: Array,    
+    activities: Array  
   });
 
 const bot = mongoose.model("bot", botSchema)
