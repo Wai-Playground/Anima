@@ -1,31 +1,44 @@
-import { Client } from "discord.js";
-import { Commands } from "../client/Custom_Commands";
+import { Client, CommandInteraction } from "discord.js";
+import { Commands } from "../client/Amadeus_Commands";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 class Help extends Commands {
+  lol: number
   constructor() {
     super("help", {
+      description: "Peen",
       data: new SlashCommandBuilder()
-        .setName("help")
-        .setDescription("Replies with Pong!")
         .addStringOption((option) =>
           option
-            .setName("input")
-            .setDescription("The input to echo back")
+            .setName("command")
+            .setDescription("Optional | Specify which command you would like to see.")
             .setRequired(false)
         ),
-      dbRequired: false,
+      dbRequired: true,
       ownerOnly: true,
     });
+  
+
+    
+    
   }
   async check() {
       return true
 
   }
 
-  async execute(bot: Client, interaction) {
-    const string = interaction.options.getString("input");
-    await interaction.reply({ content: "get help nerd " + string, ephemeral: true });
+  async execute(bot: Client, interaction: CommandInteraction) {
+
+    
+    const cmd = interaction.options.getString("command")
+
+    if (cmd) {
+      //bot.
+
+    } else {
+
+    }
+
   }
 }
 

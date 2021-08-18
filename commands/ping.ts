@@ -1,13 +1,12 @@
 import { Client } from "discord.js";
-import { Commands } from "../client/Custom_Commands";
+import { Commands } from "../client/Amadeus_Commands";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 class Ping extends Commands {
   constructor() {
     super("ping", {
+      description: "no",
       data: new SlashCommandBuilder()
-        .setName("ping")
-        .setDescription("Replies with Pong!")
         .addIntegerOption((option) =>
           option
             .setName("input")

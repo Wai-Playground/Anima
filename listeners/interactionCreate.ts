@@ -18,7 +18,7 @@ class interactionCreate extends Listeners {
 
       let cmd = bot.commands.get(interaction.commandName);
       if (await cmd.check(bot, interaction) && await cmd.default_checks(bot, interaction)) return cmd.execute(bot, interaction)
-      throw Error;
+
 
       
     } catch (error) {

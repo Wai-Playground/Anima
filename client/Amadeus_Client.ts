@@ -46,6 +46,7 @@ export default class CustomClient extends Client {
       const cmd = new command()
 
       console.info( "[c] "+ this.name + " has loaded command: " + cmd.data.name + ".");
+      console.log(cmd.data.toJSON())
       this.slashCommands.push(cmd.data.toJSON());
       this.commands.set(cmd.data.name, cmd);
     }
@@ -75,7 +76,6 @@ export default class CustomClient extends Client {
 
     for (const file of eventFiles) {
       const event = require(`.${path}/${file}`);
-      
       const ev = new event()
 
       console.log("[l]" + `${this.name} has loaded listener: ${ev.name}.` )
@@ -129,10 +129,10 @@ export default class CustomClient extends Client {
    * @param this | Bot
    * @param token | token, should have been declared in the creation.
    */
-  run(this: CustomClient) {
+  async run(this: CustomClient) {
     this.commandLoader();
     this.eventsLoader();
     this.mangoLoader();
-    super.login(this.token);
+    await super.login(this.token);
   }
 }

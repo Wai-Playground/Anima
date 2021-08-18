@@ -1,10 +1,12 @@
-const { mongoose } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
-const botSchema = new mongoose.Schema({
+const botSchema = new Schema({
     _id: Number,
     name: String,
 
     activities: Array  
   });
 
-const bot = mongoose.model("bot", botSchema)
+const bot_model = model("bot", botSchema)
+export = bot_model;
+

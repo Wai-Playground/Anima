@@ -1,8 +1,12 @@
-const userSchema = new mongoose.Schema({
+const { Schema, model} = require("mongoose");
+
+const userSchema = new Schema({
     _id: Number,
     name: String,
 
-    activities: Array  
+    lvl: Number,
+    xp: Number  
   });
 
-const user = mongoose.model("user", userSchema)
+const user = model("user", userSchema)
+export = user;
