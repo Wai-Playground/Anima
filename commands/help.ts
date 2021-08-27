@@ -1,9 +1,9 @@
 import { Client, CommandInteraction } from "discord.js";
 import { Commands } from "../client/Amadeus_Commands";
 const { SlashCommandBuilder } = require("@discordjs/builders");
+import CustomClient from "../client/Amadeus_Client";
 
 class Help extends Commands {
-  lol: number
   constructor() {
     super("help", {
       description: "Peen",
@@ -22,20 +22,25 @@ class Help extends Commands {
     
     
   }
-  async check() {
-      return true
 
-  }
+  async execute(bot: CustomClient, interaction: CommandInteraction) {
+    let cmdObj: Commands, cmd: String
+    
 
-  async execute(bot: Client, interaction: CommandInteraction) {
+     
+    cmd = interaction.options.getString("command")
+    cmdObj = bot.commands.get(cmd)
 
     
-    const cmd = interaction.options.getString("command")
+  
+    
 
-    if (cmd) {
-      //bot.
+    if (cmdObj) {
+      return interaction.reply(cmdObj.data.description)
+      
 
     } else {
+      return interaction.reply("Could not find the command! Mispelled?")
 
     }
 

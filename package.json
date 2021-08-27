@@ -27,6 +27,7 @@
     "fs": "0.0.1-security",
     "mongodb": "^4.1.0",
     "mongoose": "^5.13.7",
+    "svg-captcha": "^1.4.0",
     "time-stamp": "^2.2.0",
     "ts-node": "^10.2.0"
   },

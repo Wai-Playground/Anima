@@ -5,7 +5,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 
 export class Commands {
   name: string = null;
-  data: typeof SlashCommandBuilder;
+  data: typeof SlashCommandBuilder = new SlashCommandBuilder();
   description: string = null;
   dbRequired: Boolean = false;
   ownerOnly: Boolean = false;
@@ -38,8 +38,9 @@ export class Commands {
   async default_checks(bot, interaction) {
 
     if (this.ownerOnly) {
-      interaction.reply("Sorry, this is for the owner only. Try again when you- wait...")
-      return (interaction.user.id == process.env.OWNER_ID ? true : false)
+      const ret = (interaction.user.id == process.env.OWNER_ID ? true : false)
+      if (!ret) return interaction.reply("Sorry, this is for the owner only. Try again when you- wait...")
+      
     }
     
     if (this.dbRequired) {
