@@ -1,0 +1,297 @@
+/**
+ * Wai Hlaing 2021
+ * Menu-Handler Amadeus
+ */
+
+import {
+  ButtonInteraction,
+  Collector,
+  CommandInteraction,
+  Interaction,
+  Message,
+  MessageActionRow,
+  MessageButton,
+  MessageEmbed,
+  MessageInteraction,
+  MessageSelectMenu,
+  SelectMenuInteraction,
+  User,
+} from "discord.js";
+import { EventEmitter } from "events";
+
+
+class menuSingles extends MessageEmbed {
+  index: number; // keeps track of the sigle index.
+  rowCol: Array<MessageActionRow>; // messageActionRow
+  constructor(single, count = null) {
+    super();
+
+    /**
+     * This whole loop just goes through each key values and replaces the value of it with the one from the JSON file. There is probably a function that does this automatically...
+     * but I don't know about it.
+     */
+
+    for (const pairs of Object.entries(single.embed)) // makes a key, value array. ["key", "value"], ["key", "value"]
+      super.hasOwnProperty(pairs[0]) // remember, super is the messageEmbed Class so it got the same properties as our json embed. ex: color, title, description, fields, etc..
+        ? (super[pairs[0]] = single.embed[pairs[0]]) // replacees it with the json field values.
+        : null; // nothing.
+
+    this.index = single.index || count;
+    
+
+    /*
+    if (single.hasOwnProperty("actions")) {
+      this.rowCol = [];
+
+      for (const actions of single.actions) {
+        const row = new MessageActionRow();
+        //if (actions.hasOwnProperty("buttons")) return
+        
+
+        if (actions.hasOwnProperty("selectMenu")) {
+          const menu = actions.selectMenu;
+          if (menu == ("build" || undefined)) return; //Place holder
+          row.addComponents(
+            // message components are too new for me so I am just gonna stick with the builders.
+            new MessageSelectMenu()
+              .setCustomId("select_number_" + count.toString() + "_row_" + this.rowCol.length)
+              .setPlaceholder("None Selected")
+              .addOptions(menu)
+          );
+        } else if (actions.hasOwnProperty("buttons")) {
+          if (actions.buttons == ("build" || undefined)) return;
+          for (const button of actions.buttons) {
+            
+            row.addComponents(
+              // buttons are just like rows but clickable. 
+              new MessageButton()
+              .setCustomId("button_" + count.toString() + "_row_" + this.rowCol.length)
+              .setLabel(button.label)
+              .setEmoji(button.emoji)
+              .setStyle(button.style)
+             
+            )
+
+          }
+          
+
+        }
+
+        this.rowCol.push(row);
+      }
+    }*/
+  }
+}
+
+export default class Menu extends EventEmitter {
+  slides: Array<menuSingles>;
+  json: any;
+  index: number;
+  interaction: CommandInteraction;
+  user: User;
+  message: any;
+  selectCollector: any;
+  buttonCollector: any;
+  filter: any;
+  //ephemeral: boolean;
+  constructor(json, interaction: CommandInteraction) {
+    super();
+
+    if (!json) return;
+
+    this.json = json;
+    this.index = 0;
+    this.interaction = interaction;
+    this.user = interaction.user;
+
+    this.filter = (i) => {
+      i.deferUpdate();
+      return i.user.id === interaction.user.id;
+    };
+
+    this.slides = [];
+    //this.ephemeral = (this.json.hasOwnProperty("ephemeral") ? this.json.ephemeral : false)
+    let count = 0;
+
+    /**
+     * For each single cells in the array of multiples, we loop to get the class representation of it. The class's parent is a messegeEmbed so we can send it easily as well.
+     */
+
+    this.json.multiples.forEach((singles) => {
+      this.slides.push(new menuSingles(singles, count));
+
+      count++; // why is this red.
+
+      if (count == this.json.multiples.length)
+        /**
+         * Trickiest bug, it was emitting before there were any listeners hooked so it was effectively useless. delaying it to send a pulse after the listeners are hooked did the job. Thanks to Xetera#0001 for helping me out.
+         */
+
+        process.nextTick(() => {
+          this.emit("ready", this.slides);
+        });
+    });
+  }
+  /**
+   * Starts the engine.
+   */
+
+  public async start() {
+  
+    this.interaction.reply({
+      embeds: [this.slides[0]],
+      components: await this.action(),
+      //ephemeral: this.ephemeral
+    });
+
+    this.message = await this.interaction.fetchReply();
+    this.collectButton(this.filter);
+    this.collectSelect(this.filter);
+  }
+
+  /**
+   * Sets the index to the specified page and then edits the message.
+   * @param page number | index number
+   */
+
+  public async setPage(page: any = 0) {
+    if (page < 0 || page > this.slides.length - 1) return;
+
+    this.index = page;
+
+    this.interaction.editReply({
+      embeds: [this.slides[page]],
+      components: await this.action(),
+      
+      
+    });
+
+  }
+
+  private async action() {
+    type chapters = {
+      label: string;
+      value: string;
+      description: string;
+    };
+
+    let chapters = [];
+
+    for (const pages of this.slides) {
+      const chapter: chapters = {
+        label: pages.title,
+        value: pages.index.toString(),
+        description: pages.description,
+      };
+
+      chapters.push(chapter);
+    }
+
+    const selectRow = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
+        .setCustomId(
+          "MENU.select_" + this.index.toString() + "_user_" + this.user.id
+        )
+        .setPlaceholder("Select a page")
+        .addOptions(chapters)
+    );
+
+    const buttons = [
+      {
+        disabled: this.index > 0 ? false : true,
+        label: "<< First",
+        style: 2,
+      },
+      {
+        disabled: this.index > 0 ? false : true,
+        label: "Back",
+        style: 1,
+      },
+      {
+        disabled: this.index >= this.slides.length - 1? true : false,
+        label: "Next",
+        style: 1,
+      },
+      {
+        disabled: this.index >= this.slides.length - 1? true : false,
+        label: "Last >>",
+        style: 2,
+      },
+      {
+        label: "Done",
+        emj: "<:trash:886429816260280374>",
+        style: 4,
+      },
+    ];
+
+    let i = 0;
+    const buttonRow = new MessageActionRow();
+
+    for (const button of buttons) {
+      buttonRow.addComponents(
+        new MessageButton()
+          .setDisabled(
+            button.hasOwnProperty("disabled") ? button.disabled : false
+          )
+          .setCustomId("MENU.button_" + i.toString() + "_user_" + this.user.id)
+          .setLabel(button.hasOwnProperty("label") ? button.label : null)
+          .setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
+          .setStyle(button.style)
+      );
+      i++;
+    }
+    return [selectRow, buttonRow];
+  }
+
+  private async collectButton(filter) {
+    this.buttonCollector = this.message.createMessageComponentCollector({
+      filter,
+      componentType: "BUTTON",
+      time: 60000,
+    });
+    this.buttonCollector.on("collect", (interaction: ButtonInteraction) => {
+      const button = interaction.customId.match(/(\d{1,1})/g)[0];
+      this.emit("buttonCollected", button)
+
+      switch (parseInt(button)) {
+        case 0:
+          this.setPage(0)
+
+          break;
+        case 1:
+          this.setPage(this.index - 1)
+
+          break;
+        case 2:
+          this.setPage(this.index + 1)
+          break;
+        case 3:
+          this.setPage(this.slides.length - 1)
+          break;
+        case 4:
+          this.end()
+          break;
+
+      }
+    });
+  }
+
+  private async collectSelect(filter) {
+    this.selectCollector = this.message.createMessageComponentCollector({
+      filter,
+      componentType: "SELECT_MENU",
+      time: 60000,
+    });
+    this.selectCollector.on("collect", (interaction: SelectMenuInteraction) => {
+      const index = interaction.customId.match(/(\d{1,1})/g)[0];
+      this.emit("selectCollected", index)
+      this.setPage(interaction.values[index]);
+    });
+  }
+
+  public async end() {
+    this.selectCollector.stop()
+    this.buttonCollector.stop()
+    this.interaction.followUp("")
+  }
+}
