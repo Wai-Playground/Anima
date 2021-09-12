@@ -1,0 +1,94 @@
+{
+  "menu": "help",
+  "multiples": [
+    {
+      "index": 0,
+      "embed": {
+        "title": "Hey! Header 1",
+        "color": "#fafa6e",
+        "fields": [
+          {
+            "name": "Title One",
+            "value": "Body One",
+            "inline": true
+          },
+          {
+            "name": "Title Two",
+            "value": "Body Two",
+            "inline": true
+          }
+        ],
+        "description": "Description for header 1"
+      },
+      "actions": [
+        {
+          "selectMenu": [
+            {
+              "label": "Label One",
+              "description": "This is a Desc of Label One, click me to go to 2! Or the button below.",
+              "value": "Label_One"
+            },
+            {
+              "label": "Label One Choice 2",
+              "description": "TeST TEST",
+              "value": "Label_Two"
+            }
+          ]
+        },
+        {
+          "selectMenu": [
+            {
+              "label": "Label One BUT DIFFERENTTTTTTTTTTTTTTTTTT",
+              "description": "This is a Desc of Label One, click me to goASDSADSA to 2! Or the button below.",
+              "value": "Label_One_G1"
+            }
+
+          ]
+
+        },
+        {
+          "buttons": [
+            {
+              "emoji": "🆗",
+              "label": "Click me!",
+              "function": 1,
+              "style": "PRIMARY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "embed": {
+        "title": "Hey! Header 2",
+        "description": "Description for header 2",
+        "color": "#23aa8f",
+        "fields": [
+          {
+            "id": 1,
+            "name": "Title 1 of Header 2",
+            "value": "Body 1 of Header 2"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "selectMenu": "build"
+        },
+        {
+          "buttons": "build"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "embed": {
+      
+        "description": "Description for header 3",
+        "title": "AYo ! Header 3",
+        "color": "#2a4858"
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import CustomClient from "../client/Amadeus_Client";
-import { Listeners } from "../client/listeners";
+import { Listeners } from "../client/Amadeus_listeners";
 
 class interactionCreate extends Listeners {
   constructor() {
@@ -17,7 +17,7 @@ class interactionCreate extends Listeners {
     try {
 
       let cmd = bot.commands.get(interaction.commandName);
-      if (await cmd.check(bot, interaction) && await cmd.default_checks(bot, interaction)) return cmd.execute(bot, interaction)
+      if (await cmd.check(bot, interaction) && await cmd.default_checks(bot, interaction)) cmd.execute(bot, interaction)
 
 
       
