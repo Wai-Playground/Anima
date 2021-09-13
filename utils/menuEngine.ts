@@ -5,14 +5,10 @@
 
 import {
   ButtonInteraction,
-  Collector,
   CommandInteraction,
-  Interaction,
-  Message,
   MessageActionRow,
   MessageButton,
   MessageEmbed,
-  MessageInteraction,
   MessageSelectMenu,
   SelectMenuInteraction,
   User,
@@ -290,8 +286,10 @@ export default class Menu extends EventEmitter {
   }
 
   public async end() {
+    this.emit("stop")
     this.selectCollector.stop()
     this.buttonCollector.stop()
-    this.interaction.followUp("")
+   
+    
   }
 }

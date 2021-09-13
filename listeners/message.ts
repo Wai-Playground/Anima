@@ -69,9 +69,14 @@ class Message extends Listeners {
 
 	}
 
-	distExp(bot: CustomClient, msg, userType: Model<typeof user>) {
-		const db_user = userType.findOne({_id: msg.author.id}) 
+	async distExp(bot: CustomClient, msg, userType: Model<typeof user>) {
+		const db_user = await userType.findOne({_id: msg.author.id}) 
 		if (!db_user) return;
+
+		db_user.xp += 1
+		
+		db_user.save()
+		console.log(db_user.xp)
 
 
 	}

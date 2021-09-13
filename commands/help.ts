@@ -15,11 +15,11 @@ class Help extends Commands {
         .addStringOption((option) =>
           option
             .setName("command")
-            .setDescription("Optional | Specify which command you would like to see.")
+            .setDescription("Optional | If you want a list of all commands or ")
             .setRequired(false)
         ),
-      dbRequired: true,
-      ownerOnly: true,
+      dbRequired: false,
+      ownerOnly: false,
     });
     
   }
@@ -31,13 +31,13 @@ class Help extends Commands {
     const test = {
       multiples: [
         {
-        index: 0,
+
         embed: {
-          title: "Hey! Heaasdasdsaer 1",
+          title: "te",
           color: "#fafa6e",
           fields: [
             {
-              name: "Title One",
+              name: "te",
               value: "Body One",
               inline: true
             },
@@ -48,10 +48,11 @@ class Help extends Commands {
             }
           ],
           description: "Description for header 1"
-          }
+          },
+          
         },
         {
-          index: 1,
+
           embed: {
             title: "TAETAE",
             color: "#fafade",
@@ -68,7 +69,8 @@ class Help extends Commands {
               }
             ],
             description: "Description for hasd1"
-            }
+            },
+          
         }
         
 
@@ -81,6 +83,11 @@ class Help extends Commands {
     menu.on("ready", () => {
       menu.start()
     })
+    menu.once("stop", () => {
+      interaction.deleteReply()
+    })
+    
+
     
 
     
