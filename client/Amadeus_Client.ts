@@ -1,13 +1,12 @@
 import { lstat, stat, statSync } from "fs";
 
-
 require("dotenv").config();
 const fs = require("fs");
 const { Client, Collection, Intents } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const mongoose = require("mongoose");
-const path = require('path')
+const path = require("path");
 export default class CustomClient extends Client {
   /**
    * Description | Custom Client.
@@ -16,7 +15,14 @@ export default class CustomClient extends Client {
    */
 
   constructor(name: string = "Bot", token: string, uri: string) {
-    super({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.GUILD_MEMBERS] });
+    super({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_TYPING,
+        Intents.FLAGS.GUILD_MEMBERS,
+      ],
+    });
 
     (this.name = name), (this.token = token), (this.uri = uri);
 
@@ -24,35 +30,29 @@ export default class CustomClient extends Client {
     this.slashCommands = []; // Make a new arr for commands to forward to discord.
   }
 
-
   async loadCog(this: CustomClient, cPath: string = `./commands`) {
-
-
-    let files = fs.readdirSync(cPath)
+    let files = fs.readdirSync(cPath);
     let newPath: string;
 
-  
     files.forEach((file) => {
-      newPath = cPath + '/' + file
+      newPath = cPath + "/" + file;
       if (fs.statSync(newPath).isDirectory()) {
-        this.loadCog(newPath)
+        this.loadCog(newPath);
       } else {
-        if (file.endsWith('.js')) {
-          console.log(`.${newPath}`)
+        if (file.endsWith(".js")) {
+          console.log(`.${newPath}`);
           const command = require(`.${newPath}`);
-          const cmd = new command()
-    
-          console.info( "[c] "+ this.name + " has loaded command: " + cmd.data.name + ".");
-          console.log(cmd.data.toJSON())
+          const cmd = new command();
+
+          console.info(
+            "[c] " + this.name + " has loaded command: " + cmd.data.name + "."
+          );
+          console.log(cmd.data.toJSON());
           this.slashCommands.push(cmd.data.toJSON());
           this.commands.set(cmd.data.name, cmd);
-
         }
-
       }
-    })
-    
-
+    });
   }
 
   /**
@@ -77,7 +77,7 @@ export default class CustomClient extends Client {
      * I just gave myself a brain tumor writing loadCog. I tried to copy my py code and translate it to js but it didnt work because I am ass at js and py is alot better please discord.py come back.
      */
 
-    await this.loadCog(cPath)
+    await this.loadCog(cPath);
 
     /*
 
@@ -110,28 +110,28 @@ export default class CustomClient extends Client {
         ),
         { body: this.slashCommands }
       );
-      console.info("[c] Delivered Slash commands to Discord. GUILD_ID: " + process.env.GUILD_ID)
+      console.info(
+        "[c] Delivered Slash commands to Discord. GUILD_ID: " +
+          process.env.GUILD_ID
+      );
     } catch (e) {
       console.error(e);
       console.info(this.name + " could not send Discord / commands...");
     }
-    
   }
 
   eventsLoader(this: CustomClient, path: string = "./listeners") {
-
     const eventFiles = fs
       .readdirSync(path)
       .filter((file) => file.endsWith(".js"));
 
     for (const file of eventFiles) {
       const event = require(`.${path}/${file}`);
-      const ev = new event()
+      const ev = new event();
 
-      console.log("[l]" + `${this.name} has loaded listener: ${ev.name}.` )
+      console.log("[l]" + `${this.name} has loaded listener: ${ev.name}.`);
 
       if (ev.once) {
-        
         super.once(ev.name, (...args) => ev.execute(this, ...args));
       } else {
         super.on(ev.name, (...args) => ev.execute(this, ...args));
