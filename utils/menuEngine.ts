@@ -21,12 +21,12 @@ class menuSingles extends MessageEmbed {
   rowCol: Array<MessageActionRow>; // messageActionRow
   constructor(single, count = null) {
     super();
-
+    
     /**
      * This whole loop just goes through each key values and replaces the value of it with the one from the JSON file. There is probably a function that does this automatically...
      * but I don't know about it.
      */
-
+    
     for (const pairs of Object.entries(single.embed)) // makes a key, value array. ["key", "value"], ["key", "value"]
       super.hasOwnProperty(pairs[0]) // remember, super is the messageEmbed Class so it got the same properties as our json embed. ex: color, title, description, fields, etc..
         ? (super[pairs[0]] = single.embed[pairs[0]]) // replacees it with the json field values.
@@ -135,7 +135,7 @@ export default class Menu extends EventEmitter {
   public async start() {
   
     this.interaction.reply({
-      embeds: [this.slides[0]],
+      embeds: [this.slides[this.index]],
       components: await this.action(),
       //ephemeral: this.ephemeral
     });
@@ -248,6 +248,10 @@ export default class Menu extends EventEmitter {
     this.buttonCollector.on("collect", (interaction: ButtonInteraction) => {
       const button = interaction.customId.match(/(\d{1,1})/g)[0];
       this.emit("buttonCollected", button)
+      this.buttonCollector.on('end', () => {
+        this.end()
+      
+      });
 
       switch (parseInt(button)) {
         case 0:
@@ -279,16 +283,26 @@ export default class Menu extends EventEmitter {
       time: 60000,
     });
     this.selectCollector.on("collect", (interaction: SelectMenuInteraction) => {
-      const index = interaction.customId.match(/(\d{1,1})/g)[0];
-      this.emit("selectCollected", index)
-      this.setPage(interaction.values[index]);
+      let collectedIndex = parseInt(interaction.values[0])
+      if (this.index == collectedIndex) return
+      this.emit("selectCollected", collectedIndex)
+      this.setPage(collectedIndex);
+    });
+
+    this.selectCollector.on('end', () => {
+      this.end()
+      
     });
   }
 
   public async end() {
-    this.emit("stop")
-    this.selectCollector.stop()
-    this.buttonCollector.stop()
+    this.emit("end")
+    if (!this.selectCollector.ended || !this.buttonCollector.ended) {
+      this.selectCollector.stop()
+      this.buttonCollector.stop()
+    
+    }
+ 
    
     
   }

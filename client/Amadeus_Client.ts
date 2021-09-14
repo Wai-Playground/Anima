@@ -1,3 +1,5 @@
+
+
 require("dotenv").config();
 const fs = require("fs");
 const { Client, Collection, Intents } = require("discord.js");
@@ -10,6 +12,7 @@ export default class CustomClient extends Client {
    * @param {*} name | Name of the bot.
    * @param {*} backup_prefix | Default = "-"
    */
+
   constructor(name: string = "Bot", token: string, uri: string) {
     super({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.GUILD_MEMBERS] });
 

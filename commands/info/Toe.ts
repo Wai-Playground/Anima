@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
 
-import { Commands } from "../client/Amadeus_Commands";
-import game_model from "../db_schemas/toe";
+import { Commands } from "../../client/Amadeus_Commands";
+import game_model from "../../db_schemas/toe";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageActionRow, MessageButton } = require("discord.js");
 

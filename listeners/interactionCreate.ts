@@ -9,8 +9,9 @@ class interactionCreate extends Listeners {
   }
 
   async execute(bot: CustomClient, interaction) {
-    console.log("interaction")
+    
     if (!interaction.isCommand()) return;
+    console.log(interaction.user.username + " used " + interaction.commandName)
 
     if (!bot.commands.has(interaction.commandName)) return;
 
