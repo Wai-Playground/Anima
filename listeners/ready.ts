@@ -1,6 +1,6 @@
 import { ClientUser } from "discord.js";
 import CustomClient from "../client/Amadeus_Client";
-import { Listeners } from "../client/listeners";
+import { Listeners } from "../client/Amadeus_listeners";
 import bot_model from "../db_schemas/bot_type";
 
 class Ready extends Listeners {

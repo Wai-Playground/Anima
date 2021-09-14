@@ -1,3 +1,4 @@
+import { lstat, stat, statSync } from "fs";
 
 
 require("dotenv").config();
@@ -6,6 +7,7 @@ const { Client, Collection, Intents } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const mongoose = require("mongoose");
+const path = require('path')
 export default class CustomClient extends Client {
   /**
    * Description | Custom Client.
@@ -22,11 +24,42 @@ export default class CustomClient extends Client {
     this.slashCommands = []; // Make a new arr for commands to forward to discord.
   }
 
+
+  async loadCog(this: CustomClient, cPath: string = `./commands`) {
+
+
+    let files = fs.readdirSync(cPath)
+    let newPath: string;
+
+  
+    files.forEach((file) => {
+      newPath = cPath + '/' + file
+      if (fs.statSync(newPath).isDirectory()) {
+        this.loadCog(newPath)
+      } else {
+        if (file.endsWith('.js')) {
+          console.log(`.${newPath}`)
+          const command = require(`.${newPath}`);
+          const cmd = new command()
+    
+          console.info( "[c] "+ this.name + " has loaded command: " + cmd.data.name + ".");
+          console.log(cmd.data.toJSON())
+          this.slashCommands.push(cmd.data.toJSON());
+          this.commands.set(cmd.data.name, cmd);
+
+        }
+
+      }
+    })
+    
+
+  }
+
   /**
    * Description | Loading Commands.
    * @param this | CustomClient
    */
-  async commandLoader(this: CustomClient, path: string = `./commands`) {
+  async commandLoader(this: CustomClient, cPath: string = `./commands`) {
     /**
      * Read carefully. I am too tired to fix this now but here:
      * @error | look at path. It's "./commands" is wrong, since we are in
@@ -40,12 +73,24 @@ export default class CustomClient extends Client {
      * Please fix when you are ready cause I sure aint.
      */
 
+    /**
+     * I just gave myself a brain tumor writing loadCog. I tried to copy my py code and translate it to js but it didnt work because I am ass at js and py is alot better please discord.py come back.
+     */
+
+    await this.loadCog(cPath)
+
+    /*
+
     const commandFiles = fs
-      .readdirSync(path)
-      .filter((file) => file.endsWith(".js")); // Read commands from ./commands.
+      .readdirSync(path).filter(file => {
+        file.endsWith(".js")
+      })
+      
 
     for (const file of commandFiles) {
+      
       const command = require(`.${path}/${file}`);
+  
       const cmd = new command()
 
       console.info( "[c] "+ this.name + " has loaded command: " + cmd.data.name + ".");
@@ -53,6 +98,7 @@ export default class CustomClient extends Client {
       this.slashCommands.push(cmd.data.toJSON());
       this.commands.set(cmd.data.name, cmd);
     }
+    */
 
     const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 
@@ -69,6 +115,7 @@ export default class CustomClient extends Client {
       console.error(e);
       console.info(this.name + " could not send Discord / commands...");
     }
+    
   }
 
   eventsLoader(this: CustomClient, path: string = "./listeners") {

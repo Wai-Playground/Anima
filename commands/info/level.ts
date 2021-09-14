@@ -2,9 +2,9 @@ import { Client, CommandInteraction } from "discord.js";
 import { Commands } from "../../client/Amadeus_Commands";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
-export class Ping extends Commands {
+class Level extends Commands {
   constructor() {
-    super("ping", {
+    super("level", {
       description: "For pinging the bot.",
       data: new SlashCommandBuilder(),
       dbRequired: false,
@@ -18,3 +18,5 @@ export class Ping extends Commands {
     return interaction.reply({ content: "Pong!", ephemeral: true });
   }
 }
+
+export = Level;

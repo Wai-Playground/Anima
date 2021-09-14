@@ -4,8 +4,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 import CustomClient from "../../client/Amadeus_Client";
 
 import Menu from "../../utils/menuEngine";
-
-export class Help extends Commands {
+class Help extends Commands {
   bot: CustomClient
   constructor() {
     super("help", {
@@ -68,6 +67,7 @@ export class Help extends Commands {
   }
 
   public async execute(bot: CustomClient, interaction: CommandInteraction) {
+    interaction.reply("ok")
 
     let data = []
     let commandOption = interaction.options.getString("command");
@@ -110,3 +110,4 @@ export class Help extends Commands {
 
 
 }
+export = Help;
