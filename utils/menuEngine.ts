@@ -100,8 +100,8 @@ export default class Menu extends EventEmitter {
     this.interaction = interaction;
     this.user = interaction.user;
 
-    this.filter = (i) => {
-      i.deferUpdate();
+    this.filter = async (i) => {
+      await i.deferUpdate();
       return i.user.id === interaction.user.id;
     };
 

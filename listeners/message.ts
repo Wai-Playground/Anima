@@ -18,53 +18,10 @@ class Message extends Listeners {
 		this.checkBotTag(bot, msg)
 		this.distExp(bot, msg, user)
 
-		//his.kurisu(bot, msg)
-        
-        
-
-
-
 	}
-
-	async kurisu(bot: CustomClient, msg) {
-
-		const payload = {
-			inputs: {
-				text: msg.content
-			}
-		}
-
-		const headers = {
-			'Authorization': 'Bearer ' +
-			process.env.HUGGINGFACE_TOKEN
-		}
-
-		//msg.channel.startTyping();
-		const response = await fetch(process.env.API_URL, {
-			method: 'post',
-			body: JSON.stringify(payload),
-			headers: headers
-		})
-
-		const data = await response.json();
-		console.log(data.generated_text)
-		let botRes = (data.hasOwnProperty('generated_text') ? data.generated_text : data.error);
-
-		
-		msg.reply(botRes)
-
-
-		
-		
-
-	}
-
 	checkBotTag(bot: CustomClient, msg) {
 		
-		if (msg.mentions.has(bot.user.id)) {
-			msg.reply("Yo")
-
-		}
+		if (msg.mentions.has(bot.user.id)) return;
 
 
 	}

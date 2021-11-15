@@ -1,9 +1,17 @@
+import { InteractionResponseType } from "@discordjs/builders/node_modules/discord-api-types";
 import {
+  ButtonInteraction,
   Channel,
   CommandInteraction,
+  Interaction,
+  InteractionType,
+  MessageComponentType,
+  SelectMenuInteraction,
   TextBasedChannels,
   User,
 } from "discord.js";
+import { InteractionResponseTypes, InteractionTypes } from "discord.js/typings/enums";
+import { RawInteractionData } from "discord.js/typings/rawDataTypes";
 import { EventEmitter } from "events";
 import { nextTick } from "process";
 import Queries from "./queries";
@@ -18,8 +26,8 @@ import Character from "./tomoClasses/characters";
  */
 class engineBase extends EventEmitter {
   discUserObj: User; // Discord User Object.
-  interaction: CommandInteraction // Discord Interactions Objects.
-  channel: Channel | TextBasedChannels; // Discord Channel Object.
+  interaction: CommandInteraction & ButtonInteraction | SelectMenuInteraction // Discord Interactions Objects.
+  channel: Channel & TextBasedChannels; // Discord Channel Object.
 
   constructor(
     user: User,
@@ -72,7 +80,6 @@ class engineBase extends EventEmitter {
   }
 
   async getUserUni(_id: String | number = null) {
-
     return await Queries.userUniverse(_id == undefined ? this.discUserObj.id : _id); //If the _id is not passed, use interaction user id.
   }
 

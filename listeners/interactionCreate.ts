@@ -1,3 +1,4 @@
+import { Interaction } from "discord.js";
 import CustomClient from "../client/Amadeus_Client";
 import { Listeners } from "../client/Amadeus_listeners";
 
@@ -8,7 +9,7 @@ class interactionCreate extends Listeners {
     });
   }
 
-  async execute(bot: CustomClient, interaction) {
+  async execute(bot: CustomClient, interaction: Interaction) {
     
     if (!interaction.isCommand()) return;
     console.log(interaction.user.username + " used " + interaction.commandName)

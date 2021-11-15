@@ -1,5 +1,6 @@
 import { Client, CommandInteraction } from "discord.js";
 import user from "../db_schemas/user_type";
+import { UserNotFoundError } from "../tomoEngine/statics/errors";
 import Amadeus_Base from "./Amadeus_Base";
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
@@ -59,20 +60,23 @@ export abstract class Commands extends Amadeus_Base {
     }
     
     if (this.dbRequired) {
-      const author = await user.findOne({_id: interaction.user.id})
-      if (!author) {
+      try {
+        const author = await user.findOne({_id: interaction.user.id});
+        if (!author) throw new UserNotFoundError(interaction.user.id, "users");
+        
+
+      } catch (error) {
+
         const author_db = new user({
           _id: interaction.user.id,
           name: interaction.user.username,
           xp: 0,
           lvl: 1
         }) 
-
-        author_db.save()
-        interaction.reply("Sorry, you weren't on the list, try again!")
-        return false;
+        await author_db.save();
+        
+      
       }
-
     }
     return true;
   }
