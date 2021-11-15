@@ -1,0 +1,327 @@
+/**
+ * Wai Hlaing 2021
+ * Menu-Handler Amadeus
+ */
+
+ import {
+    ButtonInteraction,
+    CommandInteraction,
+    Interaction,
+    MessageActionRow,
+    MessageButton,
+    //MessageSelectMenu,
+    //SelectMenuInteraction,
+    User,
+  } from "discord.js";
+  import { EventEmitter } from "events";
+import engineBase from "./base";
+
+
+  
+  
+  class novelSingles {
+    index: number; // keeps track of the sigle index.
+    //rowCol: Array<MessageActionRow>; // messageActionRow
+    text: string;
+    character: number;
+    background: number;
+    constructor(single, count = null) {
+      this.index = single.index || count;
+      this.character = single.character;
+      this.text = single.text || null;
+      this.background = single.bg;
+      
+  
+      /*
+      if (single.hasOwnProperty("actions")) {
+        this.rowCol = [];
+  
+        for (const actions of single.actions) {
+          const row = new MessageActionRow();
+          //if (actions.hasOwnProperty("buttons")) return
+          
+  
+          if (actions.hasOwnProperty("selectMenu")) {
+            const menu = actions.selectMenu;
+            if (menu == ("build" || undefined)) return; //Place holder
+            row.addComponents(
+              // message components are too new for me so I am just gonna stick with the builders.
+              new MessageSelectMenu()
+                .setCustomId("select_number_" + count.toString() + "_row_" + this.rowCol.length)
+                .setPlaceholder("None Selected")
+                .addOptions(menu)
+            );
+          } else if (actions.hasOwnProperty("buttons")) {
+            if (actions.buttons == ("build" || undefined)) return;
+            for (const button of actions.buttons) {
+              
+              row.addComponents(
+                // buttons are just like rows but clickable. 
+                new MessageButton()
+                .setCustomId("button_" + count.toString() + "_row_" + this.rowCol.length)
+                .setLabel(button.label)
+                .setEmoji(button.emoji)
+                .setStyle(button.style)
+               
+              )
+  
+            }
+            
+  
+          }
+  
+          this.rowCol.push(row);
+        }
+      }*/
+    }
+  }
+  
+  export default class Novel extends engineBase {
+
+    slides: Array<novelSingles>;
+    json: any;
+    index: number;
+    user: User;
+    message: any;
+    selectCollector: any;
+    buttonCollector: any;
+    filter: any;
+    ephemeral: boolean;
+    characters: Array<any>;
+    backgrounds: Array<any>;
+    constructor(json, interaction: CommandInteraction) {
+      super(interaction.user, interaction);
+    
+  
+      if (!json) return;
+  
+      this.json = json;
+      this.index = 0;
+      this.interaction = interaction;
+      this.user = interaction.user;
+      this.ephemeral = (this.json.hasOwnProperty("ephemeral") ? this.json.ephemeral : false)
+
+      this.interaction.deferReply({ ephemeral: this.ephemeral })
+  
+      this.filter = (i: any) => {
+        i.deferUpdate();
+        return i.user.id === interaction.user.id;
+      };
+  
+      this.slides = [];
+      this.characters = []
+      this.backgrounds = [];
+
+      var db_holder: any, single_holder: novelSingles;
+
+      let count: number = 0;
+
+      this.json.characters.forEach(async (chars: number) => {
+        db_holder = await super.getCharacter(chars)
+        this.characters.push(db_holder);
+        
+        
+      })
+
+      this.json.backgrounds.forEach(async (bgs: number) => {
+        db_holder = await super.getBackground(bgs)
+        this.backgrounds.push(db_holder);
+        
+        
+      })
+  
+      /**
+       * For each single cells in the array of multiples, we loop to get the class representation of it. The class's parent is a messegeEmbed so we can send it easily as well.
+       */
+  
+      this.json.multiples.forEach(async (singles) => {
+
+        
+        single_holder = new novelSingles(singles, count);
+        
+        
+
+        for (var prop in single_holder) {
+          if (single_holder.hasOwnProperty(prop) && single_holder[prop] == undefined) {
+            single_holder[prop] = this.slides[count - 1][prop]
+          }
+          
+        }
+        //console.log(single_holder)
+        this.slides.push(single_holder);
+  
+        count++; // why is this red.
+
+
+        if (count == this.json.multiples.length) {
+          /**
+           * Trickiest bug, it was emitting before there were any listeners hooked so it was effectively useless. delaying it to send a pulse after the listeners are hooked did the job. Thanks to Xetera#0001 for helping me out.
+           */
+  
+          process.nextTick(() => {
+            this.emit("ready", this.slides);
+          });
+        }
+
+      });
+
+
+    }
+    /**
+     * Starts the engine.
+     */
+  
+    public async start() {
+      //console.log(this.backgrounds.length)
+    
+      await this.interaction.reply({
+        content: `\n` + this.slides[this.index].text,
+        components: await this.action(),
+        //ephemeral: this.ephemeral
+      });
+  
+      this.message = await this.interaction.fetchReply();
+      this.collectButton(this.filter);
+      //this.collectSelect(this.filter);
+    }
+  
+    /**
+     * Sets the index to the specified page and then edits the message.
+     * @param page number | index number
+     */
+  
+    public async setPage(page: any = 0) {
+      
+      if (page < 0 || page > this.slides.length - 1) return;
+  
+      this.index = page;
+      this.emit("set", this.index)
+  
+      this.interaction.editReply({
+        content: `\n` + this.slides[this.index].text,
+        components: await this.action(),
+        
+        
+      });
+  
+    }
+  
+    private async action() {
+      /*
+      type chapters = {
+        label: string;
+        value: string;
+        description: string;
+      };
+      */
+
+/*  
+      const selectRow = new MessageActionRow().addComponents(
+        new MessageSelectMenu()
+          .setCustomId(
+            "MENU.select_" + this.index.toString() + "_user_" + this.user.id
+          )
+          .setPlaceholder("Select a page")
+          .addOptions(chapters)
+      );
+  */
+      const buttons = [
+        {
+          disabled: this.index > 0 ? false : true,
+          label: "Back",
+          style: 1,
+        },
+        {
+          disabled: this.index >= this.slides.length - 1 ? true : false,
+          label: "Next",
+          style: 1,
+        },
+        {
+          disabled: this.ephemeral,
+          label: "Done",
+          emj: "<:trash:886429816260280374>",
+          style: 4,
+        },
+      ];
+  
+      let i = 0;
+      const buttonRow = new MessageActionRow();
+  
+      for (const button of buttons) {
+        buttonRow.addComponents(
+          new MessageButton()
+            .setDisabled(
+              button.hasOwnProperty("disabled") ? button.disabled : false
+            )
+            .setCustomId("NOVEL.button_" + i.toString() + "_user_" + this.user.id)
+            .setLabel(button.hasOwnProperty("label") ? button.label : null)
+            .setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
+            .setStyle(button.style)
+        );
+        i++;
+      }
+      return [/*selectRow,*/ buttonRow];
+    }
+  
+    private async collectButton(filter) {
+      this.buttonCollector = this.message.createMessageComponentCollector({
+        filter,
+        componentType: "BUTTON",
+        time: 60000,
+      });
+      this.buttonCollector.on("collect", (interaction: ButtonInteraction) => {
+        const button = interaction.customId.match(/(\d{1,1})/g)[0];
+        this.emit("buttonCollected", button)
+        this.buttonCollector.on('end', () => {
+          this.emit("end");
+        
+        });
+  
+        switch (parseInt(button)) {
+          case 0:
+            this.setPage(this.index - 1)
+  
+            break;
+          case 1:
+            this.setPage(this.index + 1)
+            break;
+          case 2:
+            this.end()
+            break;
+  
+        }
+      });
+    }
+  /*
+    private async collectSelect(filter) {
+      this.selectCollector = this.message.createMessageComponentCollector({
+        filter,
+        componentType: "SELECT_MENU",
+        time: 60000,
+      });
+      this.selectCollector.on("collect", (interaction: SelectMenuInteraction) => {
+        let collectedIndex = parseInt(interaction.values[0])
+        if (this.index == collectedIndex) return
+        this.emit("selectCollected", collectedIndex)
+        this.setPage(collectedIndex);
+      });
+  
+      this.selectCollector.on('end', () => {
+        this.end()
+        
+      });
+    }
+    */
+  
+    public async end() {
+      this.emit("end")
+      if ( /*!this.selectCollector.ended || */!this.buttonCollector.ended) {
+        //this.selectCollector.stop()
+        await this.buttonCollector.stop()
+      
+      }
+   
+     
+      
+    }
+  }

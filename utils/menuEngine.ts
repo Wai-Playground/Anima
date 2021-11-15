@@ -18,7 +18,7 @@ import { EventEmitter } from "events";
 
 class menuSingles extends MessageEmbed {
   index: number; // keeps track of the sigle index.
-  rowCol: Array<MessageActionRow>; // messageActionRow
+  //rowCol: Array<MessageActionRow>; // messageActionRow
   constructor(single, count = null) {
     super();
     
@@ -89,7 +89,7 @@ export default class Menu extends EventEmitter {
   selectCollector: any;
   buttonCollector: any;
   filter: any;
-  //ephemeral: boolean;
+  ephemeral: boolean;
   constructor(json, interaction: CommandInteraction) {
     super();
 
@@ -106,7 +106,7 @@ export default class Menu extends EventEmitter {
     };
 
     this.slides = [];
-    //this.ephemeral = (this.json.hasOwnProperty("ephemeral") ? this.json.ephemeral : false)
+    this.ephemeral = (this.json.hasOwnProperty("ephemeral") ? this.json.ephemeral : false)
     let count = 0;
 
     /**
@@ -118,7 +118,7 @@ export default class Menu extends EventEmitter {
 
       count++; // why is this red.
 
-      if (count == this.json.multiples.length)
+      if (count == this.json.multiples.length) {
         /**
          * Trickiest bug, it was emitting before there were any listeners hooked so it was effectively useless. delaying it to send a pulse after the listeners are hooked did the job. Thanks to Xetera#0001 for helping me out.
          */
@@ -126,6 +126,7 @@ export default class Menu extends EventEmitter {
         process.nextTick(() => {
           this.emit("ready", this.slides);
         });
+      }
     });
   }
   /**
@@ -137,7 +138,7 @@ export default class Menu extends EventEmitter {
     this.interaction.reply({
       embeds: [this.slides[this.index]],
       components: await this.action(),
-      //ephemeral: this.ephemeral
+      ephemeral: this.ephemeral
     });
 
     this.message = await this.interaction.fetchReply();
@@ -154,6 +155,7 @@ export default class Menu extends EventEmitter {
     if (page < 0 || page > this.slides.length - 1) return;
 
     this.index = page;
+    this.emit("set", this.index)
 
     this.interaction.editReply({
       embeds: [this.slides[page]],
@@ -214,6 +216,7 @@ export default class Menu extends EventEmitter {
         style: 2,
       },
       {
+        disabled: this.ephemeral,
         label: "Done",
         emj: "<:trash:886429816260280374>",
         style: 4,
@@ -249,7 +252,7 @@ export default class Menu extends EventEmitter {
       const button = interaction.customId.match(/(\d{1,1})/g)[0];
       this.emit("buttonCollected", button)
       this.buttonCollector.on('end', () => {
-        this.end()
+        this.emit("end");
       
       });
 
@@ -290,7 +293,7 @@ export default class Menu extends EventEmitter {
     });
 
     this.selectCollector.on('end', () => {
-      this.end()
+      this.emit("end");
       
     });
   }
@@ -298,8 +301,8 @@ export default class Menu extends EventEmitter {
   public async end() {
     this.emit("end")
     if (!this.selectCollector.ended || !this.buttonCollector.ended) {
-      this.selectCollector.stop()
-      this.buttonCollector.stop()
+      await this.selectCollector.stop()
+      await this.buttonCollector.stop()
     
     }
  

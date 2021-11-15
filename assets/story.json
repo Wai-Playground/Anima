@@ -1,0 +1,32 @@
+{
+    "name": "lol",
+    "characters": [0, 1, 2],
+    "backgrounds": [0, 1],
+
+    "multiples": [
+        {
+            "bg": 0,
+            "character": 1,
+            "text": "omg I am finally out of my mother's basement!"
+
+        },
+
+        {
+            "text": "is that a women?"
+
+        },
+        {
+            "character": 2,
+            "text": "ew is that a neckbeard?"
+        },
+        {
+            "text": "get away creep"
+            
+        },
+        {
+            "bg": 1,
+            "character": 0,
+            "text": "He died a virgin."
+        }
+    ]
+}

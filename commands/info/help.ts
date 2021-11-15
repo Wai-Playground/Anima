@@ -16,7 +16,7 @@ class Help extends Commands {
             .setDescription("Optional | If you want a list of all commands or ")
             .setRequired(false)
         ),
-      dbRequired: false,
+      dbRequired: true,
       ownerOnly: false,
     });
     
@@ -59,17 +59,13 @@ class Help extends Commands {
       i++;
     }
 
-
-    
-    
-
     return [ret, index];
   }
 
   public async execute(bot: CustomClient, interaction: CommandInteraction) {
-    interaction.reply("ok")
+    
 
-    let data = []
+    let data = [];
     let commandOption = interaction.options.getString("command");
 
     let command: Commands = bot.commands.get(commandOption) || null
@@ -93,19 +89,19 @@ class Help extends Commands {
       }
 
     })
-    let menu = new Menu({multiples: data[0]}, interaction)
-    console.log(data)
+    let menu = new Menu({multiples: data[0], ephemeral: false}, interaction)
+    
     menu.once("ready", () => {
       menu.index = data[1];
-      menu.start()
+      menu.start();
     })
-    menu.once("end", () => {
-      interaction.deleteReply()
-    })
-    
 
-    
-    
+    menu.once("end", () => {
+      console.log("going to END")
+      interaction.deleteReply()  .then(console.log)
+      .catch(console.error);
+    })
+
   }
 
 

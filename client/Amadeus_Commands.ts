@@ -1,9 +1,10 @@
-import { Client, GuildMember, User } from "discord.js";
+import { Client, CommandInteraction } from "discord.js";
 import user from "../db_schemas/user_type";
+import Amadeus_Base from "./Amadeus_Base";
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
-export class Commands {
+export abstract class Commands extends Amadeus_Base {
   name: string = null;
   data: typeof SlashCommandBuilder = new SlashCommandBuilder();
   description: string = null;
@@ -11,16 +12,21 @@ export class Commands {
   ownerOnly: boolean = false;
   checks: Function = null;
   disabled: boolean = false;
+  inGuildOnly: boolean = false;
+  inMainOnly: boolean = false;
 
   constructor(
     name: string,
     settings: {
       description: string,
       data: typeof SlashCommandBuilder;
-      dbRequired: boolean;
-      ownerOnly: boolean;
+      dbRequired?: boolean;
+      ownerOnly?: boolean;
+      inGuildOnly?: boolean;
+      inMainOnly?: boolean ;
     }
   ) {
+    super()
     this.name = name.toLowerCase();
     this.data = settings.data;
     ///console.log(settings.description)
@@ -30,20 +36,25 @@ export class Commands {
     this.dbRequired = settings.dbRequired;
     this.ownerOnly = settings.ownerOnly;
     this.description = settings.description.toString();
+    this.inGuildOnly = settings.inGuildOnly;
+    this.inMainOnly = settings.inMainOnly;
 
     
 
   }
 
-  async check(bot, interaction) {
+  async check(bot: Client, interaction: CommandInteraction) {
     return true;
   }
 
-  async default_checks(bot, interaction) {
+  async default_checks(bot: Client, interaction: CommandInteraction) {
+
+    if (this.disabled) return interaction.reply("Sorry, this command is disabled.")
 
     if (this.ownerOnly) {
-      const ret = (interaction.user.id == process.env.OWNER_ID ? true : false)
-      if (!ret) return interaction.reply("Sorry, this is for the owner only. Try again when you become the owner I guess.")
+      console.log(interaction.user.id == process.env.OWNER_ID) // if true then bottom is false
+      
+      if (interaction.user.id == process.env.OWNER_ID ? false : true) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
       
     }
     
@@ -61,9 +72,6 @@ export class Commands {
         interaction.reply("Sorry, you weren't on the list, try again!")
         return false;
       }
-
-      
-
 
     }
     return true;
