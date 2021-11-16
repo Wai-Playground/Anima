@@ -27,11 +27,6 @@ class Test extends Commands {
   }
 
   async execute(bot , interaction: CommandInteraction) {
-
-    const char1: Character = new Character(323, await Queries.character(323));
-
-    await char1.getVariant("sad")
-    /*
     
 
     const buttonRow = new MessageActionRow();
@@ -66,7 +61,7 @@ class Test extends Commands {
         
 
       });
-      */
+      
       
     
     /*

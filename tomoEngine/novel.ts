@@ -18,6 +18,7 @@ class NodeSingle implements single {
   characterID: number;
   backgroundID: number;
   text: string;
+  mood?: string;
   isChoiced: boolean;
 
   constructor(single: single, index: number = null) {
@@ -25,6 +26,7 @@ class NodeSingle implements single {
     this.characterID = single.character;
     this.backgroundID = single.bg;
     this.text = single.text;
+    this.mood = single.hasOwnProperty("mood") ? single.mood : null;
 
     this.isChoiced = single.hasOwnProperty("args") ? true : false;
     if (this.isChoiced) {
@@ -32,9 +34,11 @@ class NodeSingle implements single {
       for (const argument of single.args) {
         console.log(argument)
 
-
-
       }
+    }
+
+    if (this.mood) {
+
     }
   }
 }
@@ -62,7 +66,8 @@ export default class Novel extends engineBase {
     // Declare variables.
     this.json = json;
     this.interaction = interaction;
-    this.backgrounds = this.characters = new Map();
+    this.backgrounds = new Map();
+    this.characters = new Map();
     this.nodes = [];
     this.prepareAssets();
   }
@@ -74,12 +79,13 @@ export default class Novel extends engineBase {
    */
 
   async prepareAssets() {
-    // Purpose | process the multiples.
+    // Purpose | process t he multiples.
 
     this.multiples = this.json.hasOwnProperty("multiples")
       ? this.json.multiples
       : null;
 
+      /*
     // Purpose | process the characters.
 
     if (this.json.hasOwnProperty("characters")) {
@@ -95,6 +101,7 @@ export default class Novel extends engineBase {
         this.backgrounds.set(id, await this.getBackground(id));
       }
     }
+    */
 
     //Purpose | For each single, we create a new Node and add it to our Node array.
 
@@ -118,7 +125,7 @@ export default class Novel extends engineBase {
    */
 
   async start() {
-    console.log(this.nodes[2]);
+    console.log(this.characters);
 
     if (this.interaction.deferred) {
       await this.interaction.editReply({

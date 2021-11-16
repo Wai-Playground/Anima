@@ -7,7 +7,7 @@ import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
     constructor(_id: number, payload: characterPayload) {
-        super(_id, 'character', payload.name)
+        super(_id, 'character', payload.name, payload.variant.isVariant)
 
         
     }

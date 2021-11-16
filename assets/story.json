@@ -17,6 +17,7 @@
         },
         {
             "character": 2,
+            "mood": "sad",
             "text": "What do you want?",
             "args": [{
                 "text": "Who is",
