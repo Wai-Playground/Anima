@@ -3,27 +3,46 @@
  * I am going to actively try to comment instead of going with the flo
  */
 
-import { ButtonInteraction, CommandInteraction, SelectMenuInteraction } from "discord.js";
+import {
+  ButtonInteraction,
+  CommandInteraction,
+  SelectMenuInteraction,
+} from "discord.js";
 import engineBase from "./base";
 import { single } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
+import Character from "./tomoClasses/characters";
 
-class NodeSingle {
+class NodeSingle implements single {
+  index: number;
   characterID: number;
   backgroundID: number;
-  displayText: string;
+  text: string;
+  isChoiced: boolean;
 
   constructor(single: single, index: number = null) {
+    this.index = single.index || index;
     this.characterID = single.character;
     this.backgroundID = single.bg;
-    this.displayText = single.text;
+    this.text = single.text;
+
+    this.isChoiced = single.hasOwnProperty("args") ? true : false;
+    if (this.isChoiced) {
+      // For each argument in args, we put them in an array.
+      for (const argument of single.args) {
+        console.log(argument)
+
+
+
+      }
+    }
   }
 }
 
 export default class Novel extends engineBase {
   json: any;
-  backgrounds: Array<any>;
-  characters: Array<any>;
+  backgrounds: Map<number, Background>;
+  characters: Map<number, Character>;
   multiples: Array<single>;
   nodes: Array<NodeSingle>;
   /**
@@ -32,34 +51,66 @@ export default class Novel extends engineBase {
    * @param interaction | Interaction class to get information about user, channel, etc.
    */
 
-  constructor(json: Object, interaction: CommandInteraction & ButtonInteraction | SelectMenuInteraction) {
+  constructor(
+    json: object,
+    interaction:
+      | (CommandInteraction & ButtonInteraction)
+      | SelectMenuInteraction
+  ) {
     super(interaction.user, interaction);
-    // Declaring Variables
 
-    this.backgrounds = this.characters = this.nodes = []; // all are arrays of different types.
+    // Declare variables.
     this.json = json;
-    this.multiples = (
-      this.json.hasOwnProperty("multiples") ? this.json.multiples : null
-    ) as Array<single>;
-
     this.interaction = interaction;
-
-    /**
-     * Purpose | For each single, we create a new Node and add it to our Node array.
-     */
-    this.multiples.forEach((singles: single) => {
-      this.nodes.push(new NodeSingle(singles));
-    });
-
-    /**
-     * Purpose | Load background and store it in the array.
-     */
-
-    process.nextTick(() => {
-      // On next cycle we emit Ready since the listener activates later than the emitter.
-      this.emitReady();
-    });
+    this.backgrounds = this.characters = new Map();
+    this.nodes = [];
+    this.prepareAssets();
   }
+
+  /**
+   * Name | prepareAssets();
+   * Purpose | prepares the assets.
+   * Description | gets called from the constructor.
+   */
+
+  async prepareAssets() {
+    // Purpose | process the multiples.
+
+    this.multiples = this.json.hasOwnProperty("multiples")
+      ? this.json.multiples
+      : null;
+
+    // Purpose | process the characters.
+
+    if (this.json.hasOwnProperty("characters")) {
+      for (const id of this.json.characters) {
+        this.characters.set(id, await this.getCharacter(id));
+      }
+    }
+
+    // Purpose | process the backgrounds.
+
+    if (this.json.hasOwnProperty("backgrounds")) {
+      for (const id of this.json.backgrounds) {
+        this.backgrounds.set(id, await this.getBackground(id));
+      }
+    }
+
+    //Purpose | For each single, we create a new Node and add it to our Node array.
+
+    this.multiples.forEach((singles: single, index: number) => {
+      this.nodes.push(new NodeSingle(singles, index));
+    });
+    console.log(this.nodes.length == this.multiples.length);
+    if (this.nodes.length == this.multiples.length) {
+      process.nextTick(() => {
+        this.emit("ready");
+      });
+    }
+
+    // Purpose | Load background and store it in the array.
+  }
+
   /**
    * Name | start();
    * Purpose | Starts the engine.
@@ -67,15 +118,20 @@ export default class Novel extends engineBase {
    */
 
   async start() {
-    const bg1: Background = await this.getBackground(0);
-    console.log(bg1.name);
+    console.log(this.nodes[2]);
 
     if (this.interaction.deferred) {
-        await this.interaction.editReply({ content: 'A button was clicked!', components: [] });
+      await this.interaction.editReply({
+        content: "A button was clicked!",
+        components: [],
+      });
     } else {
-        await this.interaction.reply({ content: 'A button was clicked!', components: [] });
-        
+      await this.interaction.reply({
+        content: "A button was clicked!",
+        components: [],
+      });
     }
-
   }
+
+  async setPage(index: number = 0) {}
 }

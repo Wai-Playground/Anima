@@ -2,25 +2,25 @@
  * @author Shokkunn
  */
 
+import { characterPayload, moodType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
-    constructor(_id: number, payload: {
-        _id: number,
-        variant: {
-            isVariant: boolean,
-            variantUse?: string,
-            originalID?: number
-        },
-        name: string,
-        age?: number,
-        bloodtype?: string,
-        description?: string,
-        link: string
-      }) {
+    constructor(_id: number, payload: characterPayload) {
         super(_id, 'character', payload.name)
 
         
     }
+    /**
+     * getVariant()
+     * @param moodType | mood you want to query.
+     * @returns character class that has the mood that you queried.
+     */
+
+    async getVariant(moodType: moodType) {
+        const moodVariant: characterPayload = await super.getVariant(moodType);
+        return new Character(moodVariant.variant.originalId, moodVariant);
+    }
+
 
 }

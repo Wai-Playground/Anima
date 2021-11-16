@@ -4,11 +4,15 @@ const bgSchema = new Schema({
     _id: Number,
     variant: {
       isVariant: Boolean,
-      variant_use: {
+      variantIds: {
+        type: Array,
+        required: false
+      },
+      variantUse: {
         type: String,
         required: false
       },
-      originalID: {
+      originalId: {
         type: Number,
         required: false
       }

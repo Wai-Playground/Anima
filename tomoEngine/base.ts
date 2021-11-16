@@ -1,19 +1,13 @@
-import { InteractionResponseType } from "@discordjs/builders/node_modules/discord-api-types";
+
 import {
   ButtonInteraction,
   Channel,
   CommandInteraction,
-  Interaction,
-  InteractionType,
-  MessageComponentType,
   SelectMenuInteraction,
   TextBasedChannels,
   User,
 } from "discord.js";
-import { InteractionResponseTypes, InteractionTypes } from "discord.js/typings/enums";
-import { RawInteractionData } from "discord.js/typings/rawDataTypes";
 import { EventEmitter } from "events";
-import { nextTick } from "process";
 import Queries from "./queries";
 import { backgroundPayload, characterPayload } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
@@ -59,8 +53,8 @@ class engineBase extends EventEmitter {
 
   async getCharacter(_id: number) {
     try {
-      const payload: characterPayload = await Queries.character(_id);
-      return new Character(_id, payload);
+      //const payload: characterPayload = await Queries.character(_id);
+      return new Character(_id, await Queries.character(_id) as characterPayload);
 
     } catch(e) {
       console.log(e);
@@ -70,8 +64,8 @@ class engineBase extends EventEmitter {
 
   async getBackground(_id: number) {
     try {
-      const payload: backgroundPayload = await Queries.backgroundUniverse(_id);
-      return new Background(_id, payload);
+      //const payload: backgroundPayload = await Queries.backgroundUniverse(_id);
+      return new Background(_id, await Queries.backgroundUniverse(_id) as backgroundPayload);
 
     } catch(e) {
       console.log(e);

@@ -62,7 +62,7 @@ export abstract class Commands extends Amadeus_Base {
     if (this.dbRequired) {
       try {
         const author = await user.findOne({_id: interaction.user.id});
-        if (!author) throw new UserNotFoundError(interaction.user.id, "users");
+        if (!author) throw new UserNotFoundError(interaction.user.id, "user");
         
 
       } catch (error) {

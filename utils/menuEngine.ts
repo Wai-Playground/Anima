@@ -134,6 +134,7 @@ export default class Menu extends EventEmitter {
    */
 
   public async start() {
+    console.log(this.slides)
   
     this.interaction.reply({
       embeds: [this.slides[this.index]],

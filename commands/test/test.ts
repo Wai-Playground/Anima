@@ -8,6 +8,7 @@ import Novel from "../../tomoEngine/novel";
 import bg from "../../db_schemas/universe/background_type";
 import Queries from "../../tomoEngine/queries";
 import { APIMessage } from "discord-api-types";
+import Character from "../../tomoEngine/tomoClasses/characters";
 
 const json = require("../../assets/story.json")
 
@@ -26,6 +27,11 @@ class Test extends Commands {
   }
 
   async execute(bot , interaction: CommandInteraction) {
+
+    const char1: Character = new Character(323, await Queries.character(323));
+
+    await char1.getVariant("sad")
+    /*
     
 
     const buttonRow = new MessageActionRow();
@@ -52,17 +58,15 @@ class Test extends Commands {
       });
 
       
-      this.buttonCollector.on("collect", (b_interaction: ButtonInteraction & CommandInteraction) => {
+      this.buttonCollector.on("collect", async (b_interaction: ButtonInteraction & CommandInteraction) => {
         let menu = new Novel(json, b_interaction)
-    
-        menu.once("ready", async () => {
-
-          menu.start();
-        })
-        
+        menu.once("ready", async ()=> {
+          await menu.start();
+        })        
         
 
       });
+      */
       
     
     /*

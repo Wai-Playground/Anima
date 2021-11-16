@@ -7,26 +7,38 @@
         {
             "bg": 0,
             "character": 1,
-            "text": "omg I am finally out of my mother's basement!"
+            "text": "Hey, is that char 2?"
 
         },
 
         {
-            "text": "is that a women?"
+            "text": "Hello char 2!"
 
         },
         {
             "character": 2,
-            "text": "ew is that a neckbeard?"
+            "text": "What do you want?",
+            "args": [{
+                "text": "Who is",
+                "route": "$next"
+                
+                
+
+            }, {
+                "text": "bye",
+                "route": 4
+
+            }]
         },
         {
-            "text": "get away creep"
+            "text": "He is ...",
+            "route": 2
             
         },
         {
             "bg": 1,
-            "character": 0,
-            "text": "He died a virgin."
+            "character": 2,
+            "text": "Good bye"
         }
     ]
 }
