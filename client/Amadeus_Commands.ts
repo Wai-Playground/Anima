@@ -48,21 +48,26 @@ export abstract class Commands extends Amadeus_Base {
 
   }
 
+  async checkCoolDown(storage: Set<string>, interaction: CommandInteraction) {
+    if (!storage.has(interaction.user.id)) {
+      
+      console.log(interaction.user.username + " Is in cool down.")
+      storage.add(interaction.user.id)
+      setTimeout(() => {
+        storage.delete(interaction.user.id);
+        console.log(interaction.user.username + " Is no longer in cooldown.")
+      }, this.coolDown)
+      return false;
+    } else return true;
+    
+  }
+
   async check(bot: Client, interaction: CommandInteraction) {
     return true;
   }
 
   async default_checks(bot: CustomClient, interaction: CommandInteraction) {
-
-    if (this.coolDown != undefined && !bot.coolDown.has(interaction.user.id)) {
-      console.log(interaction.user.username + " Is in cool down.")
-      bot.coolDown.add(interaction.user.id)
-      setTimeout(() => {
-        bot.coolDown.delete(interaction.user.id);
-        console.log(interaction.user.username + " Is no longer in cooldown.")
-      }, this.coolDown)
-    } else return interaction.reply("Sorry, you are on cooldown.");
-
+    
     if (this.disabled) return interaction.reply("Sorry, this command is disabled.")
 
     if (this.ownerOnly) {
@@ -70,6 +75,10 @@ export abstract class Commands extends Amadeus_Base {
       
       if (interaction.user.id == process.env.OWNER_ID ? false : true) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
       
+    }
+
+    if (this.coolDown > 0) {
+      if (await this.checkCoolDown(bot.coolDown, interaction)) return interaction.reply("Sorry, your are on cooldown.")
     }
     
     if (this.dbRequired) {
@@ -91,6 +100,9 @@ export abstract class Commands extends Amadeus_Base {
       
       }
     }
+
+    
+
     return true;
   }
 
