@@ -1,8 +1,5 @@
 {
     "name": "lol",
-    "characters": [0, 1, 2],
-    "backgrounds": [0, 1],
-
     "multiples": [
         {
             "bg": 0,
@@ -22,8 +19,6 @@
             "args": [{
                 "text": "Who is",
                 "route": "$next"
-                
-                
 
             }, {
                 "text": "bye",

@@ -20,7 +20,7 @@ export default class Background extends universeBase {
 
     async getVariant(bgType: backgroundType) {
         const bgVariant: backgroundPayload = await super.getVariant(bgType);
-        return new Background(bgVariant.variant.originalId, bgVariant);
+        return new Background(bgVariant._id, bgVariant);
     }
 
 }

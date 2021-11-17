@@ -1,6 +1,7 @@
 export type basicUniverseType = "character" | "background" | "user";
 export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
 export type backgroundType = "day" | "evening" | "night";
+export type engineType = "tomo" | "rpg" | "novel";
 export interface baseUniversePayload {
   _id: number;
   variant: {
@@ -32,6 +33,6 @@ export interface single {
   bg?: number;
   character?: number;
   text: string;
-  mood?: string;
+  mood?: moodType;
   args?: Array<{ text: string; route: string | number }>;
 }

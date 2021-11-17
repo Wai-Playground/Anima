@@ -1,4 +1,4 @@
-import { basicUniverseType } from "./types";
+import { basicUniverseType, engineType } from "./types";
 
 class MangoError extends Error {
     id: number | string;
@@ -36,4 +36,38 @@ export class OriginalReqVarError extends MangoError {
 
     }
 
+}
+
+
+/**
+ * RunTime Engine Errors ---
+ */
+
+export class EngineError extends Error {
+    engineType: engineType;
+    constructor(message: string, engineType: engineType) {
+        super(`${message}, engine: ${engineType}`);
+        this.name = "EngineError";
+        this.engineType = engineType;
+    }
+}
+
+export class TomoError extends EngineError {
+    constructor(message: string) {
+        super(message, "tomo");
+        this.name = "TomoError";
+    }
+}
+export class RPGError extends EngineError {
+    constructor(message: string) {
+        super(message, "rpg");
+        this.name = "RPGError";
+    }
+}
+
+export class NovelError extends EngineError {
+    constructor(message: string) {
+        super(message, "novel");
+        this.name = "NovelError";
+    }
 }

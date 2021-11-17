@@ -19,7 +19,8 @@ export default class Character extends universeBase {
 
     async getVariant(moodType: moodType) {
         const moodVariant: characterPayload = await super.getVariant(moodType);
-        return new Character(moodVariant.variant.originalId, moodVariant);
+        console.log(moodVariant)
+        return new Character(moodVariant._id, moodVariant);
     }
 
 

@@ -55,7 +55,7 @@ export default class universeBase {
      */
 
     isVariant() {
-        return this.isVariant;
+        return this.variant;
     }
     /**
      * Not supposed to be called since the return object is not in class form.
