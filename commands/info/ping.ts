@@ -9,6 +9,7 @@ class Ping extends Commands {
       data: new SlashCommandBuilder(),
       dbRequired: false,
       ownerOnly: false,
+      coolDown: 4000
     });
   }
 

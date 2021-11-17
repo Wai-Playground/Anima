@@ -2,6 +2,7 @@ import { Client, CommandInteraction } from "discord.js";
 import user from "../db_schemas/user_type";
 import { UserNotFoundError } from "../tomoEngine/statics/errors";
 import Amadeus_Base from "./Amadeus_Base";
+import CustomClient from "./Amadeus_Client";
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
@@ -15,6 +16,7 @@ export abstract class Commands extends Amadeus_Base {
   disabled: boolean = false;
   inGuildOnly: boolean = false;
   inMainOnly: boolean = false;
+  coolDown?: number = 0;
 
   constructor(
     name: string,
@@ -25,6 +27,7 @@ export abstract class Commands extends Amadeus_Base {
       ownerOnly?: boolean;
       inGuildOnly?: boolean;
       inMainOnly?: boolean ;
+      coolDown?: number;
     }
   ) {
     super()
@@ -39,6 +42,7 @@ export abstract class Commands extends Amadeus_Base {
     this.description = settings.description.toString();
     this.inGuildOnly = settings.inGuildOnly;
     this.inMainOnly = settings.inMainOnly;
+    this.coolDown = settings.coolDown;
 
     
 
@@ -48,7 +52,16 @@ export abstract class Commands extends Amadeus_Base {
     return true;
   }
 
-  async default_checks(bot: Client, interaction: CommandInteraction) {
+  async default_checks(bot: CustomClient, interaction: CommandInteraction) {
+
+    if (this.coolDown != undefined && !bot.coolDown.has(interaction.user.id)) {
+      console.log(interaction.user.username + " Is in cool down.")
+      bot.coolDown.add(interaction.user.id)
+      setTimeout(() => {
+        bot.coolDown.delete(interaction.user.id);
+        console.log(interaction.user.username + " Is no longer in cooldown.")
+      }, this.coolDown)
+    } else return interaction.reply("Sorry, you are on cooldown.");
 
     if (this.disabled) return interaction.reply("Sorry, this command is disabled.")
 

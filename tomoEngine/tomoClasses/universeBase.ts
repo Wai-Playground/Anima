@@ -11,17 +11,19 @@ export default class universeBase {
     type: basicUniverseType;
     name: string;
     variant: boolean;
+    link: URL;
 
     /**
      * Base class for all in-universe classes. 
      * @param _id |
      * @param basicImagetype |
      */
-    constructor(_id: number, type: basicUniverseType, name: string, variant: boolean) {
+    constructor(_id: number, type: basicUniverseType, name: string, variant: boolean, link: URL) {
         this._id = _id;
         this.name = name
         this.type = type;
         this.variant = variant;
+        this.link = link;
 
     }
 

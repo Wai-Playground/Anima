@@ -117,7 +117,6 @@ export default class Novel extends engineBase {
       i++;
     }
 
-    console.log(this.nodes.length == this.multiples.length);
     if (this.nodes.length == this.multiples.length) {
       process.nextTick(() => {
         this.emit("ready");

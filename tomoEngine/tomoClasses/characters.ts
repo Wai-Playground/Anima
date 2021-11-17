@@ -7,7 +7,7 @@ import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
     constructor(_id: number, payload: characterPayload) {
-        super(_id, 'character', payload.name, payload.variant.isVariant)
+        super(_id, 'character', payload.name, payload.variant.isVariant, payload.link)
 
         
     }
@@ -19,7 +19,6 @@ export default class Character extends universeBase {
 
     async getVariant(moodType: moodType) {
         const moodVariant: characterPayload = await super.getVariant(moodType);
-        console.log(moodVariant)
         return new Character(moodVariant._id, moodVariant);
     }
 

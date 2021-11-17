@@ -25,6 +25,7 @@ export default class CustomClient extends Client {
     (this.name = name), (this.token = token), (this.uri = uri);
 
     this.commands = new Collection();
+    this.coolDown = new Set();
     this.slashCommands = []; // Make a new arr for commands to forward to discord.
   }
 
