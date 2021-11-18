@@ -20,6 +20,7 @@
   "homepage": "https://github.com/Jupiternerd/Anima#readme",
   "dependencies": {
     "@discordjs/rest": "^0.1.0-canary.0",
+    "canvas": "^2.8.0",
     "console-stamp": "^3.0.3",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.3.1",
@@ -27,6 +28,8 @@
     "enum": "^3.0.4",
     "events": "^3.3.0",
     "fs": "0.0.1-security",
+    "gif-encoder-2": "^1.0.5",
+    "gifencoder": "^2.0.1",
     "mongoose": "^5.13.8",
     "node-fetch": "^2.6.1",
     "svg-captcha": "^1.4.0",

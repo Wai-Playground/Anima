@@ -51,7 +51,7 @@ class engineBase extends EventEmitter {
     this.emit("end");
   }
 
-  async getCharacter(_id: number) {
+  async getCharacter(_id: number): Promise<Character> {
     try {
       //const payload: characterPayload = await Queries.character(_id);
       return new Character(_id, await Queries.character(_id) as characterPayload);
@@ -62,7 +62,7 @@ class engineBase extends EventEmitter {
     }
   }
 
-  async getBackground(_id: number) {
+  async getBackground(_id: number): Promise<Background> {
     try {
       //const payload: backgroundPayload = await Queries.backgroundUniverse(_id);
       return new Background(_id, await Queries.backgroundUniverse(_id) as backgroundPayload);
@@ -73,7 +73,7 @@ class engineBase extends EventEmitter {
     }
   }
 
-  async getUserUni(_id: String | number = null) {
+  async getUserUni(_id: String | number = null): Promise<any> {
     return await Queries.userUniverse(_id == undefined ? this.discUserObj.id : _id); //If the _id is not passed, use interaction user id.
   }
 

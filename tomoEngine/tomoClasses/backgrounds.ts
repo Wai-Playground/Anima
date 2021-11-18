@@ -18,7 +18,7 @@ export default class Background extends universeBase {
      * @returns Class form version of the getVariant() from universeBase class.
      */
 
-    async getVariant(bgType: backgroundType) {
+    async getVariant(bgType: backgroundType): Promise<Background> {
         const bgVariant: backgroundPayload = await super.getVariant(bgType);
         return new Background(bgVariant._id, bgVariant);
     }

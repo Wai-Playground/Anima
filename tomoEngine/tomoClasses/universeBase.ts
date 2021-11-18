@@ -11,14 +11,14 @@ export default class universeBase {
     type: basicUniverseType;
     name: string;
     variant: boolean;
-    link: URL;
+    link: string;
 
     /**
      * Base class for all in-universe classes. 
      * @param _id |
      * @param basicImagetype |
      */
-    constructor(_id: number, type: basicUniverseType, name: string, variant: boolean, link: URL) {
+    constructor(_id: number, type: basicUniverseType, name: string, variant: boolean, link: string) {
         this._id = _id;
         this.name = name
         this.type = type;
@@ -31,7 +31,7 @@ export default class universeBase {
      * 
      * @returns The ID of the class.
      */
-    getId() {
+    getId(): number {
         return this._id;
     
     }
@@ -40,7 +40,7 @@ export default class universeBase {
      * @returns name of the class
      */
 
-    getName() {
+    getName(): string {
         return this.name;
     }
     
@@ -48,7 +48,7 @@ export default class universeBase {
      * 
      * @returns type of the class
      */
-    getType() {
+    getType(): basicUniverseType {
         return this.type;
     }
     /**
@@ -61,7 +61,7 @@ export default class universeBase {
     }
     /**
      * Not supposed to be called since the return object is not in class form.
-     * @param id id of the original variant.
+     * @param id id of the original variant. default: this._id (class)
      * @param string moodType or backgroundType.
      * @param type Optional.
      * @returns requested variant.
@@ -82,7 +82,7 @@ export default class universeBase {
             if (!res.variant.isVariant) throw new OriginalReqVarError(res._id, type);
 
         } catch (e) {
-            return console.log(e)
+            console.log(e)
         } finally {
             
             return res;

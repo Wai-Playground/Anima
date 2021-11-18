@@ -32,8 +32,9 @@
             
         },
         {
-            "bg": 1,
-            "character": 2,
+            "bg": 0,
+            "character": 1,
+            "mood": "happy",
             "text": "Good bye"
         }
     ]

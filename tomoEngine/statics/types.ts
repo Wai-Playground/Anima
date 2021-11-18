@@ -14,7 +14,7 @@ export interface baseUniversePayload {
 }
 export interface backgroundPayload extends baseUniversePayload {
   description?: string;
-  link: URL;
+  link: string;
 }
 
 export interface characterPayload extends baseUniversePayload {
@@ -25,7 +25,7 @@ export interface characterPayload extends baseUniversePayload {
     greetings: Array<string>;
     farewells: Array<string>;
   };
-  link: URL;
+  link: string;
 }
 
 export interface single {
@@ -34,5 +34,6 @@ export interface single {
   character?: number;
   text: string;
   mood?: moodType;
+  route?: number | string;
   args?: Array<{ text: string; route: string | number }>;
 }
