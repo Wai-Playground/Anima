@@ -10,11 +10,11 @@ import {
   MessageButton,
   MessageEmbed,
   MessageSelectMenu,
+  MessageSelectOptionData,
   SelectMenuInteraction,
   User,
 } from "discord.js";
 import { EventEmitter } from "events";
-
 
 class menuSingles extends MessageEmbed {
   index: number; // keeps track of the sigle index.
@@ -136,7 +136,6 @@ export default class Menu extends EventEmitter {
 
   public async start() {
     this.test++;
-    console.log(this.slides)
   
     this.interaction.reply({
       embeds: [this.slides[this.index]],
@@ -170,16 +169,11 @@ export default class Menu extends EventEmitter {
   }
 
   private async action(): Promise<MessageActionRow[]> {
-    type chapters = {
-      label: string;
-      value: string;
-      description: string;
-    };
 
     let chapters = [];
 
     for (const pages of this.slides) {
-      const chapter: chapters = {
+      const chapter: MessageSelectOptionData = {
         label: pages.title,
         value: pages.index.toString(),
         description: pages.description,
@@ -282,7 +276,7 @@ export default class Menu extends EventEmitter {
     });
   }
 
-  private async collectSelect(filter) {
+  private async collectSelect(filter: Function) {
     this.selectCollector = this.message.createMessageComponentCollector({
       filter,
       componentType: "SELECT_MENU",

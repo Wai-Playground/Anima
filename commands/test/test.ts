@@ -27,9 +27,9 @@ class Test extends Commands {
   }
 
   async execute(bot , interaction: CommandInteraction) {
-    await interaction.deferReply();
+    await interaction.deferReply({ephemeral: true});
     let jsons = JSON.parse(JSON.stringify(json));
-    let nvl = new Novel(jsons, interaction)
+    let nvl = new Novel(jsons, interaction, true)
     //console.log(json)
     nvl.once("ready", () => {
       return nvl.start();

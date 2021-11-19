@@ -16,10 +16,12 @@ import {
   ButtonInteractionCollectorOptions,
   SelectMenuInteractionCollectorOptions,
   InteractionCollector,
+  MessageSelectMenu,
+  MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
 import { NovelError, TomoError } from "./statics/errors";
-import { single, moodType } from "./statics/types";
+import { single, moodType, scripts,  } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -33,9 +35,13 @@ class NodeSingle {
   text: string;
   mood?: string;
   isChoiced: boolean;
-  route: number | string;
+  route?: number | string;
   built: boolean = false;
   built_img: MessageAttachment;
+  choices?: Array<MessageSelectOptionData>
+  placeholder?: string;
+  lookUpArr?: Array<scripts | number> 
+
 
   constructor(single: single, index: number = null) {
     this.index = single.index || index;
@@ -44,16 +50,24 @@ class NodeSingle {
     this.text = single.text;
     this.mood = single.hasOwnProperty("mood") ? single.mood : null;
     this.route = single.hasOwnProperty("route") ? single.route : index + 1;
-    
-
+  
     this.isChoiced = single.hasOwnProperty("args") ? true : false;
     if (this.isChoiced) {
-      // For each argument in args, we put them in an array.
-      for (const argument of single.args) {
+      this.choices = []
+      this.lookUpArr = []
+      let i = 0;
+      this.placeholder = single.hasOwnProperty("placeholder") ? single.placeholder : "Select an option..."
+      for (const arg of single.args) {
+        this.choices.push({
+          label: arg.label,
+          value: i.toString()
+        })
+        this.lookUpArr.push(arg.route)
+        console.log(this.choices)
+        i++;
       }
-    }
 
-    if (this.mood) {
+      
     }
   }
 }
@@ -69,6 +83,7 @@ export default class Novel extends engineBase {
   height: number = 1080;
   width: number = 720;
   selection: number;
+  ephemeral: boolean;
   filter: Function = async (i: any) => {
     await i.deferUpdate();
     return i.user.id === this.interaction.user.id;
@@ -85,7 +100,8 @@ export default class Novel extends engineBase {
 
   constructor(
     json: object,
-    interaction: CommandInteraction | ButtonInteraction | SelectMenuInteraction
+    interaction: CommandInteraction | ButtonInteraction | SelectMenuInteraction,
+    ephemeral: boolean
   ) { 
     super(interaction.user, interaction);
 
@@ -96,14 +112,11 @@ export default class Novel extends engineBase {
     this.backgrounds = new Map();
     this.characters = new Map();
     this.index = 0;
+    this.ephemeral = ephemeral;
     this.nodes = [];
     this.prepareAssets();
   }
 
-
-  async sanitizeScripts() {
-
-  }
 
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
     const canvas: Canvas = createCanvas(1080, 720);
@@ -119,6 +132,25 @@ export default class Novel extends engineBase {
     this.nodes[index].built_img = new MessageAttachment(canvas.toBuffer(), `novel_userID_${this.interaction.user.id}_node_${index}_${this.name}.png`);
 
     return this.nodes[index].built_img;
+
+  }
+
+  parseScript(str: scripts): void {
+    console.log(str);
+
+
+    switch(str) {
+      case "$end":
+        this.end();
+        break;
+      case "$flag_b":
+        break;
+      case "$next":
+        this.setPage(this.index + 1);
+        break;
+      case "$flag_g":
+        break;      
+    }
 
   }
 
@@ -231,6 +263,7 @@ export default class Novel extends engineBase {
     this.message = await this.interaction.fetchReply();
 
     this.collectButton(this.filter);
+    if (this.nodes[this.index].isChoiced) this.collectSelect(this.filter);
   }
 
   async setPage(index: number = this.index) {
@@ -243,6 +276,8 @@ export default class Novel extends engineBase {
       components: await this.action()
     }
     await this.interaction.editReply(payload)
+    if (this.nodes[this.index].isChoiced) this.collectSelect(this.filter);
+    
     //await this.interaction.editReply(payload);
 
   }
@@ -251,10 +286,14 @@ export default class Novel extends engineBase {
     this.buttonCollector = this.message.createMessageComponentCollector({
       filter,
       componentType: "BUTTON",
-      time: 10000,
+      time: 60000,
     });
     this.buttonCollector.on("collect", (interaction: ButtonInteraction) => {
       const button = interaction.customId.match(/(\d{1,1})/g)[0];
+      let skript: scripts | number;
+      skript = this.nodes[this.index].route as scripts | number;
+      if (typeof skript == 'string') return this.parseScript(skript);
+
       this.emit("buttonCollected", button)
       this.buttonCollector.on('end', () => {
         this.emit("end");
@@ -266,9 +305,18 @@ export default class Novel extends engineBase {
           this.setPage(this.index - 1)
           break;
         case 1:
+          
+          
           this.setPage(this.index + 1);
+
           break;
         case 2:
+          if (this.selection != undefined) {
+            console.log("confirmed")
+            skript = this.nodes[this.index].lookUpArr[this.selection] as scripts & number;
+            if (isNaN(skript)) return this.parseScript(skript);
+            this.setPage(skript);
+          }
           
           break;
 
@@ -278,9 +326,10 @@ export default class Novel extends engineBase {
   }
 
   async action(): Promise<MessageActionRow[]> {
+    let ret: Array<MessageActionRow> = [];
     const buttons = [
       {
-        disabled: this.index > 0 ? false : true,
+        disabled: (this.index > 0 ? false : true) || (this.nodes[this.index - 1].isChoiced),
         label: "Back",
         style: 1,
       },
@@ -290,7 +339,7 @@ export default class Novel extends engineBase {
         style: 1,
       },
       {
-        disabled: !(this.nodes[this.index].isChoiced),
+        disabled: !(this.nodes[this.index].isChoiced && (this.selection != undefined)),
         label: "Confirm Selection",
         style: 1,
       }
@@ -312,10 +361,49 @@ export default class Novel extends engineBase {
       );
       i++;
     }
+    ret.push(buttonRow)
+    if (this.nodes[this.index].isChoiced) {
+      const selectRow = new MessageActionRow().addComponents(
+        new MessageSelectMenu()
+          .setCustomId(
+            "NOVEL.select_" + this.index.toString() + "_user_" + this.interaction.user.id
+          )
+          .setPlaceholder(this.selection == undefined ? this.nodes[this.index].placeholder : this.nodes[this.index].choices[this.selection].label)
+          .addOptions(this.nodes[this.index].choices)
+      );
+    
+      ret.push(selectRow)
+      
+    }
     //console.log(buttonRow)
 
-    return [buttonRow];
+    return ret;
 
+  }
+
+  private async collectSelect(filter: Function) {
+    this.selectCollector = this.message.createMessageComponentCollector({
+      filter,
+      componentType: "SELECT_MENU",
+      time: 60000,
+    });
+    this.selectCollector.on("collect", async (interaction: SelectMenuInteraction) => {
+      let value = interaction.values[0] // value[1] = selection, value[2] = index
+      console.log(value)
+
+      if (this.index == parseInt(value)) return;
+      this.selection = parseInt(value)
+
+      this.emit("selectCollected", value)
+
+      this.interaction.editReply({components: await this.action()})
+      
+    });
+
+    this.selectCollector.on('end', () => {
+      this.emit("end");
+      
+    });
   }
 
   public async end() {

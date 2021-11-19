@@ -49,7 +49,7 @@ class engineBase extends EventEmitter {
    */
   emitEnd() {
     this.emit("end");
-    
+
   }
 
   async getCharacter(_id: number): Promise<Character> {

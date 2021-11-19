@@ -16,12 +16,14 @@
             "character": 2,
             "mood": "sad",
             "text": "What do you want?",
+            "placeholder": "Select your dialoguasdse...",
             "args": [{
-                "text": "Who is",
+                "label": "Who is",
                 "route": "$next"
+                
 
             }, {
-                "text": "bye",
+                "label": "bye",
                 "route": 4
 
             }]

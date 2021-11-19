@@ -1,3 +1,5 @@
+import { MessageSelectOptionData } from "discord.js";
+
 export type basicUniverseType = "character" | "background" | "user";
 export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
 export type backgroundType = "day" | "evening" | "night";
@@ -17,6 +19,7 @@ export interface backgroundPayload extends baseUniversePayload {
   link: string;
 }
 
+
 export interface characterPayload extends baseUniversePayload {
   age?: number;
   bloodtype?: string;
@@ -28,12 +31,20 @@ export interface characterPayload extends baseUniversePayload {
   link: string;
 }
 
+export type scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
+
+export interface argument extends MessageSelectOptionData{
+  route: scripts | number
+
+}
+
 export interface single {
   index?: number;
   bg?: number;
   character?: number;
   text: string;
   mood?: moodType;
-  route?: number | string;
-  args?: Array<{ text: string; route: string | number }>;
+  route?: number | scripts;
+  placeholder?: string;
+  args?: Array<argument>;
 }

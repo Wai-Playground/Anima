@@ -10,8 +10,11 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(3000);
-*/
-console.log("Server listening to port 3000. Press Ctrl+C to stop it.");
 
+//console.log("Server listening to port 3000. Press Ctrl+C to stop it.");
+*/
 import Amadeus from "./client/Amadeus_Client";
+process.on('unhandledRejection', error => {
+	console.error('Unhandled promise rejection:', error);
+});
 new Amadeus("Kringe", process.env.TOKEN, process.env.DURI).run()

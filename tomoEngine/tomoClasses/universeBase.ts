@@ -56,7 +56,7 @@ export default class universeBase {
      * @returns boolean | if the class is a variant or not.
      */
 
-    isVariant() {
+    isVariant(): boolean {
         return this.variant;
     }
     /**
