@@ -80,6 +80,7 @@ class menuSingles extends MessageEmbed {
 }
 
 export default class Menu extends EventEmitter {
+  test: number;
   slides: Array<menuSingles>;
   json: any;
   index: number;
@@ -134,6 +135,7 @@ export default class Menu extends EventEmitter {
    */
 
   public async start() {
+    this.test++;
     console.log(this.slides)
   
     this.interaction.reply({
@@ -167,7 +169,7 @@ export default class Menu extends EventEmitter {
 
   }
 
-  private async action() {
+  private async action(): Promise<MessageActionRow[]> {
     type chapters = {
       label: string;
       value: string;

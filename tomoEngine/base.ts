@@ -20,7 +20,7 @@ import Character from "./tomoClasses/characters";
  */
 class engineBase extends EventEmitter {
   discUserObj: User; // Discord User Object.
-  interaction: CommandInteraction & ButtonInteraction | SelectMenuInteraction // Discord Interactions Objects.
+  interaction: CommandInteraction | ButtonInteraction| SelectMenuInteraction // Discord Interactions Objects.
   channel: Channel & TextBasedChannels; // Discord Channel Object.
 
   constructor(
@@ -39,8 +39,8 @@ class engineBase extends EventEmitter {
    * @description | Emits an 'ready' event.
    */
   emitReady() {
-    
     this.emit("ready");
+
   }
 
   /**
@@ -49,6 +49,7 @@ class engineBase extends EventEmitter {
    */
   emitEnd() {
     this.emit("end");
+    
   }
 
   async getCharacter(_id: number): Promise<Character> {

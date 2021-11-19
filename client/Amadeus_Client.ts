@@ -96,7 +96,7 @@ export default class CustomClient extends Client {
         ),
         { body: this.slashCommands }
       );
-      console.log(this.slashCommands)
+      //console.log(this.slashCommands)
       console.info(
         "[c] Delivered Slash commands to Discord. GUILD_ID: " +
           process.env.GUILD_ID

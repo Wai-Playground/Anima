@@ -27,40 +27,18 @@ class Test extends Commands {
   }
 
   async execute(bot , interaction: CommandInteraction) {
+    await interaction.deferReply();
+    let jsons = JSON.parse(JSON.stringify(json));
+    let nvl = new Novel(jsons, interaction)
+    //console.log(json)
+    nvl.once("ready", () => {
+      return nvl.start();
+    })
     
-
-    const buttonRow = new MessageActionRow();
-    const filter = async (i) => {
-      await i.deferUpdate();
-      return i.user.id === interaction.user.id;
-    };
-
-    
-      buttonRow.addComponents(
-        new MessageButton()
-          .setCustomId("lol")
-          .setLabel("HI")
-          .setStyle(1)
-      );
-      await interaction.reply("Ready?");
-      await interaction.editReply({components: [buttonRow]});
-      this.message = await interaction.fetchReply();
-
-      this.buttonCollector = this.message.createMessageComponentCollector({
-        filter,
-        componentType: "BUTTON",
-        time: 60000,
-      });
 
       
-      this.buttonCollector.on("collect", async (b_interaction: ButtonInteraction & CommandInteraction) => {
-        let menu = new Novel(json, b_interaction)
-        menu.once("ready", async ()=> {
-          await menu.start();
-        })        
-        
 
-      });
+
       
       
     

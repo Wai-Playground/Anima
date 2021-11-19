@@ -1,6 +1,8 @@
 import { Client, CommandInteraction, MessageAttachment } from "discord.js";
 import { createReadStream, createWriteStream } from "fs";
 import { Commands } from "../../client/Amadeus_Commands";
+import Queries from "../../tomoEngine/queries";
+import Character from "../../tomoEngine/tomoClasses/characters";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 const GIFEncoder = require('gif-encoder-2')
@@ -20,49 +22,19 @@ class Ping extends Commands {
   }
 
   async execute(bot: typeof Client, interaction: CommandInteraction) {
-    //return interaction.reply({ content: "Pong!", ephemeral: true });
+    const payload = await Queries.character(1);
+    const char = new Character(payload._id, payload);
 
-    const size = 200;
-    const half = size / 2;
-
-    const canvas = createCanvas(size, size);
-    const ctx = canvas.getContext("2d");
-
-    function drawBackground() {
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, size, size);
-    }
-
-    const encoder = new GIFEncoder(size, size);
-    encoder.setDelay(500);
-    encoder.start();
-
-    drawBackground();
-    ctx.fillStyle = "#ff0000";
-    ctx.fillRect(0, 0, half, half);
-    encoder.addFrame(ctx);
-
-    drawBackground();
-    ctx.fillStyle = "#00ff00";
-    ctx.fillRect(half, 0, half, half);
-    encoder.addFrame(ctx);
-
-    drawBackground();
-    ctx.fillStyle = "#0000ff";
-    ctx.fillRect(half, half, half, half);
-    encoder.addFrame(ctx);
-
-    drawBackground();
-    ctx.fillStyle = "#ffff00";
-    ctx.fillRect(0, half, half, half);
-    encoder.addFrame(ctx);
-
-    encoder.finish();
+    const payload1 = await Queries.character(1);
+    const char1 = new Character(payload._id, payload);
+    console.log(char)
+    console.log(char1)
 
 
-    const attachment = new MessageAttachment(encoder.out.getData(), 'lolol.gif')
+    
 
-    await interaction.reply({files: [attachment]})
+    
+    
     
     
 

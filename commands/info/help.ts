@@ -94,6 +94,7 @@ class Help extends Commands {
     menu.once("ready", () => {
       menu.index = data[1];
       menu.start();
+      console.log(menu.test);
     })
 
     menu.once("end", () => {
