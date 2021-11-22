@@ -4,11 +4,12 @@
         {
             "bg": 0,
             "character": 1,
-            "text": "Hey, is that char 2?"
+            "text": "Omg is that william ZHENG?"
 
         },
 
         {
+            "bg": 1,
             "text": "Hello char 2!"
 
         },
