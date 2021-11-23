@@ -35,47 +35,6 @@ class menuSingles extends MessageEmbed {
     this.index = single.index || count;
     
 
-    /*
-    if (single.hasOwnProperty("actions")) {
-      this.rowCol = [];
-
-      for (const actions of single.actions) {
-        const row = new MessageActionRow();
-        //if (actions.hasOwnProperty("buttons")) return
-        
-
-        if (actions.hasOwnProperty("selectMenu")) {
-          const menu = actions.selectMenu;
-          if (menu == ("build" || undefined)) return; //Place holder
-          row.addComponents(
-            // message components are too new for me so I am just gonna stick with the builders.
-            new MessageSelectMenu()
-              .setCustomId("select_number_" + count.toString() + "_row_" + this.rowCol.length)
-              .setPlaceholder("None Selected")
-              .addOptions(menu)
-          );
-        } else if (actions.hasOwnProperty("buttons")) {
-          if (actions.buttons == ("build" || undefined)) return;
-          for (const button of actions.buttons) {
-            
-            row.addComponents(
-              // buttons are just like rows but clickable. 
-              new MessageButton()
-              .setCustomId("button_" + count.toString() + "_row_" + this.rowCol.length)
-              .setLabel(button.label)
-              .setEmoji(button.emoji)
-              .setStyle(button.style)
-             
-            )
-
-          }
-          
-
-        }
-
-        this.rowCol.push(row);
-      }
-    }*/
   }
 }
 
@@ -120,9 +79,6 @@ export default class Menu extends EventEmitter {
       count++; // why is this red.
 
       if (count == this.json.multiples.length) {
-        /**
-         * Trickiest bug, it was emitting before there were any listeners hooked so it was effectively useless. delaying it to send a pulse after the listeners are hooked did the job. Thanks to Xetera#0001 for helping me out.
-         */
 
         process.nextTick(() => {
           this.emit("ready", this.slides);
@@ -135,8 +91,6 @@ export default class Menu extends EventEmitter {
    */
 
   public async start() {
-    this.test++;
-  
     this.interaction.reply({
       embeds: [this.slides[this.index]],
       components: await this.action(),
@@ -248,10 +202,6 @@ export default class Menu extends EventEmitter {
     this.buttonCollector.on("collect", (interaction: ButtonInteraction) => {
       const button = interaction.customId.match(/(\d{1,1})/g)[0];
       this.emit("buttonCollected", button)
-      this.buttonCollector.on('end', () => {
-        this.emit("end");
-      
-      });
 
       switch (parseInt(button)) {
         case 0:
@@ -274,6 +224,11 @@ export default class Menu extends EventEmitter {
 
       }
     });
+
+    this.buttonCollector.on('end', () => {
+      this.emit("end");
+    
+    });
   }
 
   private async collectSelect(filter: Function) {
@@ -293,6 +248,7 @@ export default class Menu extends EventEmitter {
       this.emit("end");
       
     });
+
   }
 
   public async end() {

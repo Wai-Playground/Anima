@@ -257,16 +257,10 @@ export default class Novel extends engineBase {
     this.message = await this.interaction.fetchReply();
 
     if (this.buttonCollector == undefined) this.collectButton(this.filter);
+    if (this.selectCollector == undefined) this.collectSelect(this.filter);
     
     
-    if ((this.nodes[this.index].isChoiced))
-    {
-      if (this.selectCollector != undefined) {
-        if (this.selectCollector.checkEnd()) this.collectSelect(this.filter);
-
-      } else this.collectSelect(this.filter)
-        
-    }
+    
   }
 
   async setPage(index: number = this.index) {
@@ -285,20 +279,19 @@ export default class Novel extends engineBase {
       components: await this.action(),
     };
     await this.interaction.editReply(payload);
-    //console.log((this.selectCollector != undefined))
+    console.log(this.selectCollector == undefined && this.nodes[index].isChoiced)
     
-    if ((this.nodes[this.index].isChoiced))
-    {
-      if (this.selectCollector != undefined) {
-        if (this.selectCollector.checkEnd()) this.collectSelect(this.filter);
+    this.refreshCoolDown()
 
-      } else this.collectSelect(this.filter)
-        
-    }
 
     
 
     //await this.interaction.editReply(payload);
+  }
+
+  private refreshCoolDown() {
+    if (this.buttonCollector) this.buttonCollector.resetTimer()
+    if (this.selectCollector) this.selectCollector.resetTimer()
   }
 
   private async collectButton(filter: Function) {
@@ -314,9 +307,6 @@ export default class Novel extends engineBase {
       if (typeof skript == "string") return this.parseScript(skript);
 
       this.emit("buttonCollected", button);
-      this.buttonCollector.on("end", () => {
-        this.emit("end");
-      });
 
       switch (parseInt(button)) {
         case 0:
@@ -342,6 +332,10 @@ export default class Novel extends engineBase {
 
           break;
       }
+    });
+
+    this.buttonCollector.on("end", () => {
+      this.emit("end");
     });
   }
 
@@ -406,7 +400,7 @@ export default class Novel extends engineBase {
           .setPlaceholder(
             this.selection == undefined
               ? this.nodes[this.index].placeholder
-              : this.nodes[this.index].choices[this.selection].label
+              : "• "+ this.nodes[this.index].choices[this.selection].label
           )
           .addOptions(this.nodes[this.index].choices)
       );
