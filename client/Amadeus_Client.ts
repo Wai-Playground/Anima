@@ -4,7 +4,7 @@ const { Client, Collection, Intents } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 import Mongo from "./Mongo"
-
+//
 export default class CustomClient extends Client {
   /**
    * Description | Custom Client.
