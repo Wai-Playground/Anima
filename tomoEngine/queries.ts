@@ -1,16 +1,14 @@
-import bg from "../db_schemas/universe/background_type";
-import char from "../db_schemas/universe/characters_type";
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError } from "./statics/errors";
 import { backgroundPayload, characterPayload } from "./statics/types";
-
+import Monmonga from "../client/Mongo";
 class Queries {
-    
     public static async character(_id: string | number) {
         let payload: characterPayload;
         
         try {
-            payload = await char.findOne({ _id: _id});
+          
+            payload = await Monmonga.universeDB().collection<characterPayload>("characters").findOne({ _id: _id});
             if (!payload) throw new UniBaseNotFoundError(_id, "background");
 
         } catch(e) {
@@ -23,10 +21,10 @@ class Queries {
 
     }
 
-    public static async backgroundUniverse(_id: string | number) {
+    public static async background(_id: string | number) {
         let payload: backgroundPayload;
         try {
-            payload = await bg.findOne({ _id: _id});
+            payload = await Monmonga.universeDB().collection<backgroundPayload>("backgrounds").findOne({ _id: _id});
             if (!payload) throw new UniBaseNotFoundError(_id, "background");
 
         } catch(e) {
@@ -35,17 +33,16 @@ class Queries {
             return payload;
         }
         
-        
 
     }
 
-    public static async characterVariant(originalId: number, name: string | number) {
+    public static async characterVariant(originalID: number | string, mood: string | number) {
         let payload: characterPayload;
 
         try {
 
-            payload = await char.findOne({'variant.originalId': originalId, 'variant.variantUse': name});
-            if (!payload) throw new UniBaseNotFoundError(originalId, "background");
+            payload = await Monmonga.universeDB().collection<characterPayload>("characters").findOne({'variant.originalID': originalID, 'variant.variantUse': mood});
+            if (!payload) throw new UniBaseNotFoundError(originalID, "character");
 
         } catch(e) {
             console.log(e);
@@ -55,11 +52,11 @@ class Queries {
 
     }
 
-    public static async backgroundVariant(originalId: number, name: string | number) {
+    public static async backgroundVariant(originalID: number | string, name: string | number) {
         let payload: backgroundPayload;
         try {
-            payload = await bg.findOne({'variant.originalId': originalId, 'variant.variantUse': name});
-            if (!payload) throw new UniBaseNotFoundError(originalId, "background");
+            payload = await Monmonga.universeDB().collection<backgroundPayload>("backgrounds").findOne({'variant.originalID': originalID, 'variant.variantUse': name});
+            if (!payload) throw new UniBaseNotFoundError(originalID, "background");
 
         } catch(e) {
             console.log(e);

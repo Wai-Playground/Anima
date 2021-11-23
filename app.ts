@@ -17,4 +17,4 @@ import Amadeus from "./client/Amadeus_Client";
 process.on('unhandledRejection', error => {
 	console.error('Unhandled promise rejection:', error);
 });
-new Amadeus("Kringe", process.env.TOKEN, process.env.DURI).run()
+new Amadeus("Kringe", process.env.TOKEN, process.env.URI).run()

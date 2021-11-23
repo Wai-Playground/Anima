@@ -52,7 +52,7 @@ class engineBase extends EventEmitter {
 
   }
 
-  async getCharacter(_id: number): Promise<Character> {
+  async getCharacter(_id: number | string): Promise<Character> {
     try {
       //const payload: characterPayload = await Queries.character(_id);
       return new Character(_id, await Queries.character(_id) as characterPayload);
@@ -63,10 +63,10 @@ class engineBase extends EventEmitter {
     }
   }
 
-  async getBackground(_id: number): Promise<Background> {
+  async getBackground(_id: number | string): Promise<Background> {
     try {
       //const payload: backgroundPayload = await Queries.backgroundUniverse(_id);
-      return new Background(_id, await Queries.backgroundUniverse(_id) as backgroundPayload);
+      return new Background(_id, await Queries.background(_id) as backgroundPayload);
 
     } catch(e) {
       console.log(e);

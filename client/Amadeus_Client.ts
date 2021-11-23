@@ -1,11 +1,9 @@
-import { Mongoose } from "mongoose";
-
 require("dotenv").config();
 const fs = require("fs");
 const { Client, Collection, Intents } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const mongoose = require("mongoose");
+import Mongo from "./Mongo"
 
 export default class CustomClient extends Client {
   /**
@@ -136,34 +134,7 @@ export default class CustomClient extends Client {
    */
 
   async mangoLoader(this: CustomClient) {
-    const settings = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-    };
-
-    let serverRetries = 0; //Variable to count the retries.
-
-    try {
-      //Run function of connect.
-      console.time("Database_Connection_Time"); //Starts Timer.
-      await mongoose.connect(this.uri, settings);
-
-    } catch (e) {
-      //If error, retry the function and add 1 to the retries.
-      console.error("Mango login failed... retrying.");
-      serverRetries++;
-
-      await mongoose.connect(this.uri, settings);
-    } finally {
-      //Finally log the results.
-      console.info(
-        `Mango connection successful after ${
-          serverRetries > 0 ? serverRetries : "no"
-        } ${serverRetries == 1 ? "retry" : "retries"}, time elapsed:`
-      ); //Logs the retries and the time elasped.
-      console.timeEnd("Database_Connection_Time"); //Stops timer.
-    }
+    await Mongo.connect()
   }
 
   /**

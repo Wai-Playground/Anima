@@ -5,11 +5,6 @@ import Queries from "../../tomoEngine/queries";
 import Character from "../../tomoEngine/tomoClasses/characters";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
-const GIFEncoder = require('gif-encoder-2')
-const { createCanvas } = require('canvas')
-const { writeFile } = require('fs')
-const path = require('path')
-
 class Ping extends Commands {
   constructor() {
     super("ping", {

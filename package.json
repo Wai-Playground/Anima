@@ -30,6 +30,7 @@
     "fs": "0.0.1-security",
     "gif-encoder-2": "^1.0.5",
     "gifencoder": "^2.0.1",
+    "mongodb": "^4.2.0",
     "mongoose": "^5.13.8",
     "node-fetch": "^2.6.1",
     "svg-captcha": "^1.4.0",

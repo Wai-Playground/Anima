@@ -5,12 +5,11 @@ export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
 export type backgroundType = "day" | "evening" | "night";
 export type engineType = "tomo" | "rpg" | "novel";
 export interface baseUniversePayload {
-  _id: number;
+  _id: number | string;
   variant: {
     isVariant: boolean;
-    variantIds?: Array<number>;
     variantUse?: string;
-    originalId?: number;
+    originalID?: number;
   };
   name: string;
 }
@@ -24,7 +23,7 @@ export interface characterPayload extends baseUniversePayload {
   age?: number;
   bloodtype?: string;
   description?: string;
-  universe?: {
+  personality?: {
     greetings: Array<string>;
     farewells: Array<string>;
   };
@@ -33,15 +32,15 @@ export interface characterPayload extends baseUniversePayload {
 
 export type scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
 
-export interface argument extends MessageSelectOptionData{
+export interface argument extends MessageSelectOptionData {
   route: scripts | number
 
 }
 
 export interface single {
   index?: number;
-  bg?: number;
-  character?: number;
+  bg?: number | string;
+  character?: number | string;
   text: string;
   mood?: moodType;
   route?: number | scripts;

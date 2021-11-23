@@ -6,7 +6,7 @@ import { backgroundPayload, backgroundType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Background extends universeBase {
-    constructor(_id: number, payload: backgroundPayload) {
+    constructor(_id: number | string, payload: backgroundPayload) {
         super(_id, 'background', payload.name, payload.variant.isVariant, payload.link);
         
 
