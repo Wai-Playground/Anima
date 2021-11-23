@@ -1,7 +1,7 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError } from "./statics/errors";
 import { backgroundPayload, characterPayload } from "./statics/types";
-import Monmonga from "../client/Mongo";
+import Monmonga from "../client/Monmonga";
 class Queries {
     public static async character(_id: string | number) {
         let payload: characterPayload;

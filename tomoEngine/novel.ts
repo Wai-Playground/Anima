@@ -259,8 +259,6 @@ export default class Novel extends engineBase {
     if (this.buttonCollector == undefined) this.collectButton(this.filter);
     if (this.selectCollector == undefined) this.collectSelect(this.filter);
     
-    
-    
   }
 
   async setPage(index: number = this.index) {
@@ -279,7 +277,6 @@ export default class Novel extends engineBase {
       components: await this.action(),
     };
     await this.interaction.editReply(payload);
-    console.log(this.selectCollector == undefined && this.nodes[index].isChoiced)
     
     this.refreshCoolDown()
 
