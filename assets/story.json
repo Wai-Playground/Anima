@@ -4,22 +4,23 @@
         {
             "bg": 0,
             "character": 1,
-            "text": "Omg is that william ZHENG?"
+            "text": "$greeting, Character 0 Speaking"
 
         },
 
         {
             "bg": 1,
-            "text": "Hello char 2!"
+            "text": "Character 0 but different background."
 
         },
         {
-            "character": 2,
-            "mood": "sad",
-            "text": "What do you want?",
-            "placeholder": "Select your dialoguasdse...",
+            "character": 0,
+            "mood": "happy",
+            "text": "Happy variant of character 0",
+            "placeholder": "Choose which place to go",
             "args": [{
-                "label": "Who is",
+                "emoji": "🎂",
+                "label": "Cake Emoji! Should go next.",
                 "route": "$next"
                 
 
@@ -30,15 +31,14 @@
             }]
         },
         {
-            "text": "He is ...",
+            "text": "Last should be the cake emoji thingy. Still happy variatn! But click next to go back to the choosing palce.",
             "route": 2
             
         },
         {
             "bg": 0,
-            "character": 1,
-            "mood": "happy",
-            "text": "Good bye"
+            "character": 2,
+            "text": "Character Two says good bye."
         }
     ]
 }

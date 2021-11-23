@@ -60,6 +60,7 @@ class NodeSingle implements single{
       for (const arg of single.args) {
         this.choices.push({
           label: arg.label,
+          emoji: arg.emoji || "💬",
           value: i.toString(),
         });
         this.lookUpArr.push(arg.route);
@@ -232,11 +233,11 @@ export default class Novel extends engineBase {
 
   async start() {
     const payload = {
-      content: `>>> ${this.characters.get(this.nodes[0].character).name} >> ${
-        this.nodes[0].text
+      content: `>>> ${this.characters.get(this.nodes[this.index].character).name} >> ${
+        this.nodes[this.index].text
       }`,
       files: [
-        this.nodes[0].built ? this.nodes[0].built_img : await this.buildNode(0),
+        this.nodes[this.index].built ? this.nodes[this.index].built_img : await this.buildNode(this.index),
       ],
       //attachments: [build],
       components: await this.action(),
@@ -255,8 +256,17 @@ export default class Novel extends engineBase {
 
     this.message = await this.interaction.fetchReply();
 
-    this.collectButton(this.filter);
-    if (this.nodes[this.index].isChoiced) this.collectSelect(this.filter);
+    if (this.buttonCollector == undefined) this.collectButton(this.filter);
+    
+    
+    if ((this.nodes[this.index].isChoiced))
+    {
+      if (this.selectCollector != undefined) {
+        if (this.selectCollector.checkEnd()) this.collectSelect(this.filter);
+
+      } else this.collectSelect(this.filter)
+        
+    }
   }
 
   async setPage(index: number = this.index) {
@@ -275,7 +285,18 @@ export default class Novel extends engineBase {
       components: await this.action(),
     };
     await this.interaction.editReply(payload);
-    if (this.nodes[this.index].isChoiced) this.collectSelect(this.filter);
+    //console.log((this.selectCollector != undefined))
+    
+    if ((this.nodes[this.index].isChoiced))
+    {
+      if (this.selectCollector != undefined) {
+        if (this.selectCollector.checkEnd()) this.collectSelect(this.filter);
+
+      } else this.collectSelect(this.filter)
+        
+    }
+
+    
 
     //await this.interaction.editReply(payload);
   }
@@ -302,6 +323,9 @@ export default class Novel extends engineBase {
           this.setPage(this.index - 1);
           break;
         case 1:
+          skript = this.nodes[this.index].route;
+          console.log(skript + "ROUTEEE")
+          if (typeof(skript) == "number") return this.setPage(skript)
           this.setPage(this.index + 1);
 
           break;
@@ -311,7 +335,8 @@ export default class Novel extends engineBase {
             skript = this.nodes[this.index].lookUpArr[
               this.selection
             ] as scripts & number;
-            if (isNaN(skript)) return this.parseScript(skript);
+            if (typeof(skript) != "number") return this.parseScript(skript);
+            console.log(skript)
             this.setPage(skript);
           }
 
@@ -415,6 +440,7 @@ export default class Novel extends engineBase {
     );
 
     this.selectCollector.on("end", () => {
+      console.log("select ended!")
       this.emit("end");
     });
   }
