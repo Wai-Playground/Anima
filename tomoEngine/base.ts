@@ -66,7 +66,7 @@ class engineBase extends EventEmitter {
   async getBackground(_id: number | string): Promise<Background> {
     try {
       //const payload: backgroundPayload = await Queries.backgroundUniverse(_id);
-      return new Background(_id, await Queries.backgroundUniverse(_id) as backgroundPayload);
+      return new Background(_id, await Queries.background(_id) as backgroundPayload);
 
     } catch(e) {
       console.log(e);

@@ -21,7 +21,7 @@ class Queries {
 
     }
 
-    public static async backgroundUniverse(_id: string | number) {
+    public static async background(_id: string | number) {
         let payload: backgroundPayload;
         try {
             payload = await Monmonga.universeDB().collection<backgroundPayload>("backgrounds").findOne({ _id: _id});

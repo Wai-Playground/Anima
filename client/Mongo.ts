@@ -3,6 +3,9 @@ import {MongoClient} from "mongodb"
 require("dotenv").config()
 
 let momonga: MongoClient;
+/**
+ * Mongodb utility class.
+ */
 export default class Monmonga extends Amadeus_Base {
     constructor() {
         super()

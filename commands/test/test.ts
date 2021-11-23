@@ -6,6 +6,7 @@ import Novel from "../../tomoEngine/novel";
 import Queries from "../../tomoEngine/queries";
 import { APIMessage } from "discord-api-types";
 import Character from "../../tomoEngine/tomoClasses/characters";
+import Background from "../../tomoEngine/tomoClasses/backgrounds";
 
 const json = require("../../assets/story.json")
 
@@ -24,6 +25,9 @@ class Test extends Commands {
   }
 
   async execute(bot , interaction: CommandInteraction) {
+    let payload = await Queries.background(0);
+    let bg = new Background(0, payload)
+    await interaction.reply(bg.name)
     /*
     await interaction.deferReply({ephemeral: true});
     let jsons = JSON.parse(JSON.stringify(json));
