@@ -256,8 +256,17 @@ export default class Novel extends engineBase {
 
     this.message = await this.interaction.fetchReply();
 
-    this.collectButton(this.filter);
-    if ((this.nodes[this.index].isChoiced) && (this.selectCollector == undefined)) this.collectSelect(this.filter);
+    if (this.buttonCollector == undefined) this.collectButton(this.filter);
+    
+    
+    if ((this.nodes[this.index].isChoiced))
+    {
+      if (this.selectCollector != undefined) {
+        if (this.selectCollector.checkEnd()) this.collectSelect(this.filter);
+
+      } else this.collectSelect(this.filter)
+        
+    }
   }
 
   async setPage(index: number = this.index) {
@@ -276,8 +285,18 @@ export default class Novel extends engineBase {
       components: await this.action(),
     };
     await this.interaction.editReply(payload);
+    //console.log((this.selectCollector != undefined))
     
-    if ((this.nodes[this.index].isChoiced) && (this.selectCollector == undefined || this.selectCollector.checkEnd())) this.collectSelect(this.filter);
+    if ((this.nodes[this.index].isChoiced))
+    {
+      if (this.selectCollector != undefined) {
+        if (this.selectCollector.checkEnd()) this.collectSelect(this.filter);
+
+      } else this.collectSelect(this.filter)
+        
+    }
+
+    
 
     //await this.interaction.editReply(payload);
   }
@@ -421,6 +440,7 @@ export default class Novel extends engineBase {
     );
 
     this.selectCollector.on("end", () => {
+      console.log("select ended!")
       this.emit("end");
     });
   }
