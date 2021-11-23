@@ -15,7 +15,7 @@ import {
   MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
-import { single, scripts } from "./statics/types";
+import { single, scripts, moodType } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -27,14 +27,14 @@ import {
   NodeCanvasRenderingContext2D,
 } from "canvas";
 
-class NodeSingle {
+class NodeSingle implements single{
   index: number;
-  character: number;
-  background: number;
+  character: number | string;
+  background: number | string;
   text: string;
-  mood?: string;
+  mood?: moodType;
   isChoiced: boolean;
-  route?: number | string;
+  route?: number | scripts;
   built: boolean = false;
   built_img: MessageAttachment;
   choices?: Array<MessageSelectOptionData>;
@@ -73,8 +73,8 @@ class NodeSingle {
 export default class Novel extends engineBase {
   name: string;
   json: any;
-  backgrounds: Map<number, Background>;
-  characters: Map<number, Character>;
+  backgrounds: Map<number | string, Background>;
+  characters: Map<number | string, Character>;
   multiples: Array<single>;
   nodes: Array<NodeSingle>;
   index: number;

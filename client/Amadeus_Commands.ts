@@ -1,5 +1,4 @@
 import { Client, CommandInteraction } from "discord.js";
-import user from "../db_schemas/user_type";
 import { UserNotFoundError } from "../tomoEngine/statics/errors";
 import Amadeus_Base from "./Amadeus_Base";
 import CustomClient from "./Amadeus_Client";
@@ -80,7 +79,7 @@ export abstract class Commands extends Amadeus_Base {
     if (this.coolDown > 0) {
       if (await this.checkCoolDown(bot.coolDown, interaction)) return interaction.reply("Sorry, your are on cooldown.")
     }
-    
+    /*
     if (this.dbRequired) {
       try {
         const author = await user.findOne({_id: interaction.user.id});
@@ -99,7 +98,7 @@ export abstract class Commands extends Amadeus_Base {
         
       
       }
-    }
+    }*/
 
     
 

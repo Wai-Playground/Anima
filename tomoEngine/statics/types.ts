@@ -5,10 +5,9 @@ export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
 export type backgroundType = "day" | "evening" | "night";
 export type engineType = "tomo" | "rpg" | "novel";
 export interface baseUniversePayload {
-  _id: number;
+  _id: number | string;
   variant: {
     isVariant: boolean;
-    variantIds?: Array<number>;
     variantUse?: string;
     originalId?: number;
   };
@@ -40,8 +39,8 @@ export interface argument extends MessageSelectOptionData{
 
 export interface single {
   index?: number;
-  bg?: number;
-  character?: number;
+  bg?: number | string;
+  character?: number | string;
   text: string;
   mood?: moodType;
   route?: number | scripts;

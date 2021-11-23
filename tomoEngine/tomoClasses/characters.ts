@@ -6,7 +6,7 @@ import { characterPayload, moodType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
-    constructor(_id: number, payload: characterPayload) {
+    constructor(_id: number | string, payload: characterPayload) {
         super(_id, 'character', payload.name, payload.variant.isVariant, payload.link)
 
         

@@ -7,7 +7,7 @@ import Queries from "../queries";
 import { OriginalReqVarError } from "../statics/errors";
 
 export default class universeBase {
-    _id: number;
+    _id: number | string;
     type: basicUniverseType;
     name: string;
     variant: boolean;
@@ -18,7 +18,7 @@ export default class universeBase {
      * @param _id |
      * @param basicImagetype |
      */
-    constructor(_id: number, type: basicUniverseType, name: string, variant: boolean, link: string) {
+    constructor(_id: number | string, type: basicUniverseType, name: string, variant: boolean, link: string) {
         this._id = _id;
         this.name = name
         this.type = type;
@@ -31,7 +31,7 @@ export default class universeBase {
      * 
      * @returns The ID of the class.
      */
-    getId(): number {
+    getId(): number | string {
         return this._id;
     
     }
@@ -66,7 +66,7 @@ export default class universeBase {
      * @param type Optional.
      * @returns requested variant.
      */
-    async getVariant(string: moodType | backgroundType, id: number = this._id, type: basicUniverseType = this.type) {
+    async getVariant(string: moodType | backgroundType, id: number | string = this._id, type: basicUniverseType = this.type) {
         let res: any;
         try {
             if (type == "background") {

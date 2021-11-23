@@ -1,11 +1,8 @@
 import { ButtonInteraction, Client, CommandInteraction, InteractionCollector, Message, MessageActionRow, MessageButton, PartialMessage } from "discord.js";
 import { Commands } from "../../client/Amadeus_Commands";
-import { createConnection } from "mongoose";
 import engineBase from "../../tomoEngine/base";
-import user from "../../db_schemas/user_type";
 import tomoEngine from "../../tomoEngine/tomoEngine";
 import Novel from "../../tomoEngine/novel";
-import bg from "../../db_schemas/universe/background_type";
 import Queries from "../../tomoEngine/queries";
 import { APIMessage } from "discord-api-types";
 import Character from "../../tomoEngine/tomoClasses/characters";
@@ -27,13 +24,14 @@ class Test extends Commands {
   }
 
   async execute(bot , interaction: CommandInteraction) {
+    /*
     await interaction.deferReply({ephemeral: true});
     let jsons = JSON.parse(JSON.stringify(json));
     let nvl = new Novel(jsons, interaction, true)
     //console.log(json)
     nvl.once("ready", () => {
       return nvl.start();
-    })
+    })*/
     
 
       
