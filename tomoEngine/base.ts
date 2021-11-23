@@ -74,9 +74,11 @@ class engineBase extends EventEmitter {
     }
   }
 
+  /*
+
   async getUserUni(_id: String | number = null): Promise<any> {
     return await Queries.userUniverse(_id == undefined ? this.discUserObj.id : _id); //If the _id is not passed, use interaction user id.
-  }
+  } */
 
 
 }

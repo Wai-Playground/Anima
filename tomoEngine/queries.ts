@@ -1,6 +1,6 @@
 import bg from "../db_schemas/universe/background_type";
 import char from "../db_schemas/universe/characters_type";
-import user_universe from "../db_schemas/universe/user_universe_type";
+//import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError } from "./statics/errors";
 import { backgroundPayload, characterPayload } from "./statics/types";
 
@@ -70,13 +70,13 @@ class Queries {
 
 
     }
-
+/*
     public static async userUniverse(_id: String | number) {
         
         return await user_universe.findOne({ _id: _id});
         
 
-    }
+    }*/
 
 
 

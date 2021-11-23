@@ -1,3 +1,5 @@
+import { Mongoose } from "mongoose";
+
 require("dotenv").config();
 const fs = require("fs");
 const { Client, Collection, Intents } = require("discord.js");
@@ -13,6 +15,7 @@ export default class CustomClient extends Client {
    */
 
   constructor(name: string = "Bot", token: string, uri: string) {
+
     super({
       intents: [
         Intents.FLAGS.GUILDS,
@@ -27,6 +30,7 @@ export default class CustomClient extends Client {
     this.commands = new Collection();
     this.coolDown = new Set();
     this.slashCommands = []; // Make a new arr for commands to forward to discord.
+
   }
 
   async loadCog(this: CustomClient, cPath: string = `./commands`) {
@@ -107,7 +111,7 @@ export default class CustomClient extends Client {
     }
   }
 
-  eventsLoader(this: CustomClient, path: string = "./listeners") {
+  async eventsLoader(this: CustomClient, path: string = "./listeners") {
     const eventFiles = fs
       .readdirSync(path)
       .filter((file) => file.endsWith(".js"));
@@ -144,6 +148,7 @@ export default class CustomClient extends Client {
       //Run function of connect.
       console.time("Database_Connection_Time"); //Starts Timer.
       await mongoose.connect(this.uri, settings);
+
     } catch (e) {
       //If error, retry the function and add 1 to the retries.
       console.error("Mango login failed... retrying.");

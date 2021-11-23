@@ -1,4 +1,4 @@
-const { Schema, model} = require("mongoose");
+import mongoose, { Schema } from "mongoose";
 
 const bgSchema = new Schema({
     _id: Number,
@@ -22,5 +22,5 @@ const bgSchema = new Schema({
     link: String
   });
 
-const bg = model("background", bgSchema)
-export = bg;
+  const bg = mongoose.connection.useDb("universe").model("characters", bgSchema)
+  export = bg;

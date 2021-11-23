@@ -1,4 +1,5 @@
-const { Schema, model} = require("mongoose");
+import mongoose, { Schema } from "mongoose";
+
 
 const charSchema = new Schema({
     _id: Number,
@@ -30,15 +31,13 @@ const charSchema = new Schema({
       type: String,
       required: false
     },
-    universe: {
+    personality: {
       greetings: Array,
       farewells: Array,
       
-
     },
     link: String
 
   });
-
-const char = model("characters", charSchema)
+const char = mongoose.connection.useDb("universe").model("characters", charSchema)
 export = char;
