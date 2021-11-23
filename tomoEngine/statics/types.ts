@@ -31,9 +31,11 @@ export interface characterPayload extends baseUniversePayload {
 }
 
 export type scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
+export type user_scripts = "$nickname" | "$suffix";
+
 
 export interface argument extends MessageSelectOptionData {
-  route: scripts | number
+  route: scripts | number;
 
 }
 

@@ -17,13 +17,6 @@ class Ping extends Commands {
   }
 
   async execute(bot: typeof Client, interaction: CommandInteraction) {
-    const payload = await Queries.character(1);
-    const char = new Character(payload._id, payload);
-
-    const payload1 = await Queries.character(1);
-    const char1 = new Character(payload._id, payload);
-    console.log(char)
-    console.log(char1)
 
 
     
