@@ -3,7 +3,7 @@ const fs = require("fs");
 const { Client, Collection, Intents } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-import Mongo from "./Mongo"
+import Momonga from "./Amadeus_Mongo"
 //
 export default class CustomClient extends Client {
   /**
@@ -134,7 +134,7 @@ export default class CustomClient extends Client {
    */
 
   async mangoLoader(this: CustomClient) {
-    await Mongo.connect()
+    await Momonga.connect()
   }
 
   /**

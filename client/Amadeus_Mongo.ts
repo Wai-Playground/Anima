@@ -2,7 +2,7 @@ import Amadeus_Base from "./Amadeus_Base";
 import {MongoClient} from "mongodb"
 require("dotenv").config()
 
-let momonga: MongoClient;
+var momonga: MongoClient;
 /**
  * Mongodb utility class.
  */
@@ -40,11 +40,11 @@ export default class Monmonga extends Amadeus_Base {
         }
     }
 
-    static universeDB() {
+    public static universeDB() {
         return momonga.db("universe")
 
     }
-    static discordDB() {
+    public static discordDB() {
         return momonga.db("discord")
 
     }
