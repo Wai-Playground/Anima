@@ -6,8 +6,13 @@ import { characterPayload, moodType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
+    personality: {
+        greetings: Array<string> 
+        farewells: Array<string>
+    }
     constructor(_id: number | string, payload: characterPayload) {
         super(_id, 'character', payload.name, payload.variant.isVariant, payload.link)
+        this.personality = payload.personality;
 
         
     }
@@ -20,6 +25,10 @@ export default class Character extends universeBase {
     async getVariant(moodType: moodType): Promise<Character> {
         const moodVariant: characterPayload = await super.getVariant(moodType);
         return new Character(moodVariant._id, moodVariant);
+    }
+
+    getPersonality() {
+        return this.personality;
     }
 
 

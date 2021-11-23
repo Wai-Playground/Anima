@@ -36,13 +36,13 @@ class Queries {
 
     }
 
-    public static async characterVariant(originalId: number | string, name: string | number) {
+    public static async characterVariant(originalID: number | string, mood: string | number) {
         let payload: characterPayload;
 
         try {
 
-            payload = await Monmonga.universeDB().collection<characterPayload>("characters").findOne({'variant.originalId': originalId, 'variant.variantUse': name});
-            if (!payload) throw new UniBaseNotFoundError(originalId, "background");
+            payload = await Monmonga.universeDB().collection<characterPayload>("characters").findOne({'variant.originalID': originalID, 'variant.variantUse': mood});
+            if (!payload) throw new UniBaseNotFoundError(originalID, "character");
 
         } catch(e) {
             console.log(e);
@@ -52,11 +52,11 @@ class Queries {
 
     }
 
-    public static async backgroundVariant(originalId: number | string, name: string | number) {
+    public static async backgroundVariant(originalID: number | string, name: string | number) {
         let payload: backgroundPayload;
         try {
-            payload = await Monmonga.universeDB().collection<backgroundPayload>("backgrounds").findOne({'variant.originalId': originalId, 'variant.variantUse': name});
-            if (!payload) throw new UniBaseNotFoundError(originalId, "background");
+            payload = await Monmonga.universeDB().collection<backgroundPayload>("backgrounds").findOne({'variant.originalID': originalID, 'variant.variantUse': name});
+            if (!payload) throw new UniBaseNotFoundError(originalID, "background");
 
         } catch(e) {
             console.log(e);

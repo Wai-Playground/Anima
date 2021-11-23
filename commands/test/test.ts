@@ -25,9 +25,10 @@ class Test extends Commands {
   }
 
   async execute(bot , interaction: CommandInteraction) {
-    let payload = await Queries.background(0);
-    let bg = new Background(0, payload)
-    await interaction.reply(bg.name)
+    let payload = await Queries.character(0);
+    let bg = await new Character(0, payload).getVariant("happy")
+    console.log(bg.personality)
+    await interaction.reply({content: bg.personality.toString()})
     /*
     await interaction.deferReply({ephemeral: true});
     let jsons = JSON.parse(JSON.stringify(json));

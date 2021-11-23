@@ -9,7 +9,7 @@ export interface baseUniversePayload {
   variant: {
     isVariant: boolean;
     variantUse?: string;
-    originalId?: number;
+    originalID?: number;
   };
   name: string;
 }
@@ -23,7 +23,7 @@ export interface characterPayload extends baseUniversePayload {
   age?: number;
   bloodtype?: string;
   description?: string;
-  universe?: {
+  personality?: {
     greetings: Array<string>;
     farewells: Array<string>;
   };
@@ -32,7 +32,7 @@ export interface characterPayload extends baseUniversePayload {
 
 export type scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
 
-export interface argument extends MessageSelectOptionData{
+export interface argument extends MessageSelectOptionData {
   route: scripts | number
 
 }
