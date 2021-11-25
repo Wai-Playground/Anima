@@ -11,7 +11,7 @@ export default class Character extends universeBase {
         farewells: Array<string>
     }
     constructor(_id: number | string, payload: characterPayload) {
-        super(_id, 'character', payload.name, payload.variant.isVariant, payload.link)
+        super(_id, 'characters', payload.name, payload.variant.isVariant, payload.link)
         this.personality = payload.personality;
 
         

@@ -69,11 +69,11 @@ export default class universeBase {
     async getVariant(string: moodType | backgroundType, id: number | string = this._id, type: basicUniverseType = this.type) {
         let res: any;
         try {
-            if (type == "background") {
+            if (type == "backgrounds") {
 
                 res = await Queries.backgroundVariant(id, string) as backgroundPayload;
 
-            } else if (type == "character") {
+            } else if (type == "characters") {
 
                 res = await Queries.characterVariant(id, string) as characterPayload;
 

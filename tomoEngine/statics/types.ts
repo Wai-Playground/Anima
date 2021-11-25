@@ -1,6 +1,6 @@
 import { MessageSelectOptionData } from "discord.js";
 /** Basic types (start) */
-export type basicUniverseType = "character" | "background" | "user";
+export type basicUniverseType = "characters" | "backgrounds" | "users";
 export type engineType = "tomo" | "rpg" | "novel";
 
 /** Basic types (end) */
