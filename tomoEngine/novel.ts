@@ -15,7 +15,7 @@ import {
   MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
-import { single, scripts, moodType } from "./statics/types";
+import { single, scripts, moodType, user_scripts } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -27,7 +27,7 @@ import {
   NodeCanvasRenderingContext2D,
 } from "canvas";
 
-class NodeSingle implements single{
+class NodeSingle implements single {
   index: number;
   character: number | string;
   background: number | string;
@@ -117,7 +117,6 @@ export default class Novel extends engineBase {
     this.nodes = [];
     this.prepareAssets();
   }
-
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
     const canvas: Canvas = createCanvas(this.width, this.height);
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
@@ -142,8 +141,6 @@ export default class Novel extends engineBase {
   }
 
   parseScript(str: scripts): void {
-    console.log(str);
-
     switch (str) {
       case "$end":
         this.end();
@@ -188,8 +185,9 @@ export default class Novel extends engineBase {
         this.backgrounds.set(single.bg, payload); // we set it in this map
       }
 
-      // console.log(i + `_${single.mood}`);
-      if (!this.characters.has(single.character) || single.mood != undefined) {
+      
+
+      if (!this.characters.has(single.character) || single.mood != undefined) { // If cache dont have character or the mood is defined:
         if (!this.characters.has(single.character))
           console.log(
             "[ch] Char not logged, getting the payload. Payload ID:" +
@@ -200,7 +198,7 @@ export default class Novel extends engineBase {
         payload = await this.getCharacter(single.character);
 
         if (single.mood) {
-          payload = await payload.getVariant(single.mood); // If the character is a variant, we can substitute
+          payload = await payload.getVariant(single.mood); // If the character is a variant, we can substitute the main payload with this.
 
           single.character = payload.getId;
         }
@@ -209,6 +207,8 @@ export default class Novel extends engineBase {
       }
 
       this.nodes.push(new NodeSingle(single, i)); // Push it into our arra of nodes.
+      if (single.text.includes("$")) single.text = this.parseCharacterScript(single.text, this.characters[this.nodes[i].character]) // If this single has a $ in it we run it through this funcion and replace it with this.
+
 
       i++;
     }

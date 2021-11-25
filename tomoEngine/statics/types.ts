@@ -38,8 +38,9 @@ export interface characterPayload extends baseUniversePayload {
 /** Tomo types (start) */
 export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
 export type scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
-export type user_scripts = "$nickname" | "$suffix";
+export type user_scripts = "$nickname" | "$suffix" | "$greetings" | "$farewells";
 export type backgroundType = "day" | "evening" | "night";
+export type mood_states = "detest" | "hate" | "annoyed" | "main" | "friendly" | "happy" | "passionate" | "close" | "flustered" | "love" | "goal"
 
 export interface argument extends MessageSelectOptionData {
   route: scripts | number;

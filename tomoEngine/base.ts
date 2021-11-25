@@ -74,6 +74,19 @@ class engineBase extends EventEmitter {
     }
   }
 
+  async parseUserScript(str: string): Promise<string> {
+    
+    
+
+    return str;
+
+  }
+
+  parseCharacterScript(str: string, character: Character): string {
+
+    return str;
+  }
+
   /*
 
   async getUserUni(_id: String | number = null): Promise<any> {
