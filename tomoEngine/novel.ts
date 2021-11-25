@@ -40,6 +40,7 @@ class NodeSingle implements single{
   choices?: Array<MessageSelectOptionData>;
   placeholder?: string;
   lookUpArr?: Array<scripts | number>;
+  backable: boolean;
 
   constructor(single: single, index: number = null) {
     this.index = single.index || index;
@@ -47,6 +48,7 @@ class NodeSingle implements single{
     this.background = single.bg;
     this.text = single.text;
     this.mood = single.hasOwnProperty("mood") ? single.mood : null;
+    this.backable = single.hasOwnProperty("backable") ? single.backable : true;
     this.route = single.hasOwnProperty("route") ? single.route : index + 1;
 
     this.isChoiced = single.hasOwnProperty("args") ? true : false;
@@ -200,7 +202,7 @@ export default class Novel extends engineBase {
         if (single.mood) {
           payload = await payload.getVariant(single.mood); // If the character is a variant, we can substitute
 
-          single.character = payload.getId();
+          single.character = payload.getId;
         }
 
         this.characters.set(single.character, payload);
@@ -346,14 +348,16 @@ export default class Novel extends engineBase {
       {
         disabled:
           (this.index > 0 ? false : true) ||
-          this.nodes[this.index - 1].isChoiced,
+          (this.nodes[this.index - 1].isChoiced) ||
+          (!this.nodes[this.index].backable),
+          
         label: "Back",
         style: 1,
       },
       {
         disabled:
           (this.index >= this.nodes.length - 1 ? true : false) ||
-          this.nodes[this.index].isChoiced,
+          (this.nodes[this.index].isChoiced),
         label: "Next",
         style: 1,
       },
@@ -397,7 +401,7 @@ export default class Novel extends engineBase {
           .setPlaceholder(
             this.selection == undefined
               ? this.nodes[this.index].placeholder
-              : "• "+ this.nodes[this.index].choices[this.selection].label
+              : this.nodes[this.index].choices[this.selection].emoji + this.nodes[this.index].choices[this.selection].label
           )
           .addOptions(this.nodes[this.index].choices)
       );
@@ -418,10 +422,9 @@ export default class Novel extends engineBase {
     this.selectCollector.on(
       "collect",
       async (interaction: SelectMenuInteraction) => {
-        let value = interaction.values[0]; // value[1] = selection, value[2] = index
+        let value = interaction.values[0]; // value[1] = selection
         console.log(value);
 
-        if (this.index == parseInt(value)) return;
         this.selection = parseInt(value);
 
         this.emit("selectCollected", value);

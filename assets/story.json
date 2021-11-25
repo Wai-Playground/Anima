@@ -4,40 +4,59 @@
         {
             "bg": 0,
             "character": 1,
-            "text": "$greeting, Character 0 Speaking"
+            "text": "Select your class",
+            "args": [{
+                "emoji": "✨",
+                "label": "Mage",
+                "route": 1
+            }, {
+                "emoji": "🗡️",
+                "label": "Knight",
+                "route": 2
+
+            }, {
+                "emoji": "🏹",
+                "label": "Archer",
+                "route": 3
+            }]
 
         },
 
         {
             "bg": 1,
-            "text": "Character 0 but different background."
+            "text": "Yay mage.",
+            "route": 4,
+            "backable": false
+            
 
         },
         {
             "character": 0,
             "mood": "happy",
-            "text": "Happy variant of character 0",
+            "text": "Yay Knight",
             "placeholder": "Choose which place to go",
+            "backable": false,
             "args": [{
-                "emoji": "🎂",
-                "label": "Cake Emoji! Should go next.",
-                "route": "$next"
+                "label": "Retry?",
+                "route": 0
                 
 
             }, {
-                "label": "bye",
+                "label": "Exit",
                 "route": 4
 
             }]
         },
         {
-            "text": "Last should be the cake emoji thingy. Still happy variatn! But click next to go back to the choosing palce.",
-            "route": 2
+            "text": "Yay, arrow guy",
+            "route": 4,
+            "backable": false
             
         },
         {
             "bg": 0,
             "character": 2,
+            "backable": false,
             "text": "Character Two says good bye."
         }
     ]

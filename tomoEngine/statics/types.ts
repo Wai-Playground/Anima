@@ -1,9 +1,11 @@
 import { MessageSelectOptionData } from "discord.js";
-
+/** Basic types (start) */
 export type basicUniverseType = "character" | "background" | "user";
-export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
-export type backgroundType = "day" | "evening" | "night";
 export type engineType = "tomo" | "rpg" | "novel";
+
+/** Basic types (end) */
+
+/** Mongodb payload types (start) */
 export interface baseUniversePayload {
   _id: number | string;
   variant: {
@@ -30,9 +32,14 @@ export interface characterPayload extends baseUniversePayload {
   link: string;
 }
 
+/** Mongodb payload types (end) */
+
+
+/** Tomo types (start) */
+export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
 export type scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
 export type user_scripts = "$nickname" | "$suffix";
-
+export type backgroundType = "day" | "evening" | "night";
 
 export interface argument extends MessageSelectOptionData {
   route: scripts | number;
@@ -48,4 +55,7 @@ export interface single {
   route?: number | scripts;
   placeholder?: string;
   args?: Array<argument>;
+  backable?: boolean;
 }
+
+/** Tomo types (end) */

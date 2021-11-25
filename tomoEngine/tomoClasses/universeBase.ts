@@ -31,7 +31,7 @@ export default class universeBase {
      * 
      * @returns The ID of the class.
      */
-    getId(): number | string {
+    get getId(): number | string {
         return this._id;
     
     }
@@ -40,7 +40,7 @@ export default class universeBase {
      * @returns name of the class
      */
 
-    getName(): string {
+    get getName(): string {
         return this.name;
     }
     
@@ -48,7 +48,7 @@ export default class universeBase {
      * 
      * @returns type of the class
      */
-    getType(): basicUniverseType {
+    get getType(): basicUniverseType {
         return this.type;
     }
     /**
@@ -56,7 +56,7 @@ export default class universeBase {
      * @returns boolean | if the class is a variant or not.
      */
 
-    isVariant(): boolean {
+    get isVariant(): boolean {
         return this.variant;
     }
     /**

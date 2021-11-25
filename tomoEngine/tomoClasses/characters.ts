@@ -27,7 +27,7 @@ export default class Character extends universeBase {
         return new Character(moodVariant._id, moodVariant);
     }
 
-    getPersonality() {
+    get Personality() {
         return this.personality;
     }
 
