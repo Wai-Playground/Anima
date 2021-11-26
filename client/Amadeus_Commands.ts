@@ -43,8 +43,6 @@ export abstract class Commands extends Amadeus_Base {
     this.inMainOnly = settings.inMainOnly;
     this.coolDown = settings.coolDown;
 
-    
-
   }
 
   async checkCoolDown(storage: Set<string>, interaction: CommandInteraction) {

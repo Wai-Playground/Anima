@@ -6,7 +6,13 @@ class Level extends Commands {
   constructor() {
     super("level", {
       description: "For pinging the bot.",
-      data: new SlashCommandBuilder(),
+      data: new SlashCommandBuilder()
+      .addNumberOption((option) =>
+      option
+        .setName("test")
+        .setDescription("test2")
+        .setRequired(false)
+    ),
       dbRequired: false,
       ownerOnly: false,
     });

@@ -32,8 +32,9 @@ export default class CustomClient extends Client {
   }
 
   async loadCog(this: CustomClient, cPath: string = `./commands`) {
+
     let files = fs.readdirSync(cPath);
-    let newPath: string;
+    let newPath: string
 
     files.forEach((file) => {
       newPath = cPath + "/" + file;
@@ -44,13 +45,19 @@ export default class CustomClient extends Client {
           
           const command = require(`.${newPath}`);
           const cmd = new command();
+          let payload: {
+            name: string,
+            description?: string,
+            options: [],
+            default_permissions?: any
+          }
 
           console.info(
             "[c] " + this.name + " has loaded command: " + cmd.data.name + "."
           );
-          //console.log(cmd.data.toJSON());
-          this.slashCommands.push(cmd.data.toJSON());
-          this.commands.set(cmd.data.name, cmd);
+          payload = cmd.data.toJSON()
+          this.slashCommands.push(payload);
+          this.commands.set(payload.name, cmd);
         }
       }
     });
