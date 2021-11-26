@@ -2,13 +2,13 @@
  * @author Shokkunn
  */
 
-import { backgroundPayload, backgroundType, basicUniverseType, characterPayload, moodType } from "../statics/types";
+import { BackgroundPayload, BackgroundType, BasicUniverseType, CharacterPayload, MoodType } from "../statics/types";
 import Queries from "../queries";
 import { OriginalReqVarError } from "../statics/errors";
 
 export default class universeBase {
     _id: number | string;
-    type: basicUniverseType;
+    type: BasicUniverseType;
     name: string;
     variant: boolean;
     link: string;
@@ -18,7 +18,7 @@ export default class universeBase {
      * @param _id |
      * @param basicImagetype |
      */
-    constructor(_id: number | string, type: basicUniverseType, name: string, variant: boolean, link: string) {
+    constructor(_id: number | string, type: BasicUniverseType, name: string, variant: boolean, link: string) {
         this._id = _id;
         this.name = name
         this.type = type;
@@ -48,7 +48,7 @@ export default class universeBase {
      * 
      * @returns type of the class
      */
-    get getType(): basicUniverseType {
+    get getType(): BasicUniverseType {
         return this.type;
     }
     /**
@@ -62,20 +62,20 @@ export default class universeBase {
     /**
      * Not supposed to be called since the return object is not in class form.
      * @param id id of the original variant. default: this._id (class)
-     * @param string moodType or backgroundType.
+     * @param string MoodType or BackgroundType.
      * @param type Optional.
      * @returns requested variant.
      */
-    async getVariant(string: moodType | backgroundType, id: number | string = this._id, type: basicUniverseType = this.type) {
+    async getVariant(string: MoodType | BackgroundType, id: number | string = this._id, type: BasicUniverseType = this.type) {
         let res: any;
         try {
             if (type == "backgrounds") {
 
-                res = await Queries.backgroundVariant(id, string) as backgroundPayload;
+                res = await Queries.backgroundVariant(id, string) as BackgroundPayload;
 
             } else if (type == "characters") {
 
-                res = await Queries.characterVariant(id, string) as characterPayload;
+                res = await Queries.characterVariant(id, string) as CharacterPayload;
 
             }
 

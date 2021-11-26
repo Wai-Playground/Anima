@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
-  "scripts": {
+  "Scripts": {
     "build": "tsc app.ts",
     "start": "node app.js",
     "start:dev": "node -r ts-node/register app.ts"

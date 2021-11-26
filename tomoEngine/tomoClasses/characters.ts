@@ -2,7 +2,7 @@
  * @author Shokkunn
  */
 
-import { characterPayload, moodType } from "../statics/types";
+import { CharacterPayload, MoodType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
@@ -10,7 +10,7 @@ export default class Character extends universeBase {
         greetings: Array<string> 
         farewells: Array<string>
     }
-    constructor(_id: number | string, payload: characterPayload) {
+    constructor(_id: number | string, payload: CharacterPayload) {
         super(_id, 'characters', payload.name, payload.variant.isVariant, payload.link)
         this.personality = payload.personality;
 
@@ -18,12 +18,12 @@ export default class Character extends universeBase {
     }
     /**
      * getVariant()
-     * @param moodType | mood you want to query.
+     * @param MoodType | mood you want to query.
      * @returns character class that has the mood that you queried.
      */
 
-    async getVariant(moodType: moodType): Promise<Character> {
-        const moodVariant: characterPayload = await super.getVariant(moodType);
+    async getVariant(MoodType: MoodType): Promise<Character> {
+        const moodVariant: CharacterPayload = await super.getVariant(MoodType);
         return new Character(moodVariant._id, moodVariant);
     }
 

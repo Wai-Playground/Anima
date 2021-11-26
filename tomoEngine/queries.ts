@@ -1,6 +1,6 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError } from "./statics/errors";
-import { backgroundPayload, baseUniversePayload, basicUniverseType, characterPayload } from "./statics/types";
+import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 class Queries {
     /**
@@ -9,7 +9,7 @@ class Queries {
      * @returns character payload as json
      */
     public static async character(_id: string | number) {
-        return await this.getBaseType(_id, "characters") as characterPayload;
+        return await this.getBaseType(_id, "characters") as CharacterPayload;
     }
 
     /**
@@ -18,7 +18,7 @@ class Queries {
      * @returns background payload as json
      */
     public static async background(_id: string | number) {
-        return await this.getBaseType(_id, "backgrounds") as backgroundPayload;
+        return await this.getBaseType(_id, "backgrounds") as BackgroundPayload;
     }
 
     /**
@@ -27,10 +27,10 @@ class Queries {
      * @param db priv
      * @returns priv
      */
-    private static async getBaseType(_id: number | string, db: basicUniverseType) {
-        let payload: baseUniversePayload;
+    private static async getBaseType(_id: number | string, db: BasicUniverseType) {
+        let payload: BaseUniversePayload;
         try {
-            payload = await Monmonga.universeDB().collection<baseUniversePayload>(db).findOne({ _id: _id});
+            payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({ _id: _id});
             if (!payload) throw new UniBaseNotFoundError(_id, db);
 
         } catch(e) {
@@ -48,7 +48,7 @@ class Queries {
      * @returns character payload as json
      */
     public static async characterVariant(originalID: number | string, name: string | number) {
-        return await this.getVariantType(originalID, name, "characters") as characterPayload
+        return await this.getVariantType(originalID, name, "characters") as CharacterPayload
 
     }
 
@@ -59,7 +59,7 @@ class Queries {
      * @returns background payload as json
      */
     public static async backgroundVariant(originalID: number | string, name: string | number) {
-        return await this.getVariantType(originalID, name, "backgrounds") as backgroundPayload
+        return await this.getVariantType(originalID, name, "backgrounds") as BackgroundPayload
 
     }
     /**
@@ -68,10 +68,10 @@ class Queries {
      * @param db priv
      * @returns priv
      */
-    private static async getVariantType(originalID: number | string, name: string | number, db: basicUniverseType) {
-        let payload: baseUniversePayload;
+    private static async getVariantType(originalID: number | string, name: string | number, db: BasicUniverseType) {
+        let payload: BaseUniversePayload;
         try {
-            payload = await Monmonga.universeDB().collection<baseUniversePayload>(db).findOne({'variant.originalID': originalID, 'variant.variantUse': name});
+            payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({'variant.originalID': originalID, 'variant.variantUse': name});
             if (!payload) throw new UniBaseNotFoundError(originalID, db);
 
         } catch(e) {

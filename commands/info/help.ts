@@ -97,10 +97,9 @@ class Help extends Commands {
       console.log(menu.test);
     })
 
-    menu.once("end", () => {
+    menu.once("end", async () => {
       console.log("going to END")
-      interaction.deleteReply()  .then(console.log)
-      .catch(console.error);
+      await interaction.deleteReply()
     })
 
   }

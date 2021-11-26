@@ -15,7 +15,7 @@ import {
   MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
-import { single, scripts, moodType, user_scripts } from "./statics/types";
+import { Single, Scripts, MoodType, User_Scripts } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -27,22 +27,22 @@ import {
   NodeCanvasRenderingContext2D,
 } from "canvas";
 
-class NodeSingle implements single {
+class NodeSingle implements Single {
   index: number;
   character: number | string;
   background: number | string;
   text: string;
-  mood?: moodType;
+  mood?: MoodType;
   isChoiced: boolean;
-  route?: number | scripts;
+  route?: number | Scripts;
   built: boolean = false;
   built_img: MessageAttachment;
   choices?: Array<MessageSelectOptionData>;
   placeholder?: string;
-  lookUpArr?: Array<scripts | number>;
+  lookUpArr?: Array<Scripts | number>;
   backable: boolean;
 
-  constructor(single: single, index: number = null) {
+  constructor(single: Single, index: number = null) {
     this.index = single.index || index;
     this.character = single.character;
     this.background = single.bg;
@@ -78,7 +78,7 @@ export default class Novel extends engineBase {
   json: any;
   backgrounds: Map<number | string, Background>;
   characters: Map<number | string, Character>;
-  multiples: Array<single>;
+  multiples: Array<Single>;
   nodes: Array<NodeSingle>;
   index: number;
   height: number = 480;
@@ -140,7 +140,7 @@ export default class Novel extends engineBase {
     return this.nodes[index].built_img;
   }
 
-  parseScript(str: scripts): void {
+  parseScript(str: Scripts): void {
     switch (str) {
       case "$end":
         this.end();
@@ -301,8 +301,8 @@ export default class Novel extends engineBase {
     });
     this.buttonCollector.on("collect", (interaction: ButtonInteraction) => {
       const button = interaction.customId.match(/(\d{1,1})/g)[0];
-      let skript: scripts | number;
-      skript = this.nodes[this.index].route as scripts | number;
+      let skript: Scripts | number;
+      skript = this.nodes[this.index].route as Scripts | number;
       if (typeof skript == "string") return this.parseScript(skript);
 
       this.emit("buttonCollected", button);
@@ -323,7 +323,7 @@ export default class Novel extends engineBase {
             console.log("confirmed");
             skript = this.nodes[this.index].lookUpArr[
               this.selection
-            ] as scripts & number;
+            ] as Scripts & number;
             if (typeof(skript) != "number") return this.parseScript(skript);
             console.log(skript)
             this.setPage(skript);

@@ -1,12 +1,12 @@
 import { MessageSelectOptionData } from "discord.js";
 /** Basic types (start) */
-export type basicUniverseType = "characters" | "backgrounds" | "users";
-export type engineType = "tomo" | "rpg" | "novel";
+export type BasicUniverseType = "characters" | "backgrounds" | "users";
+export type EngineType = "tomo" | "rpg" | "novel";
 
 /** Basic types (end) */
 
 /** Mongodb payload types (start) */
-export interface baseUniversePayload {
+export interface BaseUniversePayload {
   _id: number | string;
   variant: {
     isVariant: boolean;
@@ -15,13 +15,13 @@ export interface baseUniversePayload {
   };
   name: string;
 }
-export interface backgroundPayload extends baseUniversePayload {
+export interface BackgroundPayload extends BaseUniversePayload {
   description?: string;
   link: string;
 }
 
 
-export interface characterPayload extends baseUniversePayload {
+export interface CharacterPayload extends BaseUniversePayload {
   age?: number;
   bloodtype?: string;
   description?: string;
@@ -36,26 +36,30 @@ export interface characterPayload extends baseUniversePayload {
 
 
 /** Tomo types (start) */
-export type moodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
-export type scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
-export type user_scripts = "$nickname" | "$suffix" | "$greetings" | "$farewells";
-export type backgroundType = "day" | "evening" | "night";
-export type mood_states = "detest" | "hate" | "annoyed" | "main" | "friendly" | "happy" | "passionate" | "close" | "flustered" | "love" | "goal"
+export type MoodType = "happy" | "sad" | "annoyed" | "surprised" | "flustered";
+export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
+export type User_Scripts = "$nickname" | "$suffix" | "$greetings" | "$farewells";
+export type BackgroundType = "day" | "evening" | "night";
+export type Mood_States = "detest" | "hate" | "annoyed" | "main" | "friendly" | "happy" | "passionate" | "close" | "flustered" | "love" | "goal"
 
-export interface argument extends MessageSelectOptionData {
-  route: scripts | number;
+export interface Argument extends MessageSelectOptionData {
+  route: Scripts | number;
 
 }
+export interface Story {
+  name:      string;
+  multiples: Single[];
+}
 
-export interface single {
+export interface Single {
   index?: number;
   bg?: number | string;
   character?: number | string;
   text: string;
-  mood?: moodType;
-  route?: number | scripts;
+  mood?: MoodType;
+  route?: number | Scripts;
   placeholder?: string;
-  args?: Array<argument>;
+  args?: Array<Argument>;
   backable?: boolean;
 }
 

@@ -2,11 +2,11 @@
  * @author Shokkunn
  */
 
-import { backgroundPayload, backgroundType } from "../statics/types";
+import { BackgroundPayload, BackgroundType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Background extends universeBase {
-    constructor(_id: number | string, payload: backgroundPayload) {
+    constructor(_id: number | string, payload: BackgroundPayload) {
         super(_id, 'backgrounds', payload.name, payload.variant.isVariant, payload.link);
         
 
@@ -18,8 +18,8 @@ export default class Background extends universeBase {
      * @returns Class form version of the getVariant() from universeBase class.
      */
 
-    async getVariant(bgType: backgroundType): Promise<Background> {
-        const bgVariant: backgroundPayload = await super.getVariant(bgType);
+    async getVariant(bgType: BackgroundType): Promise<Background> {
+        const bgVariant: BackgroundPayload = await super.getVariant(bgType);
         return new Background(bgVariant._id, bgVariant);
     }
 

@@ -1,9 +1,9 @@
-import { basicUniverseType, engineType } from "./types";
+import { BasicUniverseType, EngineType } from "./types";
 
 class MangoError extends Error {
     id: number | string;
-    serverName: basicUniverseType;
-    constructor(message: string, id: number | string, server: basicUniverseType) {
+    serverName: BasicUniverseType;
+    constructor(message: string, id: number | string, server: BasicUniverseType) {
         super(`${message}: Server: ${server}, QueryID: ${id}`);
         this.name = "MangoError";
         this.serverName = server;
@@ -12,7 +12,7 @@ class MangoError extends Error {
 }
 
 export class UserNotFoundError extends MangoError {
-    constructor(userID: number | string, serverName: basicUniverseType) {
+    constructor(userID: number | string, serverName: BasicUniverseType) {
         super(`User not found in MongoDB`, userID, serverName);
         this.name = "UserNotFoundError";
 
@@ -21,7 +21,7 @@ export class UserNotFoundError extends MangoError {
 }
 
 export class UniBaseNotFoundError extends MangoError {
-    constructor(uniID: number | string, serverName: basicUniverseType) {
+    constructor(uniID: number | string, serverName: BasicUniverseType) {
         super(`Universe item not found in MongoDB`, uniID, serverName);
         this.name = "UniBaseNotFoundError";
 
@@ -30,7 +30,7 @@ export class UniBaseNotFoundError extends MangoError {
 }
 
 export class OriginalReqVarError extends MangoError {
-    constructor(variantID: number, serverName: basicUniverseType) {
+    constructor(variantID: number, serverName: BasicUniverseType) {
         super(`Requested Variant but received Original`, variantID, serverName);
         this.name = "OriginalReqVarError";
 
@@ -44,11 +44,11 @@ export class OriginalReqVarError extends MangoError {
  */
 
 export class EngineError extends Error {
-    engineType: engineType;
-    constructor(message: string, engineType: engineType) {
-        super(`${message}, engine: ${engineType}`);
+    EngineType: EngineType;
+    constructor(message: string, EngineType: EngineType) {
+        super(`${message}, engine: ${EngineType}`);
         this.name = "EngineError";
-        this.engineType = engineType;
+        this.EngineType = EngineType;
     }
 }
 
