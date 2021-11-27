@@ -32,6 +32,7 @@
     "gifencoder": "^2.0.1",
     "mongodb": "^4.2.0",
     "node-fetch": "^2.6.1",
+    "redis": "^4.0.0",
     "svg-captcha": "^1.4.0",
     "time-stamp": "^2.2.0",
     "ts-node": "^10.2.0"

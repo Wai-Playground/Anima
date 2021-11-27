@@ -4,6 +4,7 @@ const { Client, Collection, Intents } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 import Momonga from "./Amadeus_Mongo"
+import Red from "./Amadeus_Redis"
 //
 export default class CustomClient extends Client {
   /**
@@ -144,6 +145,10 @@ export default class CustomClient extends Client {
     await Momonga.connect()
   }
 
+  async redLoader(this: CustomClient) {
+    await Red.connect()
+  }
+
   /**
    *
    * @param this | Bot
@@ -153,6 +158,7 @@ export default class CustomClient extends Client {
     this.commandLoader();
     this.eventsLoader();
     this.mangoLoader();
+    this.redLoader();
     await super.login(this.token);
   }
 }
