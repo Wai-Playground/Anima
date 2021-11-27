@@ -10,7 +10,7 @@ import engineBase from "./base";
  * @author Shokkunn
  * @description | final complete package for the engine.
  */
-class tomoEngine extends engineBase {
+class TomoEngine extends engineBase {
   constructor(
     user: User,
     interaction: CommandInteraction
@@ -23,4 +23,4 @@ class tomoEngine extends engineBase {
 
 }
 
-export = tomoEngine;
+export = TomoEngine;

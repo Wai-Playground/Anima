@@ -35,7 +35,7 @@ class Ping extends Commands {
   }
 
   async test(bot: CustomClient, interaction: CommandInteraction) {
-    console.log(interaction.options.getSubcommand())
+    console.log("test")
 
   }
 }

@@ -131,6 +131,21 @@ export default class Novel extends engineBase {
     ctx.drawImage(bg, 0, 0, this.width, this.height);
     ctx.drawImage(ch, 0, 0, ch.naturalWidth, ch.naturalHeight);
 
+    /** Draw pfp */
+    /*
+
+    ctx.beginPath();
+
+    ctx.arc(80, 405, 60, 0, Math.PI * 2, true);
+
+    ctx.closePath();
+
+    ctx.clip();
+
+    const avatar = await loadImage(this.interaction.user.displayAvatarURL({ format: 'jpg' }));
+		ctx.drawImage(avatar, 20, 345, 120, 120);
+    */
+
     this.nodes[index].built = true;
     this.nodes[index].built_img = new MessageAttachment(
       canvas.toBuffer("image/jpeg"),
@@ -212,7 +227,6 @@ export default class Novel extends engineBase {
 
       i++;
     }
-
     // Build the node length if the legnth is less than or equal to 10.
 
     if (this.nodes.length <= 10) {
