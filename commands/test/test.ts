@@ -29,11 +29,13 @@ class Test extends Commands {
     
     await interaction.deferReply({ephemeral: true});
     let jsons = JSON.parse(JSON.stringify(json));
+    console.time('Novel')
     let nvl = new Novel(jsons, interaction, true)
     //console.log(json)
     nvl.once("ready", () => {
       return nvl.start();
     })
+    console.timeEnd("Novel")
     
 
       

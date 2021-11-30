@@ -283,6 +283,7 @@ export default class Novel extends engineBase {
   async setPage(index: number = this.index) {
     if (index < 0 || index > this.nodes.length - 1) return;
     this.index = index;
+    this.selection = undefined;
     const payload = {
       content: `>>> ${
         this.characters.get(this.nodes[index].character).name
@@ -296,8 +297,8 @@ export default class Novel extends engineBase {
       components: await this.action(),
     };
     await this.interaction.editReply(payload);
-
     this.refreshCoolDown();
+    
 
     //await this.interaction.editReply(payload);
   }
@@ -341,6 +342,7 @@ export default class Novel extends engineBase {
             if (typeof skript != "number") return this.parseScript(skript);
             console.log(skript);
             this.setPage(skript);
+            
           }
 
           break;
