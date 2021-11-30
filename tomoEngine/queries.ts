@@ -2,6 +2,8 @@
 import { UniBaseNotFoundError } from "./statics/errors";
 import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
+import Red from "../client/Amadeus_Redis";
+const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
 class Queries {
     /**
      * Retrieves character payload.
@@ -28,10 +30,19 @@ class Queries {
      * @returns priv
      */
     private static async getBaseType(_id: number | string, db: BasicUniverseType) {
-        let payload: BaseUniversePayload;
+        let payload: BaseUniversePayload, cache: string, redis = Red.memory();
         try {
+            cache = await redis.hGet(db, _id.toString());
+            if (cache) {
+                console.log("Cached! _id: "+ _id);
+                payload = JSON.parse(cache) as BaseUniversePayload;
+
+            }
             payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({ _id: _id});
             if (!payload) throw new UniBaseNotFoundError(_id, db);
+            console.log( )
+            redis.hSet(db, _id.toString(), JSON.stringify(payload));
+            redis.expire(db, EXPIRATION);
 
         } catch(e) {
             console.log(e);
@@ -69,25 +80,33 @@ class Queries {
      * @returns priv
      */
     private static async getVariantType(originalID: number | string, name: string | number, db: BasicUniverseType) {
-        let payload: BaseUniversePayload;
+        let payload: BaseUniversePayload, cache: string, hashKey: string = db + "_variants",  query: string= originalID + "_" + name, redis = Red.memory();
         try {
+            cache = await redis.hGet(hashKey, query);
+            if (cache) {
+                console.log("Cached Variant! o_id: "+ originalID);
+                payload = JSON.parse(cache) as BaseUniversePayload;
+
+            }
             payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({'variant.originalID': originalID, 'variant.variantUse': name});
             if (!payload) throw new UniBaseNotFoundError(originalID, db);
+            redis.hSet(hashKey, query, JSON.stringify(payload));
+            redis.expire(hashKey, EXPIRATION);
 
         } catch(e) {
             console.log(e);
             
         } finally {
+            
             return payload;
         }
     }
-/*
+
     public static async userUniverse(_id: String | number) {
-        
-        return await user_universe.findOne({ _id: _id});
+        //let payload: 
         
 
-    }*/
+    }
 
 
 

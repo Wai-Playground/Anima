@@ -22,14 +22,10 @@ class interactionCreate extends Listeners {
         (await cmd.check(bot, interaction)) &&
         (await cmd.default_checks(bot, interaction))
       ) {
-        console.log(interaction.options);
-        if (interaction.options.data.length != 0) {
-          // if we have options
-          if (interaction.options.data[0].type == "SUB_COMMAND") {
-            let sub = interaction.options.getSubcommand();
-            if (typeof cmd[sub] === "function")
-              return cmd[sub](bot, interaction);
-          }
+        //console.log(interaction.options.data)
+        if (interaction.options.data?.[0].type == "SUB_COMMAND") {
+          let sub = interaction.options.getSubcommand();
+          if (typeof cmd[sub] === "function") return cmd[sub](bot, interaction);
         }
 
         return cmd.execute(bot, interaction);

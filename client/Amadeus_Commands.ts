@@ -1,5 +1,4 @@
 import { Client, CommandInteraction } from "discord.js";
-import { UserNotFoundError } from "../tomoEngine/statics/errors";
 import Amadeus_Base from "./Amadeus_Base";
 import CustomClient from "./Amadeus_Client";
 
@@ -97,6 +96,9 @@ export abstract class Commands extends Amadeus_Base {
       
       }
     }*/
+
+    if (this.dbRequired) {
+    }
 
     
 

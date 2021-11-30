@@ -36,6 +36,8 @@ class Ping extends Commands {
 
   async test(bot: CustomClient, interaction: CommandInteraction) {
     console.log("test")
+    let payload = await Queries.character(0);
+    console.log(payload)
 
   }
 }

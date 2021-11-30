@@ -200,9 +200,8 @@ export default class Novel extends engineBase {
         this.backgrounds.set(single.bg, payload); // we set it in this map
       }
 
-      
-
-      if (!this.characters.has(single.character) || single.mood != undefined) { // If cache dont have character or the mood is defined:
+      if (!this.characters.has(single.character) || single.mood != undefined) {
+        // If cache dont have character or the mood is defined:
         if (!this.characters.has(single.character))
           console.log(
             "[ch] Char not logged, getting the payload. Payload ID:" +
@@ -222,8 +221,11 @@ export default class Novel extends engineBase {
       }
 
       this.nodes.push(new NodeSingle(single, i)); // Push it into our arra of nodes.
-      if (single.text.includes("$")) single.text = this.parseCharacterScript(single.text, this.characters[this.nodes[i].character]) // If this single has a $ in it we run it through this funcion and replace it with this.
-
+      if (single.text.includes("$"))
+        single.text = this.parseCharacterScript(
+          single.text,
+          this.characters[this.nodes[i].character]
+        ); // If this single has a $ in it we run it through this funcion and replace it with this.
 
       i++;
     }
@@ -249,11 +251,13 @@ export default class Novel extends engineBase {
 
   async start() {
     const payload = {
-      content: `>>> ${this.characters.get(this.nodes[this.index].character).name} >> ${
-        this.nodes[this.index].text
-      }`,
+      content: `>>> ${
+        this.characters.get(this.nodes[this.index].character).name
+      } >> ${this.nodes[this.index].text}`,
       files: [
-        this.nodes[this.index].built ? this.nodes[this.index].built_img : await this.buildNode(this.index),
+        this.nodes[this.index].built
+          ? this.nodes[this.index].built_img
+          : await this.buildNode(this.index),
       ],
       //attachments: [build],
       components: await this.action(),
@@ -274,7 +278,6 @@ export default class Novel extends engineBase {
 
     if (this.buttonCollector == undefined) this.collectButton(this.filter);
     if (this.selectCollector == undefined) this.collectSelect(this.filter);
-    
   }
 
   async setPage(index: number = this.index) {
@@ -293,18 +296,15 @@ export default class Novel extends engineBase {
       components: await this.action(),
     };
     await this.interaction.editReply(payload);
-    
-    this.refreshCoolDown()
 
-
-    
+    this.refreshCoolDown();
 
     //await this.interaction.editReply(payload);
   }
 
   private refreshCoolDown() {
-    if (this.buttonCollector) this.buttonCollector.resetTimer()
-    if (this.selectCollector) this.selectCollector.resetTimer()
+    if (this.buttonCollector) this.buttonCollector.resetTimer();
+    if (this.selectCollector) this.selectCollector.resetTimer();
   }
 
   private async collectButton(filter: Function) {
@@ -327,8 +327,8 @@ export default class Novel extends engineBase {
           break;
         case 1:
           skript = this.nodes[this.index].route;
-          console.log(skript + "ROUTEEE")
-          if (typeof(skript) == "number") return this.setPage(skript)
+          console.log(skript + "ROUTEEE");
+          if (typeof skript == "number") return this.setPage(skript);
           this.setPage(this.index + 1);
 
           break;
@@ -338,8 +338,8 @@ export default class Novel extends engineBase {
             skript = this.nodes[this.index].lookUpArr[
               this.selection
             ] as Scripts & number;
-            if (typeof(skript) != "number") return this.parseScript(skript);
-            console.log(skript)
+            if (typeof skript != "number") return this.parseScript(skript);
+            console.log(skript);
             this.setPage(skript);
           }
 
@@ -362,16 +362,16 @@ export default class Novel extends engineBase {
       {
         disabled:
           (this.index > 0 ? false : true) ||
-          (this.nodes[this.index - 1].isChoiced) ||
-          (!this.nodes[this.index].backable),
-          
+          this.nodes[this.index - 1].isChoiced ||
+          !this.nodes[this.index].backable,
+
         label: "Back",
         style: 1,
       },
       {
         disabled:
           (this.index >= this.nodes.length - 1 ? true : false) ||
-          (this.nodes[this.index].isChoiced),
+          this.nodes[this.index].isChoiced,
         label: "Next",
         style: 1,
       },
@@ -386,6 +386,26 @@ export default class Novel extends engineBase {
 
     let i = 0;
     const buttonRow = new MessageActionRow();
+    if (this.nodes[this.index].isChoiced) {
+      const selectRow = new MessageActionRow().addComponents(
+        new MessageSelectMenu()
+          .setCustomId(
+            "NOVEL.select_" +
+              this.index.toString() +
+              "_user_" +
+              this.interaction.user.id
+          )
+          .setPlaceholder(
+            this.selection == undefined
+              ? this.nodes[this.index].placeholder
+              : this.nodes[this.index].choices[this.selection].emoji +
+                  this.nodes[this.index].choices[this.selection].label
+          )
+          .addOptions(this.nodes[this.index].choices)
+      );
+
+      ret.push(selectRow);
+    }
 
     for (const button of buttons) {
       buttonRow.addComponents(
@@ -403,25 +423,7 @@ export default class Novel extends engineBase {
       i++;
     }
     ret.push(buttonRow);
-    if (this.nodes[this.index].isChoiced) {
-      const selectRow = new MessageActionRow().addComponents(
-        new MessageSelectMenu()
-          .setCustomId(
-            "NOVEL.select_" +
-              this.index.toString() +
-              "_user_" +
-              this.interaction.user.id
-          )
-          .setPlaceholder(
-            this.selection == undefined
-              ? this.nodes[this.index].placeholder
-              : this.nodes[this.index].choices[this.selection].emoji + this.nodes[this.index].choices[this.selection].label
-          )
-          .addOptions(this.nodes[this.index].choices)
-      );
 
-      ret.push(selectRow);
-    }
     //console.log(buttonRow)
 
     return ret;
@@ -437,7 +439,6 @@ export default class Novel extends engineBase {
       "collect",
       async (interaction: SelectMenuInteraction) => {
         let value = interaction.values[0]; // value[1] = selection
-        console.log(value);
 
         this.selection = parseInt(value);
 
@@ -448,7 +449,7 @@ export default class Novel extends engineBase {
     );
 
     this.selectCollector.on("end", () => {
-      console.log("select ended!")
+      console.log("select ended!");
       this.emit("end");
     });
   }
