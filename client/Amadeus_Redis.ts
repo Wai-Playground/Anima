@@ -14,9 +14,8 @@ export default class Red extends Amadeus_Base {
           memory = createClient();
           await memory.connect();
           memory.on('error', (err) => console.log('Redis Client Error', err));
-          await memory.set("key", "value")
-          console.log(await memory.get("key"))
-          console.log("Redis done.")
+
+          console.log("Redis Loaded.")
         
             
     }

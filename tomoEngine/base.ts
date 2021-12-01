@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { EventEmitter } from "events";
 import Queries from "./queries";
-import { BackgroundPayload, CharacterPayload } from "./statics/types";
+import { BackgroundPayload, CharacterPayload, User_Scripts } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -74,7 +74,8 @@ class engineBase extends EventEmitter {
     }
   }
 
-  async parseUserScript(str: string): Promise<string> {
+
+  parseUserScript(str: string): string {
     
     
 
@@ -83,8 +84,26 @@ class engineBase extends EventEmitter {
   }
 
   parseCharacterScript(str: string, character: Character): string {
+    if (str.includes("$")) {
+      let beg = str.indexOf("$"), end = str.indexOf(' ', beg) == -1 ? str.length : str.indexOf(' ', beg);
+      let sub = str.substr(beg, end) as User_Scripts
+      console.log(sub)
+      switch (sub) {
+        case "$greetings":
+          str = str.replace(sub, character.getRandGreetings())
 
+        break;
+
+        case "$farewells":
+          str = str.replace(sub, character.getRandFarewells())
+        break;
+        
+      } 
+
+    }
     return str;
+
+    //return str;
   }
 
   /*

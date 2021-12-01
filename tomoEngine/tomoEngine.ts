@@ -12,13 +12,11 @@ import engineBase from "./base";
  */
 class TomoEngine extends engineBase {
   constructor(
-    user: User,
     interaction: CommandInteraction
   ) {
-    super(user, interaction);
+    super(interaction.user, interaction);
+
   }
-
-
 
 
 }

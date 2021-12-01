@@ -73,7 +73,7 @@ export abstract class Commands extends Amadeus_Base {
       
     }
 
-    if (this.coolDown > 0) {
+    if (this.coolDown > 0 && interaction.user.id != process.env.OWNER_ID) {
       if (await this.checkCoolDown(bot.coolDown, interaction)) return interaction.reply("Sorry, your are on cooldown.")
     }
     /*
@@ -98,6 +98,9 @@ export abstract class Commands extends Amadeus_Base {
     }*/
 
     if (this.dbRequired) {
+      try {
+
+      }
     }
 
     

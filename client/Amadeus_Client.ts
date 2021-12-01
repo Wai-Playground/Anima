@@ -126,7 +126,7 @@ export default class CustomClient extends Client {
       const event = require(`.${path}/${file}`);
       const ev = new event();
 
-      console.log("[l]" + `${this.name} has loaded listener: ${ev.name}.`);
+      console.log("[l] " + `${this.name} has loaded listener: ${ev.name}.`);
 
       if (ev.once) {
         super.once(ev.name, (...args) => ev.execute(this, ...args));

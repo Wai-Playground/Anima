@@ -117,6 +117,8 @@ export default class Novel extends engineBase {
     this.nodes = [];
     this.prepareAssets();
   }
+
+
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
     const canvas: Canvas = createCanvas(this.width, this.height);
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
@@ -218,14 +220,11 @@ export default class Novel extends engineBase {
         }
 
         this.characters.set(single.character, payload);
+
       }
+      if (single.text.includes("$")) single.text = this.parseCharacterScript(single.text, payload as Character); // If this single has a $ in it we run it through this funcion and replace it with this.
 
       this.nodes.push(new NodeSingle(single, i)); // Push it into our arra of nodes.
-      if (single.text.includes("$"))
-        single.text = this.parseCharacterScript(
-          single.text,
-          this.characters[this.nodes[i].character]
-        ); // If this single has a $ in it we run it through this funcion and replace it with this.
 
       i++;
     }
@@ -251,9 +250,9 @@ export default class Novel extends engineBase {
 
   async start() {
     const payload = {
-      content: `>>> ${
+      content: `>>> **${
         this.characters.get(this.nodes[this.index].character).name
-      } >> ${this.nodes[this.index].text}`,
+      }**: ${this.nodes[this.index].text}`,
       files: [
         this.nodes[this.index].built
           ? this.nodes[this.index].built_img
@@ -285,9 +284,9 @@ export default class Novel extends engineBase {
     this.index = index;
     this.selection = undefined;
     const payload = {
-      content: `>>> ${
+      content: `>>> **${
         this.characters.get(this.nodes[index].character).name
-      } >> ${this.nodes[index].text}`,
+      }**: ${this.nodes[index].text}`,
       files: [
         this.nodes[index].built
           ? this.nodes[index].built_img

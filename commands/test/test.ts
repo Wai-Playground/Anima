@@ -7,6 +7,7 @@ import Queries from "../../tomoEngine/queries";
 import { APIMessage } from "discord-api-types";
 import Character from "../../tomoEngine/tomoClasses/characters";
 import Background from "../../tomoEngine/tomoClasses/backgrounds";
+import TomoEngine from "../../tomoEngine/tomoEngine";
 
 const json = require("../../assets/story.json")
 
@@ -28,14 +29,18 @@ class Test extends Commands {
 
     
     await interaction.deferReply({ephemeral: true});
+    /*
     let jsons = JSON.parse(JSON.stringify(json));
     console.time('Novel')
     let nvl = new Novel(jsons, interaction, true)
     //console.log(json)
     nvl.once("ready", () => {
+      console.timeEnd("Novel")
       return nvl.start();
-    })
-    console.timeEnd("Novel")
+      
+    })*/
+    let x = new TomoEngine(interaction)
+    
     
 
       
