@@ -1,6 +1,6 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError } from "./statics/errors";
-import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload } from "./statics/types";
+import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, UserUniversePayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 import Red from "../client/Amadeus_Redis";
 const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
@@ -101,11 +101,35 @@ class Queries {
             return payload;
         }
     }
+    /**
+     * Returns the user universe object; Does not use redis for caching because this is very volatile.
+     * @param _id 
+     */
 
-    public static async userUniverse(_id: String | number) {
-        //let payload: 
-        
+    public static async userUniverse(_id: string | number) {
+        let payload: UserUniversePayload;
+        try {            
+            payload = await Monmonga.universeDB().collection<UserUniversePayload>("users").findOne({_id: _id});
+            if (!payload) throw new UniBaseNotFoundError(_id, "users");
+    
+        } catch(e) {
+            console.log(e);
+        } finally {
+            return payload;
+        }
+      
+    }
 
+    public static async insertUserUniverse(payload: UserUniversePayload) {
+        try {            
+            await Monmonga.universeDB().collection<UserUniversePayload>("users").insertOne(payload); 
+    
+        } catch(e) {
+            console.log(e);
+        } finally {
+            return payload;
+        }
+      
     }
 
 

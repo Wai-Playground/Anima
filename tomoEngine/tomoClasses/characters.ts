@@ -2,17 +2,19 @@
  * @author Shokkunn
  */
 
-import { CharacterPayload, MoodType } from "../statics/types";
+import { CharacterPayload, Char_Archetype, MoodType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
     personality: {
+        archetype: Char_Archetype
         greetings: Array<string> 
         farewells: Array<string>
     }
     constructor(_id: number | string, payload: CharacterPayload) {
         super(_id, 'characters', payload.name, payload.variant.isVariant, payload.link)
         this.personality = payload.personality;
+        
 
         
     }

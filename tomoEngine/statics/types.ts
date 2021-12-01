@@ -106,14 +106,11 @@ export interface BackgroundPayload extends BaseUniversePayload {
 export interface CharacterInUser {
   originalID: number,
   _flags: Array<User_Flags>
-  _tree: Ship_Tree
   moods: {
-    pictureToUse: number,
+    pictureToUse: string,
     overall: number,
     current: number
   }
-  likes: Array<number>,
-  dislikes: Array<number>,
   gift_received: Array<{
     itemID: number,
     amount: number
@@ -131,9 +128,6 @@ export interface UserUniversePayload {
     amount: number
   }>
   
-
-  
-
 }
 
 
@@ -142,9 +136,12 @@ export interface CharacterPayload extends BaseUniversePayload {
   bloodtype?: string;
   description?: string;
   personality?: {
+    _tree: Ship_Tree
     archetype: Char_Archetype;
     greetings: Array<string>;
     farewells: Array<string>;
+    likes: Array<number>,
+    dislikes: Array<number>,
   };
   link: string;
 }
