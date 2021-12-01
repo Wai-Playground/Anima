@@ -39,13 +39,14 @@ class Test extends Commands {
       return nvl.start();
       
     })*/
-    let x = new TomoEngine(interaction)
+    const json = await Queries.story(0);
+    console.log(json)
+    
+    
+    let x = new Novel(json, interaction, true)
     x.once("ready", (d => {
       return x.start()
     }))
-    
-    
-
       
 
 

@@ -2,21 +2,17 @@
  * @author Shokkunn
  */
 
-import { CharacterPayload, Char_Archetype, MoodType } from "../statics/types";
+import { CharacterPayload, CharacterPersonality, Char_Archetype, MoodType, MoodTypeStrings, Ship_Tree } from "../statics/types";
 import universeBase from "./universeBase";
 
-export default class Character extends universeBase {
-    personality: {
-        archetype: Char_Archetype
-        greetings: Array<string> 
-        farewells: Array<string>
-    }
-    constructor(_id: number | string, payload: CharacterPayload) {
-        super(_id, 'characters', payload.name, payload.variant.isVariant, payload.link)
-        this.personality = payload.personality;
-        
 
-        
+export default class Character extends universeBase {
+
+    personality: CharacterPersonality
+    constructor(_id: number | string, payload: CharacterPayload) {
+        super(_id, 'characters', payload.name, payload.grade, payload.variant.isVariant, payload.link)
+        this.personality = payload.personality;
+
     }
     /**
      * getVariant()
@@ -24,33 +20,43 @@ export default class Character extends universeBase {
      * @returns character class that has the mood that you queried.
      */
 
-    async getVariant(MoodType: MoodType): Promise<Character> {
+    async getVariant(MoodType: MoodTypeStrings): Promise<Character> {
         const moodVariant: CharacterPayload = await super.getVariant(MoodType);
         return new Character(moodVariant._id, moodVariant);
     }
 
-    get Personality() {
-        return this.personality;
+    get likes() {
+        return this.personality.likes;
+    }
+
+    get dislikes() {
+        return this.personality.dislikes;
+    }
+
+    get archetype() {
+        return this.personality._archetype;
+
     }
 
     getRandGreetings() {
-        return this.getGreetings(Math.floor(Math.random() * this.personality?.greetings.length))
+        return this.personality.greetings[(Math.floor(Math.random() * this.personality?.greetings.length))]
+
 
     }
 
     getRandFarewells() {
-        return this.getFarewells(Math.floor(Math.random() * this.personality?.farewells.length))
+        return this.personality.farewells[(Math.floor(Math.random() * this.personality?.greetings.length))]
 
     }
 
-    getFarewells(i: number) {
-        return this.personality.farewells[i];
-
+    get farewells () {
+        return this.personality.farewells;
     }
 
-    getGreetings(i: number) {
-        return this.personality.greetings[i];
+    get greetings () {
+        return this.personality.greetings;
     }
+
 
 
 }

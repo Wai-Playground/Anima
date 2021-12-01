@@ -1,13 +1,13 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError } from "./statics/errors";
-import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, UserUniversePayload } from "./statics/types";
+import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, ItemsPayload, Story, UserUniversePayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 import Red from "../client/Amadeus_Redis";
 const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
 class Queries {
     /**
      * Retrieves character payload.
-     * @param _id | int
+     * @param _id | int or str
      * @returns character payload as json
      */
     public static async character(_id: string | number) {
@@ -16,12 +16,30 @@ class Queries {
 
     /**
      * Retrieves background payload.
-     * @param _id | int
+     * @param _id | int or str
      * @returns background payload as json
      */
     public static async background(_id: string | number) {
         return await this.getBaseType(_id, "backgrounds") as BackgroundPayload;
     }
+
+    /**
+     * Retrieves item payload.
+     * @param _id | int or str
+     * @returns item payload as json
+     */
+    public static async item(_id: string | number) {
+        return await this.getBaseType(_id, "items") as ItemsPayload;
+    }
+
+    public static async story(_id: string | number) {
+        return await this.getBaseType(_id, "stories") as Story;
+    }
+
+    
+
+
+    
 
     /**
      * Should not be used outside of this class.
@@ -101,6 +119,8 @@ class Queries {
             return payload;
         }
     }
+
+    
     /**
      * Returns the user universe object; Does not use redis for caching because this is very volatile.
      * @param _id 
@@ -123,6 +143,18 @@ class Queries {
     public static async insertUserUniverse(payload: UserUniversePayload) {
         try {            
             await Monmonga.universeDB().collection<UserUniversePayload>("users").insertOne(payload); 
+    
+        } catch(e) {
+            console.log(e);
+        } finally {
+            return payload;
+        }
+      
+    }
+
+    public static async updateUserUniverse(_id: string | number, payload: UserUniversePayload) {
+        try {            
+            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, payload); 
     
         } catch(e) {
             console.log(e);

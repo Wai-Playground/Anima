@@ -1,0 +1,38 @@
+{
+    "name": "tale1",
+    "character_specific": {
+        "action": "hug"
+      },
+    "variant": {
+        "isVariant": true,
+        "variantUse": "angry",
+        "originalID": 0
+      },
+    "multipes": [
+        {
+            "bg": null,
+            "character": 0,
+            "text": "Angry shout",
+            "backable": false
+            
+
+        },
+        {
+            "character": 1,
+            "text": "user saying dumb shit",
+            "backable": false
+            
+
+        },
+        {
+            "character": 0,
+            "text": "Angry finish",
+            "backable": false
+            
+
+        }
+
+
+    ]
+
+}

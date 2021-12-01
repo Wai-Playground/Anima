@@ -15,7 +15,7 @@ import {
   MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
-import { Single, Scripts, MoodType} from "./statics/types";
+import { Single, Scripts, MoodTypeStrings} from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -32,7 +32,7 @@ class NodeSingle implements Single {
   character: number | string;
   background: number | string;
   text: string;
-  mood?: MoodType;
+  mood?: MoodTypeStrings;
   isChoiced: boolean;
   route?: number | Scripts;
   built: boolean = false;
@@ -204,6 +204,7 @@ export default class Novel extends engineBase {
 
       if (!this.characters.has(single.character) || single.mood != undefined) {
         // If cache dont have character or the mood is defined:
+
         if (!this.characters.has(single.character))
           console.log(
             "[ch] Char not logged, getting the payload. Payload ID:" +
@@ -212,14 +213,20 @@ export default class Novel extends engineBase {
 
         // If the character mpa has the char id already we skip.
         payload = await this.getCharacter(single.character);
+        
 
         if (single.mood) {
           payload = await payload.getVariant(single.mood); // If the character is a variant, we can substitute the main payload with this.
 
           single.character = payload.getId;
         }
+        if (payload.link == null) {
+          if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link;
+          if (i <= 0) payload.link = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1200px-HD_transparent_picture.png"
+        } 
 
         this.characters.set(single.character, payload);
+
 
       }
       if (single.text.includes("$")) single.text = this.parseCharacterScript(single.text, payload as Character); // If this single has a $ in it we run it through this funcion and replace it with this.
