@@ -123,6 +123,7 @@ export interface UserUniversePayload {
   _id: number | string;
   discord_username: string;
   characters: Array<CharacterInUser>;
+  reserved: Array<CharacterInUser>;
   inventory: Array<{
     itemID: number,
     amount: number

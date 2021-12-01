@@ -15,7 +15,7 @@ import {
   MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
-import { Single, Scripts, MoodType, User_Scripts } from "./statics/types";
+import { Single, Scripts, MoodType} from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 

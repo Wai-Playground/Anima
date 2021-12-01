@@ -77,6 +77,7 @@ export abstract class Commands extends Amadeus_Base {
             Tomo_Dictionaries.default_CharInUser()
 
           ],
+          reserved: [],
           inventory: []
 
         }

@@ -40,6 +40,9 @@ class Test extends Commands {
       
     })*/
     let x = new TomoEngine(interaction)
+    x.once("ready", (d => {
+      return x.start()
+    }))
     
     
 
