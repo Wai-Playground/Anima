@@ -2,17 +2,19 @@
  * @author Shokkunn
  */
 
-import { CharacterPayload, MoodType } from "../statics/types";
+import { CharacterPayload, Char_Archetype, MoodType } from "../statics/types";
 import universeBase from "./universeBase";
 
 export default class Character extends universeBase {
     personality: {
+        archetype: Char_Archetype
         greetings: Array<string> 
         farewells: Array<string>
     }
     constructor(_id: number | string, payload: CharacterPayload) {
         super(_id, 'characters', payload.name, payload.variant.isVariant, payload.link)
         this.personality = payload.personality;
+        
 
         
     }
@@ -29,6 +31,25 @@ export default class Character extends universeBase {
 
     get Personality() {
         return this.personality;
+    }
+
+    getRandGreetings() {
+        return this.getGreetings(Math.floor(Math.random() * this.personality?.greetings.length))
+
+    }
+
+    getRandFarewells() {
+        return this.getFarewells(Math.floor(Math.random() * this.personality?.farewells.length))
+
+    }
+
+    getFarewells(i: number) {
+        return this.personality.farewells[i];
+
+    }
+
+    getGreetings(i: number) {
+        return this.personality.greetings[i];
     }
 
 

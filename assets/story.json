@@ -18,6 +18,11 @@
                 "emoji": "🏹",
                 "label": "Archer",
                 "route": 3
+            }, {
+                "emoji": "📋",
+                "label": "Greetings",
+                "route": 4
+
             }]
 
         },
@@ -54,10 +59,15 @@
             
         },
         {
+            "character": 2,
+            "text": "$greetings",
+            "backable": false
+        },
+        {
             "bg": 0,
             "character": 2,
             "backable": false,
-            "text": "Character Two says good bye."
+            "text": "$farewells"
         }
     ]
 }

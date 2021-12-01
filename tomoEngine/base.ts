@@ -9,9 +9,10 @@ import {
 } from "discord.js";
 import { EventEmitter } from "events";
 import Queries from "./queries";
-import { BackgroundPayload, CharacterPayload } from "./statics/types";
+import { BackgroundPayload, CharacterPayload, UserUniversePayload, User_Scripts } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
+import DBUsers from "./tomoClasses/users" 
 
 /**
  * @name engineBase
@@ -73,8 +74,19 @@ class engineBase extends EventEmitter {
       return null;
     }
   }
+  async getUserUniverse(_id: number | string): Promise<DBUsers> {
+    try {
+      //const payload: BackgroundPayload = await Queries.backgroundUniverse(_id);
+      return new DBUsers(_id, await Queries.userUniverse(_id) as UserUniversePayload);
 
-  async parseUserScript(str: string): Promise<string> {
+    } catch(e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+
+  parseUserScript(str: string): string {
     
     
 
@@ -83,8 +95,26 @@ class engineBase extends EventEmitter {
   }
 
   parseCharacterScript(str: string, character: Character): string {
+    if (str.includes("$")) {
+      let beg = str.indexOf("$"), end = str.indexOf(' ', beg) == -1 ? str.length : str.indexOf(' ', beg);
+      let sub = str.substr(beg, end) as User_Scripts
+      console.log(sub)
+      switch (sub) {
+        case "$greetings":
+          str = str.replace(sub, character.getRandGreetings())
 
+        break;
+
+        case "$farewells":
+          str = str.replace(sub, character.getRandFarewells())
+        break;
+        
+      } 
+
+    }
     return str;
+
+    //return str;
   }
 
   /*

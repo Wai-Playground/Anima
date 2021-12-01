@@ -1,5 +1,7 @@
 import { Client, CommandInteraction } from "discord.js";
-import { UserNotFoundError } from "../tomoEngine/statics/errors";
+import Queries from "../tomoEngine/queries";
+import Tomo_Dictionaries from "../tomoEngine/statics/tomo_dict";
+import { UserUniversePayload } from "../tomoEngine/statics/types";
 import Amadeus_Base from "./Amadeus_Base";
 import CustomClient from "./Amadeus_Client";
 
@@ -63,6 +65,36 @@ export abstract class Commands extends Amadeus_Base {
     return true;
   }
 
+  async checkDB(interaction: CommandInteraction) {
+    try {
+      const user = await Queries.userUniverse(interaction.user.id);
+      if (!user) {
+        const author = interaction.user;
+        const newUserDocument: UserUniversePayload = {
+          _id: author.id,
+          discord_username: author.username,
+          characters: [
+            Tomo_Dictionaries.default_CharInUser()
+
+          ],
+          reserved: [],
+          inventory: []
+
+        }
+
+        await Queries.insertUserUniverse(newUserDocument)
+      }
+      
+
+    } catch (e) {
+      console.log(e)
+
+    } finally {
+      return true;
+    }
+
+  }
+
   async default_checks(bot: CustomClient, interaction: CommandInteraction) {
     
     if (this.disabled) return interaction.reply("Sorry, this command is disabled.")
@@ -74,7 +106,7 @@ export abstract class Commands extends Amadeus_Base {
       
     }
 
-    if (this.coolDown > 0) {
+    if (this.coolDown > 0 && interaction.user.id != process.env.OWNER_ID) {
       if (await this.checkCoolDown(bot.coolDown, interaction)) return interaction.reply("Sorry, your are on cooldown.")
     }
     /*
@@ -98,7 +130,7 @@ export abstract class Commands extends Amadeus_Base {
       }
     }*/
 
-    
+    if (this.dbRequired) await this.checkDB(interaction)
 
     return true;
   }
