@@ -18,6 +18,7 @@ import { EventEmitter } from "events";
 
 class menuSingles extends MessageEmbed {
   index: number; // keeps track of the sigle index.
+  emoji: string
   //rowCol: Array<MessageActionRow>; // messageActionRow
   constructor(single, count = null) {
     super();
@@ -27,11 +28,13 @@ class menuSingles extends MessageEmbed {
      * but I don't know about it.
      */
     
-    for (const pairs of Object.entries(single.embed)) // makes a key, value array. ["key", "value"], ["key", "value"]
+    for (const pairs of Object.entries(single.embed)) { // makes a key, value array. ["key", "value"], ["key", "value"]
       super.hasOwnProperty(pairs[0]) // remember, super is the messageEmbed Class so it got the same properties as our json embed. ex: color, title, description, fields, etc..
         ? (super[pairs[0]] = single.embed[pairs[0]]) // replacees it with the json field values.
         : null; // nothing.
-
+    }
+    console.log(single)
+    this.emoji = single.emoji || null
     this.index = single.index || count;
     
 
@@ -39,6 +42,13 @@ class menuSingles extends MessageEmbed {
 }
 
 export default class Menu extends EventEmitter {
+  selectRow: MessageActionRow
+  buttons: Array<{
+    disabled: boolean,
+    label: string,
+    emj?: string,
+    style: number,
+  }>
   test: number;
   slides: Array<menuSingles>;
   json: any;
@@ -131,21 +141,23 @@ export default class Menu extends EventEmitter {
         label: pages.title,
         value: pages.index.toString(),
         description: pages.description,
+        emoji: pages.emoji
       };
 
       chapters.push(chapter);
     }
 
-    const selectRow = new MessageActionRow().addComponents(
+    this.selectRow = new MessageActionRow().addComponents(
       new MessageSelectMenu()
         .setCustomId(
           "MENU.select_" + this.index.toString() + "_user_" + this.user.id
         )
+        
         .setPlaceholder("Select a page")
         .addOptions(chapters)
     );
 
-    const buttons = [
+    this.buttons = [
       {
         disabled: this.index > 0 ? false : true,
         label: "<< First",
@@ -177,7 +189,7 @@ export default class Menu extends EventEmitter {
     let i = 0;
     const buttonRow = new MessageActionRow();
 
-    for (const button of buttons) {
+    for (const button of this.buttons) {
       buttonRow.addComponents(
         new MessageButton()
           .setDisabled(
@@ -190,10 +202,10 @@ export default class Menu extends EventEmitter {
       );
       i++;
     }
-    return [selectRow, buttonRow];
+    return [this.selectRow, buttonRow];
   }
 
-  private async collectButton(filter) {
+  private async collectButton(filter: Function) {
     this.buttonCollector = this.message.createMessageComponentCollector({
       filter,
       componentType: "BUTTON",

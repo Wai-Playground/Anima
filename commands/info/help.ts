@@ -33,6 +33,7 @@ class Help extends Commands {
       
       
       ret.push({
+        emoji: "❤️",
         embed: {
           title: i + `. ${cObj.name.charAt(0).toUpperCase() + cObj.name.slice(1)}`,
           description: cObj.description,
@@ -44,7 +45,7 @@ class Help extends Commands {
             {
               inline: true,
               name: "Owner Only?",
-              value: cObj.ownerOnly.toString()
+              value: cObj.ownerOnly.toString(),
             },
             {
               inline: true,
