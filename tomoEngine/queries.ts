@@ -32,14 +32,14 @@ class Queries {
         return await this.getBaseType(_id, "items") as ItemsPayload;
     }
 
+    /**
+     * retrieves story payload.
+     * @param _id | int or str
+     * @returns story paylaod as json
+     */
     public static async story(_id: string | number) {
         return await this.getBaseType(_id, "stories") as Story;
     }
-
-    
-
-
-    
 
     /**
      * Should not be used outside of this class.
@@ -54,13 +54,15 @@ class Queries {
             if (cache) {
                 console.log("Cached! _id: "+ _id);
                 payload = JSON.parse(cache) as BaseUniversePayload;
+                if (!payload) throw new UniBaseNotFoundError(_id, db);
+                return payload;
 
             }
             payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({ _id: _id});
             if (!payload) throw new UniBaseNotFoundError(_id, db);
-            console.log( )
             redis.hSet(db, _id.toString(), JSON.stringify(payload));
             redis.expire(db, EXPIRATION);
+
 
         } catch(e) {
             console.log(e);
@@ -104,8 +106,9 @@ class Queries {
             if (cache) {
                 console.log("Cached Variant! o_id: "+ originalID);
                 payload = JSON.parse(cache) as BaseUniversePayload;
-
+                return payload;
             }
+
             payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({'variant.originalID': originalID, 'variant.variantUse': name});
             if (!payload) throw new UniBaseNotFoundError(originalID, db);
             redis.hSet(hashKey, query, JSON.stringify(payload));

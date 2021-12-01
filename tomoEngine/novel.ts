@@ -220,9 +220,9 @@ export default class Novel extends engineBase {
 
           single.character = payload.getId;
         }
-        if (payload.link == null) {
-          if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link;
-          if (i <= 0) payload.link = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1200px-HD_transparent_picture.png"
+        if (payload.link == null) { // If the link is null:
+          if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link; //get from past character if we are index > 0;
+          if (i <= 0) payload.link = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1200px-HD_transparent_picture.png"// just transparnt png if we we are at index 0;
         } 
 
         this.characters.set(single.character, payload);

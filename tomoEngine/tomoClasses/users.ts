@@ -3,7 +3,7 @@
  */
 
 import Queries from "../queries";
-import { BackgroundPayload, BackgroundType, CharacterInUser, ItemInUser, UserUniversePayload } from "../statics/types";
+import { CharacterInUser, ItemInUser, UserUniversePayload } from "../statics/types";
 import universeBase from "./universeBase";
  
 export default class DBUsers extends universeBase {

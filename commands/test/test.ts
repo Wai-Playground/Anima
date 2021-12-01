@@ -9,7 +9,7 @@ import Character from "../../tomoEngine/tomoClasses/characters";
 import Background from "../../tomoEngine/tomoClasses/backgrounds";
 import TomoEngine from "../../tomoEngine/tomoEngine";
 
-const json = require("../../assets/story.json")
+const json = require("../../assets/tale.json")
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
@@ -39,12 +39,13 @@ class Test extends Commands {
       return nvl.start();
       
     })*/
-    const json = await Queries.story(0);
-    console.log(json)
+    console.time("Novel")
+    let jsons = JSON.parse(JSON.stringify(json));
     
     
-    let x = new Novel(json, interaction, true)
+    let x = new Novel(jsons, interaction, true)
     x.once("ready", (d => {
+      console.timeEnd("Novel")
       return x.start()
     }))
       

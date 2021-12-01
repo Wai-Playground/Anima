@@ -8,11 +8,11 @@
         "variantUse": "angry",
         "originalID": 0
       },
-    "multipes": [
+    "multiples": [
         {
-            "bg": null,
+            "bg": 0,
             "character": 0,
-            "text": "Angry shout",
+            "text": "dumb shit 1",
             "backable": false
             
 
@@ -26,7 +26,52 @@
         },
         {
             "character": 0,
-            "text": "Angry finish",
+            "text": "dumb shit 2",
+            "backable": false
+            
+
+        },
+        {
+            "character": 0,
+            "text": "dumb shit 4",
+            "backable": false
+            
+
+        },
+        {
+            "character": 0,
+            "text": "dumb shit 5",
+            "backable": false
+            
+
+        },
+        {
+            "character": 0,
+            "text": "dumb shit 6 But with args",
+            "args": [{
+                "label": "continue",
+                "route": "$next"
+                
+
+            }, {
+                "label": "loop",
+                "route": 0
+
+            }],
+            "backable": false
+            
+
+        },
+        {
+            "character": 1,
+            "text": "dumb shit 2",
+            "backable": false
+            
+
+        },
+        {
+            "character": 0,
+            "text": "dumb shit end",
             "backable": false
             
 
