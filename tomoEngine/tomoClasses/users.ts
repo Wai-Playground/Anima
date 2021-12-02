@@ -30,6 +30,11 @@ export default class DBUsers extends universeBase {
       return this._tomodachis;
     }
 
+    getMainTomoDachi() {
+      return this.tomodachis[0]
+
+    }
+
     getTomoFromDachis(originalID: number) {
       let find = this.tomodachis.find(tomo => tomo.originalID == originalID) || null;
       return find;

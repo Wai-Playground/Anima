@@ -15,7 +15,7 @@ import {
   MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
-import { Single, Scripts, MoodTypeStrings} from "./statics/types";
+import { Single, Scripts, Temp_MoodTypeStrings} from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -26,13 +26,14 @@ import {
   loadImage,
   NodeCanvasRenderingContext2D,
 } from "canvas";
+import { TomoError } from "./statics/errors";
 
 class NodeSingle implements Single {
   index: number;
   character: number | string;
   background: number | string;
   text: string;
-  mood?: MoodTypeStrings;
+  mood?: Temp_MoodTypeStrings;
   isChoiced: boolean;
   route?: number | Scripts;
   built: boolean = false;
@@ -216,6 +217,7 @@ export default class Novel extends engineBase {
         
 
         if (single.mood) {
+          if (payload.narrator) throw new TomoError("Narrator found within a character only clause. (mood)")
           payload = await payload.getVariant(single.mood); // If the character is a variant, we can substitute the main payload with this.
 
           single.character = payload.getId;
@@ -407,9 +409,10 @@ export default class Novel extends engineBase {
             this.selection == undefined
               ? this.nodes[this.index].placeholder
               : this.nodes[this.index].choices[this.selection].emoji +
-                  this.nodes[this.index].choices[this.selection].label
+                  " " + this.nodes[this.index].choices[this.selection].label
           )
           .addOptions(this.nodes[this.index].choices)
+          
       );
 
       ret.push(selectRow);

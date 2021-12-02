@@ -24,6 +24,11 @@ export default class Red extends Amadeus_Base {
         return memory;
     }
 
+    static async flush() {
+        memory.FLUSHALL("async")
+        console.log("memory flushed")
+    }
+
     static async checkMemory(key) {
         await memory.get(key)
     }

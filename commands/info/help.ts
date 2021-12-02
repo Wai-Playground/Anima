@@ -1,4 +1,4 @@
-import {CommandInteraction } from "discord.js";
+import {CommandInteraction, MessageEmbed } from "discord.js";
 import { Commands } from "../../client/Amadeus_Commands";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 import CustomClient from "../../client/Amadeus_Client";
@@ -95,18 +95,13 @@ class Help extends Commands {
     let menu = new Menu({multiples: data[0], ephemeral: false}, interaction)
     
     menu.once("ready", () => {
-      menu.index = data[1];
-      console.log(menu.index)
+
       menu.start();
     })
 
     menu.once("end", async () => {
       console.log("going to END")
       await interaction.deleteReply()
-    })
-
-    menu.once("selectCollected", async () => {
-      await console.log("a")
     })
 
   }

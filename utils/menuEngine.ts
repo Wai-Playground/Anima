@@ -17,10 +17,10 @@ import {
 import { EventEmitter } from "events";
 
 class menuSingles extends MessageEmbed {
-  index: number; // keeps track of the sigle index.
-  emoji: string;
-  disableButtons: boolean;
-  disableSelect: boolean;
+  index?: number; // keeps track of the sigle index.
+  emoji?: string;
+  disableButtons?: boolean;
+  disableSelect?: boolean;
   //rowCol: Array<MessageActionRow>; // messageActionRow
   constructor(single, count = null) {
     super();

@@ -8,8 +8,9 @@ import { APIMessage } from "discord-api-types";
 import Character from "../../tomoEngine/tomoClasses/characters";
 import Background from "../../tomoEngine/tomoClasses/backgrounds";
 import TomoEngine from "../../tomoEngine/tomoEngine";
+import Red from "../../client/Amadeus_Redis";
 
-const json = require("../../assets/tale.json")
+const json = require("../../assets/story.json")
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
@@ -19,7 +20,9 @@ class Test extends Commands {
   constructor() {
     super("test", {
       description: "For pinging the bot.",
-      data: new SlashCommandBuilder(),
+      data: new SlashCommandBuilder().addSubcommand((subc) =>
+      subc.setName("flush").setDescription("flush")
+    ),
       dbRequired: false,
       ownerOnly: false,
     });
@@ -68,6 +71,10 @@ class Test extends Commands {
     
 
 */
+  }
+
+  flush() {
+    Red.flush()
   }
   
 }

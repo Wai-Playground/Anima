@@ -1,6 +1,6 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError } from "./statics/errors";
-import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, ItemsPayload, Story, UserUniversePayload } from "./statics/types";
+import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 import Red from "../client/Amadeus_Redis";
 const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
@@ -38,7 +38,7 @@ class Queries {
      * @returns story paylaod as json
      */
     public static async story(_id: string | number) {
-        return await this.getBaseType(_id, "stories") as Story;
+        return await this.getBaseType(_id, "stories") as StoryPayload;
     }
 
     /**
@@ -71,6 +71,28 @@ class Queries {
         }
 
     }
+
+    /**
+     * Retrieves variant of a item.
+     * @param originalID | original id of the variant
+     * @param name | name or use of variant
+     * @returns item payload as json
+     */
+    public static async itemVariant(originalID: number | string, name: string | number) {
+        return await this.getVariantType(originalID, name, "items") as ItemsPayload
+
+    }
+    /**
+     * Retrieves variant of a story.
+     * @param originalID | original id of the variant
+     * @param name | name or use of variant
+     * @returns story payload as json
+     */
+     public static async storyVariant(originalID: number | string, name: string | number) {
+        return await this.getVariantType(originalID, name, "stories") as StoryPayload
+
+    }
+
 
     /**
      * Retrieves variant of a character.

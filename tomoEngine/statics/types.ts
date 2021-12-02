@@ -6,7 +6,7 @@ export type EngineType = "tomo" | "rpg" | "novel" | "overlord";
 /** Basic types (end) */
 
 /** Tomo Types (start) */
-export enum MoodType {
+export enum Temp_MoodType {
   happy,
   sad,
   annoyed,
@@ -15,12 +15,25 @@ export enum MoodType {
   main,
   disgusted,
 }
-export type MoodTypeStrings = keyof typeof MoodType;
+
+export type Temp_MoodTypeStrings = keyof typeof Temp_MoodType;
 export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
 export type User_Scripts = "$nickname" | "$suffix" | "$greetings" | "$farewells";
 export type BackgroundType = "day" | "evening" | "night";
-
-export type Mood_States = "detest" | "hate" | "annoyed" | "main" | "friendly" | "happy" | "passionate" | "close" | "flustered" | "love" | "goal";
+export enum Mood_States {
+  detest,
+  hate,
+  annoyed,
+  main,
+  friendly,
+  happy,
+  passionate,
+  close,
+  flustered,
+  love,
+  goal
+}
+export type Mood_States_Strings = keyof typeof Mood_States
 export type Tomo_Action = "hug" | "kiss" | "interact" | "gift"
 export type User_Flags = "memento" | "nick_names_self" | "nick_names_char" | "kiss" | "hug" | "ring" | "block_gift" | "block_all"
 export enum Char_Archetype {
@@ -143,7 +156,7 @@ export interface CharacterInUser {
   _flags: Array<User_Flags>
   bg: number,
   moods: {
-    pictureToUse: MoodTypeStrings,
+    pictureToUse: Temp_MoodTypeStrings,
     overall: number,
     current: number
   }
@@ -193,7 +206,7 @@ export interface Argument extends MessageSelectOptionData {
   route: Scripts | number;
 
 }
-export interface Story extends BaseUniversePayload {
+export interface StoryPayload extends BaseUniversePayload {
   character_specific?: {
     action: Tomo_Action
   };
@@ -207,7 +220,7 @@ export interface Single {
   bg?: number | string;
   character?: number | string;
   text: string;
-  mood?: MoodTypeStrings;
+  mood?: Temp_MoodTypeStrings;
   route?: number | Scripts;
   placeholder?: string;
   args?: Array<Argument>;

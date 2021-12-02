@@ -2,7 +2,7 @@
  * @author Shokkunn
  */
 
-import { BackgroundPayload, BackgroundType, BasicUniverseType, CharacterPayload, MoodType, MoodTypeStrings, Rarity_Grade } from "../statics/types";
+import { BackgroundPayload, BackgroundType, BasicUniverseType, CharacterPayload, ItemsPayload, Rarity_Grade, StoryPayload, Temp_MoodTypeStrings } from "../statics/types";
 import Queries from "../queries";
 import { OriginalReqVarError } from "../statics/errors";
 
@@ -61,6 +61,16 @@ export default class universeBase {
     get isVariant(): boolean {
         return this.variant;
     }
+
+    /**
+     * randIntFromZero
+     * @param max 
+     * @returns a random int from 0 to max (exclusive of max)
+     */
+    randIntFromZero(max: number) {
+        return (Math.floor(Math.random() * max))
+
+    }
     /**
      * Not supposed to be called since the return object is not in class form.
      * @param id id of the original variant. default: this._id (class)
@@ -68,17 +78,23 @@ export default class universeBase {
      * @param type Optional.
      * @returns requested variant.
      */
-    async getVariant(string: MoodTypeStrings | BackgroundType, id: number | string = this._id, type: BasicUniverseType = this.type) {
+    async getVariant(string: Temp_MoodTypeStrings | BackgroundType, id: number | string = this._id, type: BasicUniverseType = this.type) {
         let res: any;
         try {
-            if (type == "backgrounds") {
-
-                res = await Queries.backgroundVariant(id, string) as BackgroundPayload;
-
-            } else if (type == "characters") {
-
-                res = await Queries.characterVariant(id, string) as CharacterPayload;
-
+            switch(type) {
+                case "backgrounds":
+                    res = await Queries.backgroundVariant(id, string) as BackgroundPayload;
+                    break;
+                case "characters":
+                    res = await Queries.characterVariant(id, string) as CharacterPayload;
+                    break;
+                case "items":
+                    res = await Queries.itemVariant(id, string) as ItemsPayload;
+                    break;
+                case "stories":
+                    res = await Queries.storyVariant(id, string) as StoryPayload;
+                    break;
+                
             }
 
             if (!res.variant.isVariant) throw new OriginalReqVarError(res._id, type);

@@ -1,4 +1,7 @@
+import Queries from "../tomoEngine/queries";
+
 abstract class Amadeus_Base {
+
 
 
 }

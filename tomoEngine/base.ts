@@ -9,9 +9,10 @@ import {
 } from "discord.js";
 import { EventEmitter } from "events";
 import Queries from "./queries";
-import { BackgroundPayload, CharacterPayload, UserUniversePayload, User_Scripts } from "./statics/types";
+import { BackgroundPayload, CharacterPayload, StoryPayload, UserUniversePayload, User_Scripts } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
+import Story from "./tomoClasses/story";
 import DBUsers from "./tomoClasses/users" 
 
 /**
@@ -84,6 +85,16 @@ class engineBase extends EventEmitter {
       return null;
     }
   }
+  async getStoryUniverse(_id: number | string): Promise<Story> {
+    try {
+      //const payload: BackgroundPayload = await Queries.backgroundUniverse(_id);
+      return new Story(_id, await Queries.story(_id) as StoryPayload);
+
+    } catch(e) {
+      console.log(e);
+      return null;
+    }
+  }
 
 
   parseUserScript(str: string): string {
@@ -93,6 +104,8 @@ class engineBase extends EventEmitter {
     return str;
 
   }
+
+  
 
   parseCharacterScript(str: string, character: Character): string {
     if (str.includes("$")) {

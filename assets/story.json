@@ -3,7 +3,7 @@
     "multiples": [
         {
             "bg": 0,
-            "character": 1,
+            "character": 0,
             "text": "Select your class",
             "args": [{
                 "emoji": "✨",
@@ -28,7 +28,7 @@
         },
 
         {
-            "bg": 1,
+            "bg": 0,
             "text": "Yay mage.",
             "route": 4,
             "backable": false
@@ -37,7 +37,6 @@
         },
         {
             "character": 0,
-            "mood": "happy",
             "text": "Yay Knight",
             "placeholder": "Choose which place to go",
             "backable": false,
@@ -59,13 +58,11 @@
             
         },
         {
-            "character": 2,
             "text": "$greetings",
             "backable": false
         },
         {
             "bg": 0,
-            "character": 2,
             "backable": false,
             "text": "$farewells"
         }
