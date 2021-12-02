@@ -18,7 +18,9 @@ import { EventEmitter } from "events";
 
 class menuSingles extends MessageEmbed {
   index: number; // keeps track of the sigle index.
-  emoji: string
+  emoji: string;
+  disableButtons: boolean;
+  disableSelect: boolean;
   //rowCol: Array<MessageActionRow>; // messageActionRow
   constructor(single, count = null) {
     super();
@@ -33,8 +35,9 @@ class menuSingles extends MessageEmbed {
         ? (super[pairs[0]] = single.embed[pairs[0]]) // replacees it with the json field values.
         : null; // nothing.
     }
-    console.log(single)
-    this.emoji = single.emoji || null
+    this.disableButtons = single.disableButtons || false;
+    this.emoji = single.emoji || null;
+    this.disableSelect = single.disableSelect || false;
     this.index = single.index || count;
     
 
@@ -60,6 +63,7 @@ export default class Menu extends EventEmitter {
   buttonCollector: any;
   filter: any;
   ephemeral: boolean;
+  buttonRow: MessageActionRow;
   constructor(json, interaction: CommandInteraction) {
     super();
 
@@ -133,76 +137,88 @@ export default class Menu extends EventEmitter {
   }
 
   private async action(): Promise<MessageActionRow[]> {
+    let ret: Array<MessageActionRow> = [];
+    let disableButton = this.slides[this.index].disableButtons, disableSelect = this.slides[this.index].disableSelect;
+    console.log(disableButton)
+    if (!disableSelect) {
+      let chapters = [];
 
-    let chapters = [];
-
-    for (const pages of this.slides) {
-      const chapter: MessageSelectOptionData = {
-        label: pages.title,
-        value: pages.index.toString(),
-        description: pages.description,
-        emoji: pages.emoji
-      };
-
-      chapters.push(chapter);
-    }
-
-    this.selectRow = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
-        .setCustomId(
-          "MENU.select_" + this.index.toString() + "_user_" + this.user.id
-        )
-        
-        .setPlaceholder("Select a page")
-        .addOptions(chapters)
-    );
-
-    this.buttons = [
-      {
-        disabled: this.index > 0 ? false : true,
-        label: "<< First",
-        style: 2,
-      },
-      {
-        disabled: this.index > 0 ? false : true,
-        label: "Back",
-        style: 1,
-      },
-      {
-        disabled: this.index >= this.slides.length - 1? true : false,
-        label: "Next",
-        style: 1,
-      },
-      {
-        disabled: this.index >= this.slides.length - 1? true : false,
-        label: "Last >>",
-        style: 2,
-      },
-      {
-        disabled: this.ephemeral,
-        label: "Done",
-        emj: "<:trash:886429816260280374>",
-        style: 4,
-      },
-    ];
-
-    let i = 0;
-    const buttonRow = new MessageActionRow();
-
-    for (const button of this.buttons) {
-      buttonRow.addComponents(
-        new MessageButton()
-          .setDisabled(
-            button.hasOwnProperty("disabled") ? button.disabled : false
+      for (const pages of this.slides) {
+        const chapter: MessageSelectOptionData = {
+          label: pages.title,
+          value: pages.index.toString(),
+          description: pages.description,
+          emoji: pages.emoji
+        };
+  
+        chapters.push(chapter);
+      }
+  
+      this.selectRow = new MessageActionRow().addComponents(
+        new MessageSelectMenu()
+          .setCustomId(
+            "MENU.select_" + this.index.toString() + "_user_" + this.user.id
           )
-          .setCustomId("MENU.button_" + i.toString() + "_user_" + this.user.id)
-          .setLabel(button.hasOwnProperty("label") ? button.label : null)
-          .setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
-          .setStyle(button.style)
+          
+          .setPlaceholder("Select a page")
+          .addOptions(chapters)
       );
-      i++;
+      ret.push(this.selectRow)
+
     }
-    return [this.selectRow, buttonRow];
+
+    if (!disableButton) {
+      this.buttons = [
+        {
+          disabled: this.index > 0 ? false : true,
+          label: "<< First",
+          style: 2,
+        },
+        {
+          disabled: this.index > 0 ? false : true,
+          label: "Back",
+          style: 1,
+        },
+        {
+          disabled: this.index >= this.slides.length - 1? true : false,
+          label: "Next",
+          style: 1,
+        },
+        {
+          disabled: this.index >= this.slides.length - 1? true : false,
+          label: "Last >>",
+          style: 2,
+        },
+        {
+          disabled: this.ephemeral,
+          label: "Done",
+          emj: "<:trash:886429816260280374>",
+          style: 4,
+        },
+      ];
+  
+      let i = 0;
+      this.buttonRow = new MessageActionRow();
+  
+      for (const button of this.buttons) {
+        this.buttonRow.addComponents(
+          new MessageButton()
+            .setDisabled(
+              button.hasOwnProperty("disabled") ? button.disabled : false
+            )
+            .setCustomId("MENU.button_" + i.toString() + "_user_" + this.user.id)
+            .setLabel(button.hasOwnProperty("label") ? button.label : null)
+            .setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
+            .setStyle(button.style)
+        );
+        i++;
+      }
+      ret.push(this.buttonRow)
+
+    }
+
+    
+    return ret;
   }
 
   private async collectButton(filter: Function) {

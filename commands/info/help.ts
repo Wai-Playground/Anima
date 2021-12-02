@@ -33,7 +33,8 @@ class Help extends Commands {
       
       
       ret.push({
-        emoji: "❤️",
+        emoji: "<:trash:886429816260280374>",
+        disableSelect: true,
         embed: {
           title: i + `. ${cObj.name.charAt(0).toUpperCase() + cObj.name.slice(1)}`,
           description: cObj.description,
@@ -90,17 +91,22 @@ class Help extends Commands {
       }
 
     })
+    
     let menu = new Menu({multiples: data[0], ephemeral: false}, interaction)
     
     menu.once("ready", () => {
       menu.index = data[1];
+      console.log(menu.index)
       menu.start();
-      console.log(menu.test);
     })
 
     menu.once("end", async () => {
       console.log("going to END")
       await interaction.deleteReply()
+    })
+
+    menu.once("selectCollected", async () => {
+      await console.log("a")
     })
 
   }
