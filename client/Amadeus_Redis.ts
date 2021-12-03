@@ -1,6 +1,4 @@
 import Amadeus_Base from "./Amadeus_Base";
-import {createClient, } from "redis"
-import { Tedis, TedisPool } from "tedis";
 import Redis from 'ioredis';
 
 let memory: Redis.Redis;
