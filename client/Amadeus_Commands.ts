@@ -4,6 +4,7 @@ import Tomo_Dictionaries from "../tomoEngine/statics/tomo_dict";
 import { UserUniversePayload } from "../tomoEngine/statics/types";
 import Amadeus_Base from "./Amadeus_Base";
 import CustomClient from "./Amadeus_Client";
+import red from "./Amadeus_Redis";
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
@@ -46,20 +47,27 @@ export abstract class Commands extends Amadeus_Base {
     this.coolDown = settings.coolDown;
 
   }
+  
+  async checkCoolDown(interaction: CommandInteraction) {
+    const key = interaction.user.id, redis = red.memory()
+    console.log(await redis.hgetall("cooldown"))
+    // check if redis cache has the key in it
+    if (await redis.exists("cooldown", key)) {
+      // if it does, return true
+      console.log("true")
+      return true;
+    }
+    // if it doesn't, set the key and the value will be the interaction command name
+    await redis.hset("cooldown", key, this.name);
+    redis.expire("cooldown", this.coolDown);
+    // then return false
+    console.log("false")
+    return false;
 
-  async checkCoolDown(storage: Set<string>, interaction: CommandInteraction) {
-    if (!storage.has(interaction.user.id)) {
-      
-      console.log(interaction.user.username + " Is in cool down.")
-      storage.add(interaction.user.id)
-      setTimeout(() => {
-        storage.delete(interaction.user.id);
-        console.log(interaction.user.username + " Is no longer in cooldown.")
-      }, this.coolDown)
-      return false;
-    } else return true;
+
     
   }
+
 
   async check(bot: Client, interaction: CommandInteraction) {
     return true;
@@ -107,7 +115,7 @@ export abstract class Commands extends Amadeus_Base {
     }
 
     if (this.coolDown > 0 && interaction.user.id != process.env.OWNER_ID) {
-      if (await this.checkCoolDown(bot.coolDown, interaction)) return interaction.reply("Sorry, your are on cooldown.")
+      if (await this.checkCoolDown(interaction)) return interaction.reply("Sorry, your are on cooldown.")
     }
     /*
     if (this.dbRequired) {

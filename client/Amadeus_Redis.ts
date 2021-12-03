@@ -1,36 +1,28 @@
 import Amadeus_Base from "./Amadeus_Base";
-import {createClient} from "redis"
+import {createClient, } from "redis"
+import { Tedis, TedisPool } from "tedis";
+import Redis from 'ioredis';
 
-let memory;
+let memory: Redis.Redis;
 
 export default class Red extends Amadeus_Base {
     constructor() {
         super()
     }
 
-
     static async connect() {
-
-          memory = createClient();
-          await memory.connect();
-          memory.on('error', (err) => console.log('Redis Client Error', err));
-
-          console.log("Redis Loaded.")
+        memory = new Redis();
+        console.log("Redis Loaded.")
         
-            
+        
     }
 
     static memory() {
         return memory;
     }
 
-    static async flush() {
-        memory.FLUSHALL("async")
-        console.log("memory flushed")
-    }
-
-    static async checkMemory(key) {
-        await memory.get(key)
+    static async flushAll() {
+        await memory.flushall();
     }
 
 

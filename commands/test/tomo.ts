@@ -32,7 +32,7 @@ class Tomo extends Commands {
       data: new SlashCommandBuilder().addSubcommand((subc) =>
         subc.setName("hug").setDescription("hug")
       ),
-      dbRequired: false,
+      dbRequired: true,
       ownerOnly: false,
     });
   }

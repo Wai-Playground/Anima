@@ -27,7 +27,11 @@ export default class Character extends universeBase {
         return new Character(moodVariant._id, moodVariant);
     }
     
-
+    /**
+     * getRandInterStoryId()
+     * @param action_type | action you want to query.
+     * @returns random story id of the action you queried
+     */
     getRandInterStoryId(action_type: Tomo_Action) {
         const arr = this.getInteractionStoryIdArr(action_type);
         return (arr.length > 0 ? arr[this.randIntFromZero(arr.length)] : null) 

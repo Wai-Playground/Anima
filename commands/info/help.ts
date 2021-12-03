@@ -18,6 +18,7 @@ class Help extends Commands {
         ),
       dbRequired: true,
       ownerOnly: false,
+      coolDown: 4,
     });
     
   }

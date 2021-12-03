@@ -27,7 +27,6 @@ export default class CustomClient extends Client {
     (this.name = name), (this.token = token), (this.uri = uri);
 
     this.commands = new Collection();
-    this.coolDown = new Set();
     this.slashCommands = []; // Make a new arr for commands to forward to discord.
 
   }
@@ -155,10 +154,11 @@ export default class CustomClient extends Client {
    * @param token | token, should have been declared in the creation.
    */
   async run(this: CustomClient) {
+    await this.redLoader();
     this.commandLoader();
     this.eventsLoader();
     this.mangoLoader();
-    this.redLoader();
+    
     await super.login(this.token);
   }
 }

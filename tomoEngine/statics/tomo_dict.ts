@@ -11,7 +11,7 @@ export default class Tomo_Dictionaries {
             moods: {
                 pictureToUse: "main",
                 overall: 40,
-                current: 40,
+                current: 2,
             },
             gift_received: []
     

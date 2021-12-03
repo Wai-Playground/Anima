@@ -17,6 +17,7 @@ class Level extends Commands {
       ownerOnly: false,
     });
   }
+  
 
   async execute(bot: typeof Client, interaction: CommandInteraction) {
     

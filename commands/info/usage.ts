@@ -2,21 +2,23 @@ import { Client, CommandInteraction } from "discord.js";
 import { Commands } from "../../client/Amadeus_Commands";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
-class Usage extends Commands {
+class Add extends Commands {
   constructor() {
-    super("usage", {
-      description: "For pinging the bot.",
+    super("add", {
+      description: "Add",
       data: new SlashCommandBuilder(),
       dbRequired: false,
-      ownerOnly: false,
+      ownerOnly: true,
     });
   }
 
   async execute(bot: typeof Client, interaction: CommandInteraction) {
+    // init a variable that stores a number
+    
     
 
 
   }
 }
 
-export = Usage;
+export = Add;

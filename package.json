@@ -20,6 +20,8 @@
   "homepage": "https://github.com/Jupiternerd/Anima#readme",
   "dependencies": {
     "@discordjs/rest": "^0.1.0-canary.0",
+    "@types/ioredis": "^4.28.1",
+    "@types/redis": "^2.8.32",
     "canvas": "^2.8.0",
     "console-stamp": "^3.0.3",
     "discord-api-types": "^0.22.0",
@@ -30,10 +32,12 @@
     "fs": "0.0.1-security",
     "gif-encoder-2": "^1.0.5",
     "gifencoder": "^2.0.1",
+    "ioredis": "^4.28.2",
     "mongodb": "^4.2.0",
     "node-fetch": "^2.6.1",
     "redis": "^4.0.0",
     "svg-captcha": "^1.4.0",
+    "tedis": "^0.1.12",
     "time-stamp": "^2.2.0",
     "ts-node": "^10.2.0"
   },

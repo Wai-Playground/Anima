@@ -50,7 +50,7 @@ class Queries {
     private static async getBaseType(_id: number | string, db: BasicUniverseType) {
         let payload: BaseUniversePayload, cache: string, redis = Red.memory();
         try {
-            cache = await redis.hGet(db, _id.toString());
+            cache = await redis.hget(db, _id.toString());
             if (cache) {
                 console.log("Cached! _id: "+ _id);
                 payload = JSON.parse(cache) as BaseUniversePayload;
@@ -60,7 +60,7 @@ class Queries {
             }
             payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({ _id: _id});
             if (!payload) throw new UniBaseNotFoundError(_id, db);
-            redis.hSet(db, _id.toString(), JSON.stringify(payload));
+            redis.hset(db, _id.toString(), JSON.stringify(payload));
             redis.expire(db, EXPIRATION);
 
 
@@ -124,7 +124,7 @@ class Queries {
     private static async getVariantType(originalID: number | string, name: string | number, db: BasicUniverseType) {
         let payload: BaseUniversePayload, cache: string, hashKey: string = db + "_variants",  query: string= originalID + "_" + name, redis = Red.memory();
         try {
-            cache = await redis.hGet(hashKey, query);
+            cache = await redis.hget(hashKey, query);
             if (cache) {
                 console.log("Cached Variant! o_id: "+ originalID);
                 payload = JSON.parse(cache) as BaseUniversePayload;
@@ -133,7 +133,7 @@ class Queries {
 
             payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({'variant.originalID': originalID, 'variant.variantUse': name});
             if (!payload) throw new UniBaseNotFoundError(originalID, db);
-            redis.hSet(hashKey, query, JSON.stringify(payload));
+            redis.hset(hashKey, query, JSON.stringify(payload));
             redis.expire(hashKey, EXPIRATION);
 
         } catch(e) {
@@ -150,6 +150,7 @@ class Queries {
      * Returns the user universe object; Does not use redis for caching because this is very volatile.
      * @param _id 
      */
+    
 
     public static async userUniverse(_id: string | number) {
         let payload: UserUniversePayload;

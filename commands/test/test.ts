@@ -9,6 +9,7 @@ import Character from "../../tomoEngine/tomoClasses/characters";
 import Background from "../../tomoEngine/tomoClasses/backgrounds";
 import TomoEngine from "../../tomoEngine/tomoEngine";
 import Red from "../../client/Amadeus_Redis";
+import CustomClient from "../../client/Amadeus_Client";
 
 const json = require("../../assets/story.json")
 
@@ -73,10 +74,13 @@ class Test extends Commands {
 */
   }
 
-  flush() {
-    Red.flush()
+  async flush(bot: CustomClient, interaction: CommandInteraction) {
+
+    await Red.flushAll()
+    interaction.reply("Flushed Redis")
   }
-  
+
+
 }
 
 export = Test;

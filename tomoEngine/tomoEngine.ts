@@ -26,6 +26,7 @@ import {
   Mood_States_Strings,
   Ship_Tree,
   Temp_MoodType,
+  Tomo_Action,
 } from "./statics/types";
 import Tomo_Dictionaries from "./statics/tomo_dict";
 import Novel from "./novel";
@@ -105,11 +106,22 @@ class TomoEngine extends engineBase {
     return new Cards(curTomoID, new Character(curTomoID, await Queries.character(curTomoID)), user)
   }
 
-  async gift(card: Cards) {}
-
   static convertNumberToTempMoodType(mood: number) {
     if (mood > 6) return;
     return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings;
+  }
+
+  async getAndInitiateNovel(card: Cards, action: Tomo_Action): Promise<Novel> {
+    let curMood = TomoEngine.convertNumberToTempMoodType(
+      card.chInUser.moods.current
+    );
+
+    let json = await this.getStoryUniverse(card.ch.getRandInterStoryId(action));
+    if (curMood != "main") json = await json.getVariant(curMood);
+    console.log(json)
+    return new Novel(json, this.interaction, true);
+
+
   }
 
   /**
@@ -122,23 +134,11 @@ class TomoEngine extends engineBase {
    * @param interaction 
    */
   async hug(card: Cards) {
-    let curMood = TomoEngine.convertNumberToTempMoodType(
-      card.chInUser.moods.current
-    );
+  
 
-    let json = await this.getStoryUniverse(card.ch.getRandInterStoryId("hug"));
-    if (curMood != "main") json = await json.getVariant(curMood);
-    console.log(json);
-
-    let x = new Novel(json, this.interaction, true);
-    x.once("ready", () => {
-      x.start();
-    });
-
-    x.once("end", () => {
-      //do some stuff like + or - points.
-    })
   }
+
+  async gift(card: Cards) {}
 
   async kiss(card: Cards) {}
 
