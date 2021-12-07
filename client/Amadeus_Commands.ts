@@ -1,7 +1,8 @@
 import { Client, CommandInteraction } from "discord.js";
 import Queries from "../tomoEngine/queries";
 import Tomo_Dictionaries from "../tomoEngine/statics/tomo_dict";
-import { UserUniversePayload } from "../tomoEngine/statics/types";
+import { AmadeusInteraction, UserUniversePayload } from "../tomoEngine/statics/types";
+import DBUsers from "../tomoEngine/tomoClasses/users";
 import Amadeus_Base from "./Amadeus_Base";
 import CustomClient from "./Amadeus_Client";
 import red from "./Amadeus_Redis";
@@ -66,16 +67,21 @@ export abstract class Commands extends Amadeus_Base {
     
   }
 
+  
+  async execute(bot: CustomClient, interaction: AmadeusInteraction) {
+    
 
+  }
   
 
-  async check(bot: Client, interaction: CommandInteraction) {
+  async check(bot: CustomClient, interaction: AmadeusInteraction) {
     return true;
   }
 
-  async checkDB(interaction: CommandInteraction) {
+  async checkDB(interaction: AmadeusInteraction) {
+    let user: UserUniversePayload;
     try {
-      const user = await Queries.userUniverse(interaction.user.id);
+      user = await Queries.userUniverse(interaction.user.id);
       if (!user) {
         const author = interaction.user;
         const newUserDocument: UserUniversePayload = {
@@ -90,7 +96,7 @@ export abstract class Commands extends Amadeus_Base {
 
         }
 
-        await Queries.insertUserUniverse(newUserDocument)
+        user = await Queries.insertUserUniverse(newUserDocument)
       }
       
 
@@ -98,12 +104,13 @@ export abstract class Commands extends Amadeus_Base {
       console.log(e)
 
     } finally {
+      interaction.DBUser = new DBUsers(user._id, user)
       return true;
     }
 
   }
 
-  async default_checks(bot: CustomClient, interaction: CommandInteraction) {
+  async default_checks(bot: CustomClient, interaction: AmadeusInteraction) {
     
     if (this.disabled) return interaction.reply("Sorry, this command is disabled.")
 
@@ -142,6 +149,4 @@ export abstract class Commands extends Amadeus_Base {
 
     return true;
   }
-
-  async formatName(this: Commands, interaction) {}
 }

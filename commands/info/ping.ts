@@ -3,6 +3,7 @@ import { createReadStream, createWriteStream } from "fs";
 import CustomClient from "../../client/Amadeus_Client";
 import { Commands } from "../../client/Amadeus_Commands";
 import Queries from "../../tomoEngine/queries";
+import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 import Character from "../../tomoEngine/tomoClasses/characters";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
@@ -20,25 +21,23 @@ class Ping extends Commands {
           .setName("teaa")
           .setDescription("description for 2_test"))
         ,
-      dbRequired: false,
+      dbRequired: true,
       ownerOnly: false,
       coolDown: 4000,
     });
   }
 
-  async execute(bot: typeof Client, interaction: CommandInteraction) {
+  async execute(bot: CustomClient, interaction: AmadeusInteraction) {
     console.log('exculted')
+    
 
 
 
 
   }
 
-  async test(bot: CustomClient, interaction: CommandInteraction) {
-    console.time('getChar')
-    let payload = await Queries.character(0);
-    console.log(payload)
-    console.timeEnd('getChar')
+  async test(bot: CustomClient, interaction: AmadeusInteraction) {
+    console.log(interaction.DBUser)
 
   }
 }

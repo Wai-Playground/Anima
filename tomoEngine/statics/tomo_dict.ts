@@ -1,7 +1,17 @@
-import { CharacterInUser, Char_Archetype, Char_Archetype_Strings, Char_Flags, Ship_Tree, Tomo_Action, User_Flags } from "./types";
+import { Being, CharacterInUser, Char_Archetype, Char_Archetype_Strings, Char_Flags, Ship_Tree, Tomo_Action, User_Flags } from "./types";
 
 
 export default class Tomo_Dictionaries {
+
+    static default_BeingInUser(): Being {
+        return {
+            health: 100,
+            mana: 100,
+            hunger: 100,
+            stability: 100,
+            available: true
+        }
+    }
 
     static default_CharInUser(): CharacterInUser {
         const default_CharInUser: CharacterInUser = {
@@ -10,10 +20,11 @@ export default class Tomo_Dictionaries {
             _flags: ["gift", "interact"] as Array<Char_Flags>,
             moods: {
                 pictureToUse: "main",
+                being: Tomo_Dictionaries.default_BeingInUser(),
                 overall: 30,
                 current: 0,
             },
-            gift_received: []
+            inventory: []
     
         }
         return default_CharInUser;

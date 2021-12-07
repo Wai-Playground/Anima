@@ -1,6 +1,10 @@
 import { Interaction } from "discord.js";
 import CustomClient from "../../client/Amadeus_Client";
 import { Listeners } from "../../client/Amadeus_listeners";
+import { Commands } from "../../client/Amadeus_Commands"
+import DBUsers from "../../tomoEngine/tomoClasses/users";
+import Queries from "../../tomoEngine/queries";
+import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 
 class interactionCreate extends Listeners {
   constructor() {
@@ -9,14 +13,16 @@ class interactionCreate extends Listeners {
     });
   }
 
-  async execute(bot: CustomClient, interaction: Interaction) {
+  async execute(bot: CustomClient, interaction: AmadeusInteraction & Interaction) {
     if (!interaction.isCommand()) return;
     console.log(interaction.user.username + " used " + interaction.commandName);
 
     if (!bot.commands.has(interaction.commandName)) return;
+    
 
     try {
-      let cmd = bot.commands.get(interaction.commandName);
+      let cmd: Commands = bot.commands.get(interaction.commandName);
+
 
       if (
         (await cmd.check(bot, interaction)) &&
@@ -25,7 +31,11 @@ class interactionCreate extends Listeners {
         //console.log(interaction.options.data)
         if (interaction.options.data?.[0].type == "SUB_COMMAND") {
           let sub = interaction.options.getSubcommand();
-          if (typeof cmd[sub] === "function") return cmd[sub](bot, interaction);
+          
+          if (typeof cmd[sub] === "function") {
+
+            return cmd[sub](bot, interaction)
+          };
         }
 
         return cmd.execute(bot, interaction);

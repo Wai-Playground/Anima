@@ -1,5 +1,7 @@
 import { Client, CommandInteraction } from "discord.js";
+import CustomClient from "../../client/Amadeus_Client";
 import { Commands } from "../../client/Amadeus_Commands";
+import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 class Level extends Commands {
@@ -20,7 +22,7 @@ class Level extends Commands {
   }
   
 
-  async execute(bot: typeof Client, interaction: CommandInteraction) {
+  async execute(bot: CustomClient, interaction: AmadeusInteraction) {
     
 
     return interaction.reply({ content: "Pong!", ephemeral: true });

@@ -1,7 +1,9 @@
-import { MessageSelectOptionData } from "discord.js";
+import { CommandInteraction, Interaction, MessageSelectOptionData } from "discord.js";
+import DBUsers from "../tomoClasses/users";
 /** Basic types (start) */
 export type BasicUniverseType = "characters" | "backgrounds" | "users" | "items" | "stories";
 export type EngineType = "tomo" | "rpg" | "novel" | "overlord";
+
 
 /** Basic types (end) */
 
@@ -124,16 +126,25 @@ export interface ItemInUser {
   amount: number
 }
 
+export interface Being {
+  health: number,
+  mana: number
+  hunger: number,
+  stability: number,
+  available: boolean,
+}
+
 export interface CharacterInUser {
   originalID: number,
   bg: number,
   _flags: Array<Char_Flags>
   moods: {
     pictureToUse: Temp_MoodTypeStrings,
+    being: Being;
     overall: number,
     current: number
   }
-  gift_received: Array<ItemInUser>
+  inventory: Array<ItemInUser>
   //TODO: Add more when RPG begins 
 
 }
@@ -209,3 +220,7 @@ export interface OverlordMenu {
 
 }
 
+/** Custom Interaction */
+export interface AmadeusInteraction extends CommandInteraction {
+  DBUser: DBUsers
+}
