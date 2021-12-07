@@ -5,7 +5,7 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 import Momonga from "./Amadeus_Mongo"
 import Red from "./Amadeus_Redis"
-//
+
 export default class CustomClient extends Client {
   /**
    * Description | Custom Client.
@@ -31,12 +31,19 @@ export default class CustomClient extends Client {
 
   }
 
+  /**
+   * 
+   * Name | loadCog
+   * Description | Loads a cog.
+   * @param this | Bot
+   * @param cPath 
+   */
   async loadCog(this: CustomClient, cPath: string = `./commands`) {
 
     let files = fs.readdirSync(cPath);
     let newPath: string
 
-    files.forEach((file) => {
+    files.forEach((file: string) => {
       newPath = cPath + "/" + file;
       if (fs.statSync(newPath).isDirectory()) {
         this.loadCog(newPath);
@@ -45,6 +52,7 @@ export default class CustomClient extends Client {
           
           const command = require(`.${newPath}`);
           const cmd = new command();
+          
           let payload: {
             name: string,
             description?: string,

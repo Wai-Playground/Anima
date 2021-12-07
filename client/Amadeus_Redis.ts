@@ -2,7 +2,9 @@ import Amadeus_Base from "./Amadeus_Base";
 import Redis from 'ioredis';
 
 let memory: Redis.Redis;
-
+/**
+ * redis utility class
+ */
 export default class Red extends Amadeus_Base {
     constructor() {
         super()
@@ -10,9 +12,8 @@ export default class Red extends Amadeus_Base {
 
     static async connect() {
         memory = new Redis();
+        console.log(memory)
         console.log("Redis Loaded.")
-        
-        
     }
 
     static memory() {

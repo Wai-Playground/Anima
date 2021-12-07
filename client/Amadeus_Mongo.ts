@@ -2,7 +2,7 @@ import Amadeus_Base from "./Amadeus_Base";
 import {MongoClient} from "mongodb"
 require("dotenv").config()
 
-var momonga: MongoClient;
+let momonga: MongoClient;
 /**
  * Mongodb utility class.
  */

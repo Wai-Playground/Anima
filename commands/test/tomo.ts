@@ -30,7 +30,7 @@ class Tomo extends Commands {
     super("tomo", {
       description: "Tomo bs",
       data: new SlashCommandBuilder().addSubcommand((subc) =>
-        subc.setName("hug").setDescription("hug")
+        subc.setName("gift").setDescription("hug")
       ),
       dbRequired: true,
       ownerOnly: false,
@@ -46,13 +46,13 @@ class Tomo extends Commands {
    * @param bot 
    * @param interaction 
    */
-  async hug(bot, interaction: CommandInteraction) {
+  async gift(bot, interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     console.log("uh hi")
     let xd = new TomoEngine(interaction)
     xd.once("ready", async () => {
         let card = await TomoEngine.buildCard(0, interaction.user.id)
-        xd.hug(card)
+        xd.gift(card)
     })
   }
 

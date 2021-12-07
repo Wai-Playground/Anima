@@ -2,8 +2,7 @@
  * @author Shokkunn
  */
 
-import { MessagePayload } from "discord.js";
-import { CharacterPayload, CharacterPersonality, Char_Archetype, Ship_Tree, Temp_MoodTypeStrings, Tomo_Action } from "../statics/types";
+import { CharacterPayload, CharacterPersonality, Gift_Responses, Temp_MoodTypeStrings, Tomo_Action } from "../statics/types";
 import universeBase from "./universeBase";
 
 
@@ -12,7 +11,7 @@ export default class Character extends universeBase {
     personality: CharacterPersonality
     isNarrator: boolean
     constructor(_id: number | string, payload: CharacterPayload) {
-        super(_id, 'characters', payload.name, payload.grade, payload.variant.isVariant, payload.link)
+        super(_id, 'characters', payload.name, payload.emoji || "✨", payload.spoiler, payload.grade, payload.variant.isVariant, payload.link)
         this.personality = payload.personality;
         this.isNarrator = payload._id == 1 ? true : false;
     }
@@ -34,7 +33,7 @@ export default class Character extends universeBase {
      */
     getRandInterStoryId(action_type: Tomo_Action) {
         const arr = this.getInteractionStoryIdArr(action_type);
-        return (arr.length > 0 ? arr[this.randIntFromZero(arr.length)] : null) 
+        return (arr.length > 0 ? arr[this.randIntFromZero(arr.length)] : -1) 
         
     }
     /**
@@ -46,6 +45,22 @@ export default class Character extends universeBase {
         return this.personality.interaction_story_ids.hasOwnProperty(action_type) ? this.personality.interaction_story_ids[action_type] : [];
     }
 
+    /**
+     * 
+     * @param response_type | type of response
+     * @returns rand string of the response arr
+     */
+    getRandomGiftResponse(response_type: keyof Gift_Responses) {
+        const arr = this.giftResponse[response_type]
+        return arr[this.randIntFromZero(arr.length)]
+
+    }
+
+    get giftResponse() {
+        return this.personality.interaction_gift_responses;
+
+    }
+
     get likes() {
         return this.personality.likes;
     }
@@ -55,7 +70,7 @@ export default class Character extends universeBase {
     }
 
     get archetype() {
-        return this.personality._archetype;
+        return this.personality.archetype;
 
     }
     

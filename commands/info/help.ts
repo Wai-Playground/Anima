@@ -18,7 +18,7 @@ class Help extends Commands {
         ),
       dbRequired: true,
       ownerOnly: false,
-      coolDown: 4,
+      coolDown: 100,
     });
     
   }
@@ -30,8 +30,6 @@ class Help extends Commands {
       if (command) {
         if (command == pair[1]) index = i;
       } 
-
-      
       
       ret.push({
         emoji: "<:trash:886429816260280374>",

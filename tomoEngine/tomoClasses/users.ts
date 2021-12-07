@@ -12,7 +12,7 @@ export default class DBUsers extends universeBase {
     _inventory: Array<ItemInUser>
     username: string;
     constructor(_id: number | string, payload: UserUniversePayload) {
-        super(_id, 'users', payload.discord_username);
+        super(_id, 'users', payload.discord_username, "🧍");
         this.username = payload.discord_username;
         this._tomodachis = payload.characters;
         this._reservedTomo = payload.reserved;
@@ -58,9 +58,12 @@ export default class DBUsers extends universeBase {
     getItemFromInv(itemID: number) {
       let find = this.inventory.find(item => item.itemID == itemID) || null;
       return find;
-      
-
     }
+
+    checkToRemoveDanglingZeros() {
+    
+    }
+
     /**
      * Remember to call update!
      * @param itemID 
@@ -86,6 +89,8 @@ export default class DBUsers extends universeBase {
 
     }
 
+
+
     /**
      * Remember to call update!
      * @param itemID 
@@ -95,11 +100,15 @@ export default class DBUsers extends universeBase {
     removeFromInventory(itemID: number, amount: number) {
 
       let find = this.getItemFromInv(itemID), index: number, res: number;
-      if (find == null || amount > 100) return;
+      if (find == null || amount > 100000000) return;
 
       index = this._inventory.indexOf(find as ItemInUser);
       res = this._inventory[index].amount - amount;
-      res = res < 0 ? 0 : res;
+      if (res <= 0) {
+        this._inventory.splice(index)
+        return this._inventory;
+      }
+      
       
       this._inventory[index].amount = res;
       return this._inventory;
@@ -107,7 +116,9 @@ export default class DBUsers extends universeBase {
     }
 
     
-
+    async updateInventory() {
+      await Queries.updateUserInventory(this._id, this.inventory)
+    }
     async update() {
       /**TODO: Theres a more elegant solution to this. */
       await Queries.updateUserUniverse(this._id, {

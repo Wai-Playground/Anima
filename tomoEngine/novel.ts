@@ -26,9 +26,9 @@ import {
   loadImage,
   NodeCanvasRenderingContext2D,
 } from "canvas";
-import { TomoError } from "./statics/errors";
+import { NovelError, TomoError } from "./statics/errors";
 
-class NodeSingle implements Single {
+export class NodeSingle implements Single {
   index: number;
   character: number | string;
   background: number | string;
@@ -40,6 +40,7 @@ class NodeSingle implements Single {
   built_img: MessageAttachment;
   choices?: Array<MessageSelectOptionData>;
   placeholder?: string;
+  script: Scripts
   lookUpArr?: Array<Scripts | number>;
   backable: boolean;
 
@@ -48,18 +49,20 @@ class NodeSingle implements Single {
     this.character = single.character;
     this.background = single.bg;
     this.text = single.text;
+    this.script = single.script;
     this.mood = single.hasOwnProperty("mood") ? single.mood : null;
     this.backable = single.hasOwnProperty("backable") ? single.backable : true;
-    this.route = single.hasOwnProperty("route") ? single.route : index + 1;
+    this.route = single.hasOwnProperty("route") ? single.route : "$next";
 
     this.isChoiced = single.hasOwnProperty("args") ? true : false;
     if (this.isChoiced) {
+      this.placeholder = single.hasOwnProperty("placeholder")
+      ? single.placeholder
+      : "Select an option...";
+      if (typeof single.args == "string") return;
       this.choices = [];
       this.lookUpArr = [];
       let i = 0;
-      this.placeholder = single.hasOwnProperty("placeholder")
-        ? single.placeholder
-        : "Select an option...";
       for (const arg of single.args) {
         this.choices.push({
           label: arg.label,
@@ -67,7 +70,6 @@ class NodeSingle implements Single {
           value: i.toString(),
         });
         this.lookUpArr.push(arg.route);
-        console.log(this.choices);
         i++;
       }
     }
@@ -123,6 +125,7 @@ export default class Novel extends engineBase {
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
     const canvas: Canvas = createCanvas(this.width, this.height);
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
+    const customID: string = `novel_userID_${this.interaction.user.id}_node_${index}_${this.name}.jpeg`
 
     const bg: Image = await loadImage(
       this.backgrounds.get(this.nodes[index].background).link
@@ -152,25 +155,65 @@ export default class Novel extends engineBase {
     this.nodes[index].built = true;
     this.nodes[index].built_img = new MessageAttachment(
       canvas.toBuffer("image/jpeg"),
-      `novel_userID_${this.interaction.user.id}_node_${index}_${this.name}.jpg`
+      customID
     );
-
+    
     return this.nodes[index].built_img;
   }
 
   parseScript(str: Scripts): void {
+    console.log(str + " STR")
+    console.log(this.index + " INDX")
+    console.log(this.index + 1)
     switch (str) {
       case "$end":
         this.end();
         break;
       case "$flag_b":
+        this.setPage(this.index + 1);
+        break;
+      case "$beginEnd":
+        this.setPage(this.nodes.findIndex(node => node.script == "$beginEnd") || this.nodes.length - 1);
         break;
       case "$next":
         this.setPage(this.index + 1);
         break;
       case "$flag_g":
+        this.setPage(this.index + 1);
         break;
     }
+  }
+
+  deployNode(node: NodeSingle, index: number, destroy: boolean = false) {
+    console.log("WORKKKKKKKKKKKKKKKKKKKKKKKKK")
+    node.index = index;
+    if (!node.character) node.character = this.nodes[index - 1].character;
+    if (!node.background) node.background = this.nodes[index - 1].background;
+    //if (!node.route)node.route = this.nodes[index - 1].route
+    if (this.nodes.length < index) this.nodes.push(node);
+
+    if (destroy == false) this.nodes.map((tenant) => {
+      if (tenant.index >= index) {
+        if (typeof tenant.route == "number") tenant.route++;
+        console.log(tenant)
+        tenant.index++;
+      }
+    })
+
+    this.nodes.splice(index, (destroy ? 1 : 0), node)
+    console.log(this.nodes)
+    this.buildNode(index)
+    
+
+
+
+  }
+
+  deployChar(char: Character, id: number | string = undefined) {
+    //if (this.characters.has(char.getId)) throw new TomoError("Found duplicate char in memory bank.")
+    if (id == undefined) return this.characters.set(char.getId, char);
+    return this.characters.set(id, char)
+
   }
 
   /**
@@ -227,7 +270,7 @@ export default class Novel extends engineBase {
           if (i <= 0) payload.link = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1200px-HD_transparent_picture.png"// just transparnt png if we we are at index 0;
         } 
 
-        this.characters.set(single.character, payload);
+        this.deployChar(payload, single.character)
 
 
       }
@@ -245,9 +288,10 @@ export default class Novel extends engineBase {
         this.buildNode(node.index); // call the build function
       }
     }
-
+    
     process.nextTick(() => {
       this.emit("ready");
+      
     });
   }
 
@@ -258,6 +302,7 @@ export default class Novel extends engineBase {
    */
 
   async start() {
+    
     const payload = {
       content: `>>> **${
         this.characters.get(this.nodes[this.index].character).name
@@ -270,6 +315,7 @@ export default class Novel extends engineBase {
       //attachments: [build],
       components: await this.action(),
     };
+    
     if (this.interaction.isCommand()) {
       if (this.interaction.deferred) {
         console.log("deferred");
@@ -290,6 +336,7 @@ export default class Novel extends engineBase {
 
   async setPage(index: number = this.index) {
     if (index < 0 || index > this.nodes.length - 1) return;
+    this.emit("pageChange", this.nodes[index]);
     this.index = index;
     this.selection = undefined;
     const payload = {
@@ -397,6 +444,7 @@ export default class Novel extends engineBase {
     let i = 0;
     const buttonRow = new MessageActionRow();
     if (this.nodes[this.index].isChoiced) {
+      if (typeof(this.nodes[this.index].choices) == "string") throw new NovelError("Choices supposed to be set by TomoEngine but is not");
       const selectRow = new MessageActionRow().addComponents(
         new MessageSelectMenu()
           .setCustomId(

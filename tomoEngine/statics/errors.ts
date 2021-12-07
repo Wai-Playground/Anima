@@ -29,6 +29,15 @@ export class UniBaseNotFoundError extends MangoError {
 
 }
 
+export class UniVariantNotFoundError extends MangoError {
+    constructor(oID: number | string, vID: number | string,  serverName: BasicUniverseType) {
+        super(`(oid: ${oID}) Universe variant not found in MongoDB | Returned original.`, vID, serverName);
+        this.name = "UniVariantNotFoundError";
+
+    }
+
+}
+
 export class OriginalReqVarError extends MangoError {
     constructor(variantID: number, serverName: BasicUniverseType) {
         super(`Requested Variant but received Original`, variantID, serverName);

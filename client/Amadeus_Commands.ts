@@ -63,11 +63,11 @@ export abstract class Commands extends Amadeus_Base {
     // then return false
     console.log("false")
     return false;
-
-
     
   }
 
+
+  
 
   async check(bot: Client, interaction: CommandInteraction) {
     return true;
@@ -109,8 +109,8 @@ export abstract class Commands extends Amadeus_Base {
 
     if (this.ownerOnly) {
       console.log(interaction.user.id == process.env.OWNER_ID) // if true then bottom is false
-      
-      if (interaction.user.id == process.env.OWNER_ID ? false : true) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
+      //CHANGE SIGN
+      if (interaction.user.id != process.env.OWNER_ID ? false : true) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
       
     }
 

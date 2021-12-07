@@ -1,4 +1,4 @@
-import { CharacterInUser, Char_Archetype, Ship_Tree } from "./types";
+import { CharacterInUser, Char_Archetype, Char_Archetype_Strings, Char_Flags, Ship_Tree, Tomo_Action, User_Flags } from "./types";
 
 
 export default class Tomo_Dictionaries {
@@ -6,12 +6,12 @@ export default class Tomo_Dictionaries {
     static default_CharInUser(): CharacterInUser {
         const default_CharInUser: CharacterInUser = {
             originalID: 0,
-            _flags: [],
             bg: 0,
+            _flags: ["gift", "interact"] as Array<Char_Flags>,
             moods: {
                 pictureToUse: "main",
-                overall: 40,
-                current: 2,
+                overall: 30,
+                current: 0,
             },
             gift_received: []
     
@@ -21,246 +21,234 @@ export default class Tomo_Dictionaries {
 
     }
 
-    static char_tree(i: Char_Archetype): Ship_Tree {
+    static char_tree(i: Char_Archetype_Strings): Ship_Tree {
         const dict = {
-            0: {
+            "dere": {
                 Ship_Tree: {
                     "detest": {
-                        level: 10,
-                        setFlag: ["block_all"]
+                        level: 0,
+                        delFlag: ["interact"] as Array<Char_Flags>
                         
             
                     },
                     "hate": {
-                        level: 20,
-                        setFlag: ["block_gift"]
+                        level: 10,
+                        delFlag: ["gift"] as Array<Char_Flags>
             
                     }, 
                     "annoyed": {
-                        level: 30,
+                        level: 20,
                         setVariant: "annoyed" 
             
                     },
                     "main": {
-                        level: 40,
+                        level: 30,
                         setVariant: "main"
             
                     },
                     "friendly": {
-                        level: 50,
-                        setFlag: ["memento"],
+                        level: 40,
+                        setFlag: ["memento"] as Array<User_Flags>
             
                         
                     },
-                    "happy": {
-                        level: 60,
-                        setFlag: ["nick_name_char"],
-                        setVariant: "happy"
-                        
-                    },
                     "passionate": {
-                        level: 70,
-                        setFlag: ["nick_name_self"]
+                        level: 50,
+                        setFlag: ["nick_name_self"] as Array<User_Flags>
                         
                     },
                     "close": {
-                        level: 80,
-                        setFlag: ["hug"]
+                        level: 60,
+                        setFlag: ["hug"] as Array<Char_Flags>
                         
                     },
                     "flustered": {
-                        level: 90,
-                        setFlag: ["nick_name_char", "kiss"],
+                        level: 70,
+                        setFlag: ["nick_name_char", "kiss"] as Array<User_Flags>,
                         setVariant: "flustered"
                         
                     },
                     "love": {
-                        level: 100,
-                        setFlag: ["ring"]
+                        level: 90,
+                        setFlag: ["ring"] as Array<Char_Flags>
                         
+                    },
+                    "goal": {
+                        level: 100
                     }
             
-                }
+                } 
 
             },
-            1: {
+            "dan": {
                 Ship_Tree: {
                     "detest": {
-                        level: 10,
-                        setFlag: ["block_all"]
+                        level: 0,
+                        delFlag: ["interact"] as Array<Char_Flags>
                         
             
                     },
                     "hate": {
-                        level: 20,
-                        setFlag: ["block_gift"]
+                        level: 10,
+                        delFlag: ["gift"] as Array<Char_Flags>
             
                     }, 
                     "annoyed": {
-                        level: 30,
+                        level: 20,
                         setVariant: "annoyed" 
             
                     },
                     "main": {
-                        level: 40,
+                        level: 30,
                         setVariant: "main"
             
                     },
                     "friendly": {
-                        level: 50,
-                        setFlag: ["memento"],
+                        level: 40,
+                        setFlag: ["memento"] as Array<User_Flags>
             
                         
                     },
-                    "happy": {
-                        level: 60,
-                        setFlag: ["nick_name_char"],
-                        setVariant: "happy"
-                        
-                    },
                     "passionate": {
-                        level: 70,
-                        setFlag: ["nick_name_self"]
+                        level: 50,
+                        setFlag: ["nick_name_self"] as Array<User_Flags>
                         
                     },
                     "close": {
-                        level: 80,
-                        setFlag: ["hug"]
+                        level: 60,
+                        setFlag: ["hug"] as Array<Char_Flags>
                         
                     },
                     "flustered": {
-                        level: 90,
-                        setFlag: ["nick_name_char", "kiss"],
+                        level: 70,
+                        setFlag: ["nick_name_char", "kiss"] as Array<User_Flags>,
                         setVariant: "flustered"
                         
                     },
                     "love": {
-                        level: 100,
-                        setFlag: ["ring"]
+                        level: 90,
+                        setFlag: ["ring"] as Array<Char_Flags>
                         
+                    },
+                    "goal": {
+                        level: 100
                     }
             
-                }
+                } 
 
             },
-            2: {
+            "kuu": {
                 Ship_Tree: {
                     "detest": {
-                        level: 10,
-                        setFlag: ["block_all"]
+                        level: 0,
+                        delFlag: ["interact"] as Array<Char_Flags>
                         
             
                     },
                     "hate": {
-                        level: 20,
-                        setFlag: ["block_gift"]
+                        level: 10,
+                        delFlag: ["gift"] as Array<Char_Flags>
             
                     }, 
                     "annoyed": {
-                        level: 30,
+                        level: 20,
                         setVariant: "annoyed" 
             
                     },
                     "main": {
-                        level: 40,
+                        level: 30,
                         setVariant: "main"
             
                     },
                     "friendly": {
-                        level: 50,
-                        setFlag: ["memento"],
+                        level: 40,
+                        setFlag: ["memento"] as Array<User_Flags>
             
                         
                     },
-                    "happy": {
-                        level: 60,
-                        setFlag: ["nick_name_char"],
-                        setVariant: "happy"
-                        
-                    },
                     "passionate": {
-                        level: 70,
-                        setFlag: ["nick_name_self"]
+                        level: 50,
+                        setFlag: ["nick_name_self"] as Array<User_Flags>
                         
                     },
                     "close": {
-                        level: 80,
-                        setFlag: ["hug"]
+                        level: 60,
+                        setFlag: ["hug"] as Array<Char_Flags>
                         
                     },
                     "flustered": {
-                        level: 90,
-                        setFlag: ["nick_name_char", "kiss"],
+                        level: 70,
+                        setFlag: ["nick_name_char", "kiss"] as Array<User_Flags>,
                         setVariant: "flustered"
                         
                     },
                     "love": {
-                        level: 100,
-                        setFlag: ["ring"]
+                        level: 90,
+                        setFlag: ["ring"] as Array<Char_Flags>
                         
+                    },
+                    "goal": {
+                        level: 100
                     }
             
-                }
+                } 
 
             },
-            3: {
+            "tsun": {
                 Ship_Tree: {
                     "detest": {
-                        level: 10,
-                        setFlag: ["block_all"]
+                        level: 0,
+                        delFlag: ["interact"] as Array<Char_Flags>
                         
             
                     },
                     "hate": {
-                        level: 20,
-                        setFlag: ["block_gift"]
+                        level: 10,
+                        delFlag: ["gift"] as Array<Char_Flags>
             
                     }, 
                     "annoyed": {
-                        level: 30,
+                        level: 20,
                         setVariant: "annoyed" 
             
                     },
                     "main": {
-                        level: 40,
+                        level: 30,
                         setVariant: "main"
             
                     },
                     "friendly": {
-                        level: 50,
-                        setFlag: ["memento"],
+                        level: 40,
+                        setFlag: ["memento"] as Array<User_Flags>
             
                         
                     },
-                    "happy": {
-                        level: 60,
-                        setFlag: ["nick_name_char"],
-                        setVariant: "happy"
-                        
-                    },
                     "passionate": {
-                        level: 70,
-                        setFlag: ["nick_name_self"]
+                        level: 50,
+                        setFlag: ["nick_name_self"] as Array<User_Flags>
                         
                     },
                     "close": {
-                        level: 80,
-                        setFlag: ["hug"]
+                        level: 60,
+                        setFlag: ["hug"] as Array<Char_Flags>
                         
                     },
                     "flustered": {
-                        level: 90,
-                        setFlag: ["nick_name_char", "kiss"],
+                        level: 70,
+                        setFlag: ["nick_name_char", "kiss"] as Array<User_Flags>,
                         setVariant: "flustered"
                         
                     },
                     "love": {
-                        level: 100,
-                        setFlag: ["ring"]
+                        level: 90,
+                        setFlag: ["ring"] as Array<Char_Flags>
                         
+                    },
+                    "goal": {
+                        level: 100
                     }
             
-                }
+                } 
 
             }
         }

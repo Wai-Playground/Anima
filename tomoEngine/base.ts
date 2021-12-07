@@ -9,9 +9,10 @@ import {
 } from "discord.js";
 import { EventEmitter } from "events";
 import Queries from "./queries";
-import { BackgroundPayload, CharacterPayload, StoryPayload, UserUniversePayload, User_Scripts } from "./statics/types";
+import { BackgroundPayload, CharacterPayload, ItemsPayload, StoryPayload, UserUniversePayload, User_Scripts } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
+import Items from "./tomoClasses/items";
 import Story from "./tomoClasses/story";
 import DBUsers from "./tomoClasses/users" 
 
@@ -94,6 +95,18 @@ class engineBase extends EventEmitter {
       console.log(e);
       return null;
     }
+  }
+
+  async getItemUniverse(_id: number | string): Promise<Items> {
+    try {
+      //const payload: BackgroundPayload = await Queries.backgroundUniverse(_id);
+      return new Items(_id, await Queries.item(_id) as ItemsPayload);
+
+    } catch(e) {
+      console.log(e);
+      return null;
+    }
+
   }
 
 

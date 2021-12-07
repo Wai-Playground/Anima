@@ -2,32 +2,38 @@
  * @author Shokkunn
  */
 
-import { BackgroundPayload, BackgroundType, BasicUniverseType, CharacterPayload, ItemsPayload, Rarity_Grade, StoryPayload, Temp_MoodTypeStrings } from "../statics/types";
+import { BackgroundPayload, BackgroundType, BasicUniverseType, CharacterPayload, ItemsPayload, Rarity_Grade, Rarity_Grade_Strings, StoryPayload, Temp_MoodTypeStrings } from "../statics/types";
 import Queries from "../queries";
 import { OriginalReqVarError } from "../statics/errors";
 
-export default class universeBase {
+export default abstract class universeBase {
     _id: number | string;
     type: BasicUniverseType;
     name: string;
     variant?: boolean;
     link?: string;
-    grade?: Rarity_Grade
+    spoiler?: boolean;
+    _grade?: Rarity_Grade_Strings
+    emoji?: string
 
     /**
      * Base class for all in-universe classes. 
-     * @param _id |
+     * @param _id 
      * @param basicImagetype |
      */
-    constructor(_id: number | string, type: BasicUniverseType, name: string, grade: Rarity_Grade = null, variant: boolean = null, link: string = null) {
+    constructor(_id: number | string, type: BasicUniverseType, name: string, emoji: string = "📦", spoiler: boolean = false, grade: Rarity_Grade_Strings = null, variant: boolean = null, link: string = null) {
         this._id = _id;
         this.name = name
         this.type = type;
         this.variant = variant;
         this.link = link;
-        this.grade = grade;
+        this.spoiler = spoiler;
+        this._grade = grade;
+        this.emoji = emoji;
 
     }
+
+    
 
     /**
      * 
@@ -45,6 +51,18 @@ export default class universeBase {
     get getName(): string {
         return this.name;
     }
+
+
+    get gradeInt(): number {
+        return Rarity_Grade[this._grade];
+    }
+
+    /**
+     * @returns if the base is spoiler or not.
+     */
+    get isSpoiler(): boolean {
+        return this.spoiler;
+    }
     
     /**
      * 
@@ -52,6 +70,14 @@ export default class universeBase {
      */
     get getType(): BasicUniverseType {
         return this.type;
+    }
+
+    get markUpFormattedName() {
+        return `*${this.getName}* [ Grade • **${this._grade}** ]`
+    }
+
+    get formattedName() {
+        return this.markUpFormattedName.replace(/\*/g, "")
     }
     /**
      * 
@@ -69,7 +95,6 @@ export default class universeBase {
      */
     randIntFromZero(max: number) {
         return (Math.floor(Math.random() * max))
-
     }
     /**
      * Not supposed to be called since the return object is not in class form.

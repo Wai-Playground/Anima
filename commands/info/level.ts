@@ -15,6 +15,7 @@ class Level extends Commands {
     ),
       dbRequired: false,
       ownerOnly: false,
+      coolDown: 1,
     });
   }
   

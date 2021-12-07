@@ -1,6 +1,6 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
-import { UniBaseNotFoundError } from "./statics/errors";
-import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
+import { UniBaseNotFoundError, UniVariantNotFoundError } from "./statics/errors";
+import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, ItemInUser, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 import Red from "../client/Amadeus_Redis";
 const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
@@ -52,7 +52,7 @@ class Queries {
         try {
             cache = await redis.hget(db, _id.toString());
             if (cache) {
-                console.log("Cached! _id: "+ _id);
+                console.log("Cached! _id: "+ _id + " db: " + db);
                 payload = JSON.parse(cache) as BaseUniversePayload;
                 if (!payload) throw new UniBaseNotFoundError(_id, db);
                 return payload;
@@ -126,18 +126,19 @@ class Queries {
         try {
             cache = await redis.hget(hashKey, query);
             if (cache) {
-                console.log("Cached Variant! o_id: "+ originalID);
+                console.log("Cached Variant! o_id: "+ originalID + " db: " + db);
                 payload = JSON.parse(cache) as BaseUniversePayload;
                 return payload;
             }
 
             payload = await Monmonga.universeDB().collection<BaseUniversePayload>(db).findOne({'variant.originalID': originalID, 'variant.variantUse': name});
-            if (!payload) throw new UniBaseNotFoundError(originalID, db);
+            if (!payload) throw new UniVariantNotFoundError(originalID, name, db);
             redis.hset(hashKey, query, JSON.stringify(payload));
             redis.expire(hashKey, EXPIRATION);
 
         } catch(e) {
             console.log(e);
+            payload = await Queries.getBaseType(originalID, db);
             
         } finally {
             
@@ -179,8 +180,9 @@ class Queries {
     }
 
     public static async updateUserUniverse(_id: string | number, payload: UserUniversePayload) {
+        console.log(payload)
         try {            
-            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, payload); 
+            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: {payload} }); 
     
         } catch(e) {
             console.log(e);
@@ -188,6 +190,19 @@ class Queries {
             return payload;
         }
       
+    }
+
+    public static async updateUserInventory(_id: string | number, inventory: Array<ItemInUser>) {
+        console.log(inventory)
+
+        try {            
+            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: {"inventory": inventory} }); 
+    
+        } catch(e) {
+            console.log(e);
+        } finally {
+            return inventory;
+        }
     }
 
 

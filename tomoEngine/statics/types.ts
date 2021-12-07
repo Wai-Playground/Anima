@@ -7,17 +7,15 @@ export type EngineType = "tomo" | "rpg" | "novel" | "overlord";
 
 /** Tomo Types (start) */
 export enum Temp_MoodType {
+  main,
   happy,
   sad,
   annoyed,
-  surprised,
   flustered,
-  main,
-  disgusted,
 }
 
 export type Temp_MoodTypeStrings = keyof typeof Temp_MoodType;
-export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$end";
+export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$end" | "$beginEnd" | "$gift" | "$response"
 export type User_Scripts = "$nickname" | "$suffix" | "$greetings" | "$farewells";
 export type BackgroundType = "day" | "evening" | "night";
 export enum Mood_States {
@@ -26,16 +24,29 @@ export enum Mood_States {
   annoyed,
   main,
   friendly,
-  happy,
   passionate,
   close,
   flustered,
   love,
   goal
 }
+
+export enum Mood_Emojis {
+  "🖤",
+  "💔",
+  "💢",
+  "😑",
+  "💛",
+  "🧭",
+  "😊",
+  "❤️",
+  "💖",
+  "🎎"
+}
 export type Mood_States_Strings = keyof typeof Mood_States
-export type Tomo_Action = "hug" | "kiss" | "interact" | "gift"
-export type User_Flags = "memento" | "nick_names_self" | "nick_names_char" | "kiss" | "hug" | "ring" | "block_gift" | "block_all"
+export type Tomo_Action = "gift" | "interact" | "free_talk"
+export type User_Flags = "memento" | "nick_name_self" | "nick_name_char" 
+export type Char_Flags = User_Flags & Tomo_Action
 export enum Char_Archetype {
   dere,
   dan,
@@ -43,7 +54,7 @@ export enum Char_Archetype {
   tsun
 }
 export type Char_Archetype_Strings = keyof typeof Char_Archetype;
-export type Item_Type = "consumables" | "treasures"
+export type Item_Type = "consumables" | "treasures" 
 export enum Rarity_Grade {
   D,
   C,
@@ -54,86 +65,40 @@ export enum Rarity_Grade {
   SSS,
   X
 }
-export type Rarity_Grade_Strings= keyof typeof Rarity_Grade;
+export type Rarity_Grade_Strings= keyof typeof Rarity_Grade; 
 
-
+export interface Ship_Branch {
+  level: number,
+  setFlag?: Array<Char_Flags>
+  delFlag?: Array<Char_Flags>
+  setVariant?: string
+}
 export interface Ship_Tree {
-  "detest": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-      
-
-  },
-  "hate": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-
-  }, 
-  "annoyed": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-
-  },
-  "main": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-
-  },
-  "friendly": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-
-      
-  },
-  "happy": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-      
-  },
-  "passionate": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-      
-  },
-  "close": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-      
-  },
-  "flustered": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-      
-  },
-  "love": {
-      level: number,
-      setFlag?:  Array<string>
-      setVariant?: string
-      
-  }
-
+  "detest": Ship_Branch,
+  "hate": Ship_Branch, 
+  "annoyed": Ship_Branch,
+  "main": Ship_Branch,
+  "friendly": Ship_Branch,
+  "passionate": Ship_Branch,
+  "close": Ship_Branch,
+  "flustered": Ship_Branch,
+  "love": Ship_Branch,
+  "goal": Ship_Branch
 }
 /** Tomo Types (end) */
 
 /** Mongodb payload types (start) */
 export interface BaseUniversePayload {
   _id: number | string;
-  grade?: Rarity_Grade
+  grade?: Rarity_Grade_Strings
   variant: {
     isVariant: boolean;
     variantUse?: string;
     originalID?: number;
   };
   description?: string;
+  emoji?: string;
+  spoiler: boolean;
   name: string;
 }
 
@@ -146,6 +111,14 @@ export interface BackgroundPayload extends BaseUniversePayload {
   link: string;
 }
 
+export interface CharacterPayload extends BaseUniversePayload {
+  age?: number;
+  bloodtype?: string;
+  description?: string;
+  personality?: CharacterPersonality;
+  link: string;
+}
+
 export interface ItemInUser {
   itemID: number,
   amount: number
@@ -153,8 +126,8 @@ export interface ItemInUser {
 
 export interface CharacterInUser {
   originalID: number,
-  _flags: Array<User_Flags>
   bg: number,
+  _flags: Array<Char_Flags>
   moods: {
     pictureToUse: Temp_MoodTypeStrings,
     overall: number,
@@ -173,29 +146,31 @@ export interface UserUniversePayload {
   inventory: Array<ItemInUser>
   
 }
+export interface Gift_Responses {
+  likes: Array<string>
+  dislikes: Array<string>
+  above: Array<string>
+  average: Array<string>
+  below: Array<string>
+  none: Array<string>
+}
+
 
 export interface CharacterPersonality {
-  _archetype?: Char_Archetype;
+  archetype?: Char_Archetype_Strings;
   greetings: Array<string>;
   farewells: Array<string>;
   interaction_story_ids?: {
-    hug?: Array<number>,
-    gift?: Array<number>,
-    kiss?: Array<number>,
     interact: Array<number>
+    gift?: Array<number>
   }
+  interaction_gift_responses?: Gift_Responses
   likes?: Array<number>,
   dislikes?: Array<number>,
 }
 
 
-export interface CharacterPayload extends BaseUniversePayload {
-  age?: number;
-  bloodtype?: string;
-  description?: string;
-  personality?: CharacterPersonality;
-  link: string;
-}
+
 
 /** Mongodb payload types (end) */
 
@@ -208,7 +183,7 @@ export interface Argument extends MessageSelectOptionData {
 }
 export interface StoryPayload extends BaseUniversePayload {
   character_specific?: {
-    action: Tomo_Action
+    action: Tomo_Action 
   };
   multiples: Single[];
 }
@@ -220,6 +195,7 @@ export interface Single {
   bg?: number | string;
   character?: number | string;
   text: string;
+  script?: Scripts;
   mood?: Temp_MoodTypeStrings;
   route?: number | Scripts;
   placeholder?: string;
