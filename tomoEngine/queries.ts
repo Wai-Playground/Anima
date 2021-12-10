@@ -1,6 +1,6 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError, UniVariantNotFoundError } from "./statics/errors";
-import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterPayload, ItemInUser, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
+import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterInUser, CharacterPayload, ItemInUser, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 import Red from "../client/Amadeus_Redis";
 const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
@@ -11,6 +11,7 @@ class Queries {
      * @returns character payload as json
      */
     public static async character(_id: string | number) {
+        
         return await this.getBaseType(_id, "characters") as CharacterPayload;
     }
 
@@ -20,6 +21,7 @@ class Queries {
      * @returns background payload as json
      */
     public static async background(_id: string | number) {
+        
         return await this.getBaseType(_id, "backgrounds") as BackgroundPayload;
     }
 
@@ -202,6 +204,19 @@ class Queries {
             console.log(e);
         } finally {
             return inventory;
+        }
+    }
+
+    public static async updateUserTomo(_id: string | number, tomo: Array<CharacterInUser>) {
+        console.log(tomo)
+
+        try {            
+            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: {"characters": tomo } }); 
+    
+        } catch(e) {
+            console.log(e);
+        } finally {
+            return tomo;
         }
     }
 

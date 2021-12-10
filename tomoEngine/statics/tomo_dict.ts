@@ -5,11 +5,12 @@ export default class Tomo_Dictionaries {
 
     static default_BeingInUser(): Being {
         return {
-            health: 100,
-            mana: 100,
+            health: [100, 100],
+            mana: [100, 100],
             hunger: 100,
             stability: 100,
-            available: true
+            available: true,
+            level: 1
         }
     }
 
@@ -20,10 +21,10 @@ export default class Tomo_Dictionaries {
             _flags: ["gift", "interact"] as Array<Char_Flags>,
             moods: {
                 pictureToUse: "main",
-                being: Tomo_Dictionaries.default_BeingInUser(),
                 overall: 30,
                 current: 0,
             },
+            being: Tomo_Dictionaries.default_BeingInUser(),
             inventory: []
     
         }
@@ -70,7 +71,7 @@ export default class Tomo_Dictionaries {
                     },
                     "close": {
                         level: 60,
-                        setFlag: ["hug"] as Array<Char_Flags>
+                        setFlag: ["hug"] 
                         
                     },
                     "flustered": {
@@ -81,7 +82,7 @@ export default class Tomo_Dictionaries {
                     },
                     "love": {
                         level: 90,
-                        setFlag: ["ring"] as Array<Char_Flags>
+                        setFlag: ["ring"] 
                         
                     },
                     "goal": {
@@ -127,7 +128,7 @@ export default class Tomo_Dictionaries {
                     },
                     "close": {
                         level: 60,
-                        setFlag: ["hug"] as Array<Char_Flags>
+                        setFlag: ["hug"] 
                         
                     },
                     "flustered": {
@@ -138,7 +139,7 @@ export default class Tomo_Dictionaries {
                     },
                     "love": {
                         level: 90,
-                        setFlag: ["ring"] as Array<Char_Flags>
+                        setFlag: ["ring"]
                         
                     },
                     "goal": {
@@ -184,7 +185,7 @@ export default class Tomo_Dictionaries {
                     },
                     "close": {
                         level: 60,
-                        setFlag: ["hug"] as Array<Char_Flags>
+                        setFlag: ["hug"] 
                         
                     },
                     "flustered": {
@@ -195,7 +196,7 @@ export default class Tomo_Dictionaries {
                     },
                     "love": {
                         level: 90,
-                        setFlag: ["ring"] as Array<Char_Flags>
+                        setFlag: ["ring"] 
                         
                     },
                     "goal": {
@@ -241,7 +242,7 @@ export default class Tomo_Dictionaries {
                     },
                     "close": {
                         level: 60,
-                        setFlag: ["hug"] as Array<Char_Flags>
+                        setFlag: ["hug"] 
                         
                     },
                     "flustered": {
@@ -252,7 +253,7 @@ export default class Tomo_Dictionaries {
                     },
                     "love": {
                         level: 90,
-                        setFlag: ["ring"] as Array<Char_Flags>
+                        setFlag: ["ring"] 
                         
                     },
                     "goal": {

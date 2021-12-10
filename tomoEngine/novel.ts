@@ -15,7 +15,7 @@ import {
   MessageSelectOptionData,
 } from "discord.js";
 import engineBase from "./base";
-import { Single, Scripts, Temp_MoodTypeStrings} from "./statics/types";
+import { Single, Scripts, Temp_MoodTypeStrings, AmadeusInteraction} from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 
@@ -93,7 +93,6 @@ export default class Novel extends engineBase {
     return i.user.id === this.interaction.user.id;
   };
   message: any;
-  portMessage: any;
   buttonCollector: InteractionCollector<ButtonInteraction>;
   selectCollector: InteractionCollector<SelectMenuInteraction>;
   /**
@@ -104,7 +103,7 @@ export default class Novel extends engineBase {
 
   constructor(
     json: object,
-    interaction: CommandInteraction | ButtonInteraction | SelectMenuInteraction,
+    interaction: AmadeusInteraction,
     ephemeral: boolean
   ) {
     super(interaction.user, interaction);
@@ -267,7 +266,7 @@ export default class Novel extends engineBase {
         }
         if (payload.link == null) { // If the link is null:
           if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link; //get from past character if we are index > 0;
-          if (i <= 0) payload.link = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1200px-HD_transparent_picture.png"// just transparnt png if we we are at index 0;
+          if (i <= 0) payload.link = "https://images.hasgeek.com/embed/file/65c4929262a84c78b29ad37321df2eca?size=700"// just transparnt png if we we are at index 0;
         } 
 
         this.deployChar(payload, single.character)

@@ -3,7 +3,12 @@ import DBUsers from "../tomoClasses/users";
 /** Basic types (start) */
 export type BasicUniverseType = "characters" | "backgrounds" | "users" | "items" | "stories";
 export type EngineType = "tomo" | "rpg" | "novel" | "overlord";
+export enum RPG_Classes {
+  warlock,
+  
+}
 
+export type RPG_Classes_Strings = keyof typeof RPG_Classes;
 
 /** Basic types (end) */
 
@@ -46,9 +51,9 @@ export enum Mood_Emojis {
   "🎎"
 }
 export type Mood_States_Strings = keyof typeof Mood_States
-export type Tomo_Action = "gift" | "interact" | "free_talk"
-export type User_Flags = "memento" | "nick_name_self" | "nick_name_char" 
-export type Char_Flags = User_Flags & Tomo_Action
+export type Tomo_Action = "gift" | "interact" 
+export type User_Flags = "memento" | "nick_name_self" | "nick_name_char" | Tomo_Action
+export type Char_Flags = User_Flags 
 export enum Char_Archetype {
   dere,
   dan,
@@ -127,11 +132,12 @@ export interface ItemInUser {
 }
 
 export interface Being {
-  health: number,
-  mana: number
+  health: Array<number>,
+  mana: Array<number>
   hunger: number,
   stability: number,
   available: boolean,
+  level: number,
 }
 
 export interface CharacterInUser {
@@ -140,11 +146,12 @@ export interface CharacterInUser {
   _flags: Array<Char_Flags>
   moods: {
     pictureToUse: Temp_MoodTypeStrings,
-    being: Being;
     overall: number,
     current: number
-  }
+  },
+  being: Being;
   inventory: Array<ItemInUser>
+  
   //TODO: Add more when RPG begins 
 
 }
@@ -152,6 +159,8 @@ export interface CharacterInUser {
 export interface UserUniversePayload {
   _id: number | string;
   discord_username: string;
+  level: number;
+  xp: number;
   characters: Array<CharacterInUser>;
   reserved: Array<CharacterInUser>;
   inventory: Array<ItemInUser>
@@ -163,6 +172,7 @@ export interface Gift_Responses {
   above: Array<string>
   average: Array<string>
   below: Array<string>
+  duplicate: Array<string>
   none: Array<string>
 }
 

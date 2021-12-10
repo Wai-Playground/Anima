@@ -18,6 +18,8 @@ import Character from "../../tomoEngine/tomoClasses/characters";
 import Background from "../../tomoEngine/tomoClasses/backgrounds";
 import Cards from "../../tomoEngine/tomoEngine";
 import DBUsers from "../../tomoEngine/tomoClasses/users";
+import { AmadeusInteraction } from "../../tomoEngine/statics/types";
+import CustomClient from "../../client/Amadeus_Client";
 
 const json = require("../../assets/tale.json");
 
@@ -30,15 +32,29 @@ class Tomo extends Commands {
     super("tomo", {
       description: "Tomo bs",
       data: new SlashCommandBuilder().addSubcommand((subc) =>
-        subc.setName("gift").setDescription("hug")
+        subc
+        .setName("gift")
+        .setDescription("hug")
+      ).addSubcommand((subc) =>
+      subc
+      .setName("dachi")
+      .setDescription("lol")
       ),
       dbRequired: true,
       ownerOnly: false,
     });
   }
 
-  async execute(bot, interaction: CommandInteraction) {
+
+  async execute(bot, interaction: AmadeusInteraction) {
+
     
+  }
+
+  async getNewTomoEngine(interaction: AmadeusInteraction, ephemeral: boolean = true) {
+    await interaction.deferReply({ ephemeral: ephemeral });
+    return new TomoEngine(interaction)
+
   }
 
   /**
@@ -46,13 +62,20 @@ class Tomo extends Commands {
    * @param bot 
    * @param interaction 
    */
-  async gift(bot, interaction: CommandInteraction) {
-    await interaction.deferReply({ ephemeral: true });
-    console.log("uh hi")
-    let xd = new TomoEngine(interaction)
-    xd.once("ready", async () => {
-        let card = await TomoEngine.buildCard(0, interaction.user.id)
-        xd.gift(card)
+  async gift(bot: CustomClient, interaction: AmadeusInteraction) {
+    let menu = await this.getNewTomoEngine(interaction, true);
+    
+    menu.once("ready", async () => {
+        menu.gift()
+    })
+  }
+
+  async dachi(bot: CustomClient, interaction: AmadeusInteraction) {
+    
+    let menu = await this.getNewTomoEngine(interaction, false);
+    
+    menu.once("ready", async () => {
+        menu.start();
     })
   }
 

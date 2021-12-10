@@ -10,6 +10,8 @@ export default class DBUsers extends universeBase {
     _tomodachis: Array<CharacterInUser>
     _reservedTomo: Array<CharacterInUser>
     _inventory: Array<ItemInUser>
+    _level: number;
+    _xp: number;
     username: string;
     constructor(_id: number | string, payload: UserUniversePayload) {
         super(_id, 'users', payload.discord_username, "🧍");
@@ -17,8 +19,18 @@ export default class DBUsers extends universeBase {
         this._tomodachis = payload.characters;
         this._reservedTomo = payload.reserved;
         this._inventory = payload.inventory;
+        this._xp = payload.xp;
+        this._level = payload.level;
          
  
+    }
+
+    get level() {
+      return this._level;
+    }
+
+    get xp() {
+      return this._xp;
     }
 
     get inventory() {
@@ -47,10 +59,54 @@ export default class DBUsers extends universeBase {
     updateTomoState(tomoState: CharacterInUser) {
       /**@TODO THERE IS A WAY BETTER WAY TO DO THIS I SWEAR */
       let find = this.getTomoFromDachis(tomoState.originalID), index: number;
-      if (find != null) return;
+      if (find == null) return;
       index = this.tomodachis.indexOf(find);
       this._tomodachis[index] == tomoState;
     }
+
+    tomoInvGetItem(tomoID: number, itemID: number) {
+      let tomo = this.getTomoFromDachis(tomoID);
+      if (!tomo) return;
+      return tomo.inventory.find(item => item.itemID == itemID);
+      
+    }
+
+
+
+    addToTomoInventory(tomoOrigID: number, itemID: number, amount: number) {
+      let tomo = this.getTomoFromDachis(tomoOrigID), itemInInv: ItemInUser, index: number;
+      itemInInv = this.tomoInvGetItem(tomoOrigID, itemID);
+      if (!itemInInv) {
+        tomo.inventory.push({
+          itemID: itemID,
+          amount: amount
+        })
+        console.log(tomo.inventory + " TOMOINV")
+        return tomo.inventory;
+      }
+      index = tomo.inventory.indexOf(itemInInv);
+      tomo.inventory[index].amount += amount;
+      console.log(tomo.inventory + " TOMOINV")
+      return tomo.inventory; 
+      
+    }
+
+    removeFromTomoInventory(tomoOrigID: number, itemID: number, amount: number) {
+      let find = this.tomoInvGetItem(tomoOrigID, itemID), tomo = this.getTomoFromDachis(tomoOrigID), index: number, res: number;
+      if (find == null || amount > 100000000) return;
+
+      index = tomo.inventory.indexOf(find as ItemInUser);
+      res = tomo.inventory[index].amount - amount;
+      if (res <= 0) {
+        tomo.inventory.splice(index)
+        return tomo.inventory;
+      }
+      
+      
+      tomo.inventory[index].amount = res;
+      return tomo.inventory;
+    }
+
 
     /**
      * @returns the item index. null if not in index, and the whole thing if it is.
@@ -58,10 +114,6 @@ export default class DBUsers extends universeBase {
     getItemFromInv(itemID: number) {
       let find = this.inventory.find(item => item.itemID == itemID) || null;
       return find;
-    }
-
-    checkToRemoveDanglingZeros() {
-    
     }
 
     /**
@@ -83,7 +135,7 @@ export default class DBUsers extends universeBase {
       };
 
       index = this._inventory.indexOf(find as ItemInUser);
-      this._inventory[index].amount + amount;
+      this._inventory[index].amount += amount;
 
       return this._inventory;
 
@@ -114,8 +166,9 @@ export default class DBUsers extends universeBase {
       return this._inventory;
 
     }
-
-    
+    async updateTomo() {
+      await Queries.updateUserTomo(this._id, this.tomodachis)
+    }
     async updateInventory() {
       await Queries.updateUserInventory(this._id, this.inventory)
     }
@@ -123,6 +176,8 @@ export default class DBUsers extends universeBase {
       /**TODO: Theres a more elegant solution to this. */
       await Queries.updateUserUniverse(this._id, {
         _id: this._id,
+        level: this._level,
+        xp: this._xp,
         discord_username: this.username,
         characters: this._tomodachis,
         reserved: this._reservedTomo,

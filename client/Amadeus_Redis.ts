@@ -11,7 +11,7 @@ export default class Red extends Amadeus_Base {
     }
 
     static async connect() {
-        memory = new Redis();
+        memory = new Redis(6379);
         console.log(memory)
         console.log("Redis Loaded.")
     }
@@ -21,7 +21,9 @@ export default class Red extends Amadeus_Base {
     }
 
     static async flushAll() {
-        await memory.flushall();
+        let status = await memory.flushall();
+        memory.flushdb();
+        console.log(status)
     }
 
 

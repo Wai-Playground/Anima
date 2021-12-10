@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { EventEmitter } from "events";
 import Queries from "./queries";
-import { BackgroundPayload, CharacterPayload, ItemsPayload, StoryPayload, UserUniversePayload, User_Scripts } from "./statics/types";
+import { AmadeusInteraction, BackgroundPayload, CharacterPayload, ItemsPayload, StoryPayload, UserUniversePayload, User_Scripts } from "./statics/types";
 import Background from "./tomoClasses/backgrounds";
 import Character from "./tomoClasses/characters";
 import Items from "./tomoClasses/items";
@@ -23,7 +23,7 @@ import DBUsers from "./tomoClasses/users"
  */
 class engineBase extends EventEmitter {
   discUserObj: User; // Discord User Object.
-  interaction: CommandInteraction | ButtonInteraction| SelectMenuInteraction // Discord Interactions Objects.
+  interaction: AmadeusInteraction  // Discord Interactions Objects.
   channel: Channel & TextBasedChannels; // Discord Channel Object.
 
   constructor(
@@ -107,6 +107,10 @@ class engineBase extends EventEmitter {
       return null;
     }
 
+  }
+
+  async getEndScreen(user, ) {
+    
   }
 
 

@@ -10,6 +10,7 @@ import Background from "../../tomoEngine/tomoClasses/backgrounds";
 import TomoEngine from "../../tomoEngine/tomoEngine";
 import Red from "../../client/Amadeus_Redis";
 import CustomClient from "../../client/Amadeus_Client";
+import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 
 const json = require("../../assets/story.json")
 
@@ -29,7 +30,7 @@ class Test extends Commands {
     });
   }
 
-  async execute(bot , interaction: CommandInteraction) {
+  async execute(bot , interaction: AmadeusInteraction) {
 
     
     await interaction.deferReply({ephemeral: true});

@@ -68,9 +68,8 @@ export abstract class Commands extends Amadeus_Base {
   }
 
   
-  async execute(bot: CustomClient, interaction: AmadeusInteraction) {
-    
-
+  async execute(bot: CustomClient, interaction: AmadeusInteraction): Promise<any> {
+    return;
   }
   
 
@@ -86,6 +85,8 @@ export abstract class Commands extends Amadeus_Base {
         const author = interaction.user;
         const newUserDocument: UserUniversePayload = {
           _id: author.id,
+          level: 1,
+          xp: 0,
           discord_username: author.username,
           characters: [
             Tomo_Dictionaries.default_CharInUser()

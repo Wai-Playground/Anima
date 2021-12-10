@@ -9,6 +9,7 @@ import {
   MessageSelectMenu,
   MessageSelectOptionData,
   User,
+  Message,
 } from "discord.js";
 import {
   Canvas,
@@ -36,6 +37,7 @@ import {
   Ship_Branch,
   ItemInUser,
   Gift_Responses,
+  AmadeusInteraction,
 } from "./statics/types";
 import Tomo_Dictionaries from "./statics/tomo_dict";
 import Novel from "./novel";
@@ -44,16 +46,19 @@ import Queries from "./queries";
 import Story from "./tomoClasses/story";
 import { NodeSingle } from "./novel";
 import Items from "./tomoClasses/items";
+import Background from "./tomoClasses/backgrounds";
+import { APIMessage } from "discord-api-types";
 
 class Cards {
-  ch: Character;
+  ch: number;
+  bg: number;
   chInUser: CharacterInUser;
-  user: DBUsers;
+  built_img: MessageAttachment;
 
-  constructor(chInUserArrID: number, ch: Character, user: DBUsers) {
-    this.ch = ch;
-    this.user = user;
-    this.chInUser = user.getTomoFromDachis(chInUserArrID);
+  constructor(chInUser: CharacterInUser) {
+    this.chInUser = chInUser;
+    this.ch = chInUser.originalID;
+    this.bg = chInUser.bg;
   }
 }
 /**
@@ -63,45 +68,48 @@ class Cards {
 class TomoEngine extends engineBase {
   width: number = 800;
   height: number = 920;
-  authorDB: DBUsers;
   cards: Array<Cards>;
-  curChar: number = 0;
   novel: Novel;
   DBUser: DBUsers;
   itemInWheel: Array<ItemInUser>;
   itemDbWheel: Array<Items | "broke">;
+  index: number = 0;
+  message: Message | APIMessage
+
+  characters: Map<number, Character>
+  backgrounds: Map<number, Background>
 
   buttonCollector: InteractionCollector<ButtonInteraction>;
   selectCollector: InteractionCollector<SelectMenuInteraction>;
-  constructor(interaction: CommandInteraction) {
+  constructor(interaction: AmadeusInteraction) {
     super(interaction.user, interaction);
-    this.interaction = interaction;
+    this.interaction = interaction as AmadeusInteraction;
     this.prepareAsset();
   }
-  /*
+  
   async buildCharacterCard(card: Cards): Promise<Cards> {
     const canvas: Canvas = createCanvas(this.width, this.height);
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
 
     const bg: Image = await loadImage(
-      card.bg
+      this.backgrounds.get(card.bg).link
     );
     const ch: Image = await loadImage(
-      card.ch.link
+      this.characters.get(card.ch).link
     );
 
     ctx.drawImage(bg, 0, 0);
     ctx.drawImage(ch, 0, 0, ch.naturalWidth, ch.naturalHeight);
     
-    card.built = true;
+
     card.built_img = new MessageAttachment(
       canvas.toBuffer("image/jpeg"),
-      `tomo_userID_${this.authorDB._id}_node_${card.ch._id}_${card.ch.getName}.jpg`
+      `tomo_userID_${this.DBUser._id}_node_${this.index}_CH${card.ch}+BG${card.bg}.jpg`
     );
 
     return card;
   }
-  */
+  
 
   get_tree(archetype: Char_Archetype_Strings): Ship_Tree {
     return Tomo_Dictionaries.char_tree(archetype);
@@ -113,6 +121,19 @@ class TomoEngine extends engineBase {
   async prepareAsset() {
     this.itemDbWheel = [];
     this.itemInWheel = [];
+    this.cards = [];
+
+    this.backgrounds = new Map()
+    this.characters = new Map()
+
+    this.DBUser = this.interaction.DBUser
+
+    for (const characters of this.DBUser.tomodachis) {
+      this.cards.push(new Cards(characters))
+      if (!this.characters.has(characters.originalID)) this.characters.set(characters.originalID, await this.getCharacter(characters.originalID))
+      if (!this.backgrounds.has(characters.bg)) this.backgrounds.set(characters.bg, await this.getBackground(characters.bg))
+    }
+
     process.nextTick(() => {
       this.emitReady();
     });
@@ -124,27 +145,10 @@ class TomoEngine extends engineBase {
    * @param user_id | user id of the author
    * @returns Card
    */
-  static async buildCard(curTomoID: number, user_id: number | string) {
-    let user = new DBUsers(user_id, await Queries.userUniverse(user_id));
-    if (!user.getTomoFromDachis(curTomoID))
-      throw new TomoError("Tomo not found in user's collection.");
-    return new Cards(
-      curTomoID,
-      new Character(curTomoID, await Queries.character(curTomoID)),
-      user
-    );
-  }
 
   static convertNumberToTempMoodType(mood: number) {
     if (mood > Object.keys(Temp_MoodType).length / 2) return; // sad
     return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings;
-  }
-
-  static convertNumberToMoodType(mood: number) {
-    let sanitized = Math.floor(mood / 10);
-    if (sanitized > Object.keys(Mood_States).length / 2) return;
-
-    return Mood_States[sanitized] as Mood_States_Strings;
   }
 
   static convertNumberToMoodTypeNumber(mood: number) {
@@ -159,7 +163,7 @@ class TomoEngine extends engineBase {
    * @returns Novel
    */
   async getStoryJSON(
-    card: Cards = this.cards[this.curChar],
+    card: Cards = this.cards[this.index],
     action: Tomo_Action
   ): Promise<Story> {
     let idOfStory: number, story: Story;
@@ -170,7 +174,7 @@ class TomoEngine extends engineBase {
     );
 
     try {
-      idOfStory = card.ch.getRandInterStoryId(action);
+      idOfStory = this.characters.get(card.ch).getRandInterStoryId(action);
       console.log(idOfStory);
       if (idOfStory == -1)
         throw new TomoError("No story found for this action.");
@@ -178,7 +182,7 @@ class TomoEngine extends engineBase {
       console.log(e);
     }
 
-    console.log(curMood);
+
     story = await this.getStoryUniverse(idOfStory); // get the json of the story
     if (curMood != "main" && action != "gift") {
       try {
@@ -196,7 +200,8 @@ class TomoEngine extends engineBase {
     card: Cards,
     action: Tomo_Action = "interact"
   ): boolean {
-    if (card.chInUser._flags.find((flag) => flag == action)) return true;
+    console.log(card.chInUser._flags.includes(action))
+    if (card.chInUser._flags.includes(action)) return true;
     return false;
   }
 
@@ -210,7 +215,7 @@ class TomoEngine extends engineBase {
    */
 
   async fillSelectWithInv(
-    card: Cards = this.cards[this.curChar]
+    card: Cards = this.cards[this.index]
     
   ): Promise<Array<Argument>> {
     let dbItem: Items, i: number = 1,
@@ -223,7 +228,7 @@ class TomoEngine extends engineBase {
       ]
       
     this.itemDbWheel.push("broke");
-    this.itemInWheel = card.user.inventory.filter((items) => items.amount > 0);
+    this.itemInWheel = this.DBUser.inventory.filter((items) => items.amount > 0);
 
     if (this.itemInWheel.length <= 0) return ret;
     
@@ -250,40 +255,44 @@ class TomoEngine extends engineBase {
 
   async react(
     receivedItem: Items | "broke",
-    card: Cards = this.cards[this.curChar]
+    card: Cards = this.cards[this.index]
   ): Promise<NodeSingle> {
-    let res: keyof Gift_Responses, mood: Temp_MoodTypeStrings = "sad", variantMood: Character,
+    let res: keyof Gift_Responses, mood: Temp_MoodTypeStrings = "sad", variantMood: Character, ch = this.characters.get(card.ch),
     response: Single = {
       mood: mood,
-      text: card.ch.getRandomGiftResponse("none"),
+      text: this.characters.get(card.ch).getRandomGiftResponse("none"),
       backable: false
     }
     
 
     if (receivedItem == "broke") {
-      variantMood = await card.ch.getVariant(mood)
+      variantMood = await this.characters.get(card.ch).getVariant(mood)
       this.novel.deployChar(variantMood)
       response.character = variantMood.getId;
       return new NodeSingle(response);
     }
+
+    
     let itemGrade: number = receivedItem.gradeInt
     
-    if (itemGrade > card.ch.gradeInt) mood = "happy", res = "above";
+    if (itemGrade > ch.gradeInt) mood = "happy", res = "above";
 
-    if (itemGrade == card.ch.gradeInt) res = "average";
+    if (itemGrade == ch.gradeInt) res = "average";
 
-    if (itemGrade < card.ch.gradeInt) mood = "sad", res = "below";
+    if (itemGrade < ch.gradeInt) mood = "sad", res = "below";
 
 
-    if (card.ch.likes.includes(receivedItem.getId as number)) mood = "happy", res = "likes";
-    if (card.ch.dislikes.includes(receivedItem.getId as number)) mood = "annoyed", res = "dislikes"
+    if (ch.likes.includes(receivedItem.getId as number)) mood = "happy", res = "likes";
+    if (card.chInUser.inventory.find(invItem => invItem.itemID == receivedItem.getId)) mood = "sad", res = "duplicate";
+    if (ch.dislikes.includes(receivedItem.getId as number)) mood = "annoyed", res = "dislikes"
     
     
-    variantMood = await card.ch.getVariant(mood)
+    
+    variantMood = await ch.getVariant(mood)
     this.novel.deployChar(variantMood)
 
 
-    response.text = card.ch.getRandomGiftResponse(res);
+    response.text = ch.getRandomGiftResponse(res);
     response.mood = mood;
     response.character = variantMood.getId;
 
@@ -296,7 +305,7 @@ class TomoEngine extends engineBase {
 
   }
 
-  async gift(card: Cards = this.cards[this.curChar]) {
+  async gift(card: Cards = this.cards[this.index]) {
     let story = await this.getStoryJSON(card, "gift");
     let find = story.multiples.findIndex(
       (single) => single.args?.toString() == "$gift"
@@ -321,20 +330,70 @@ class TomoEngine extends engineBase {
         console.log(item)
         this.novel.deployNode(await this.react(item, card), responseIndex, true);
         if (item != "broke") {
-          card.user.removeFromInventory(item.getId as number, 1)
-          await card.user.updateInventory()
+          // Inventory management
+          this.DBUser.removeFromInventory(item.getId as number, 1);
+          this.DBUser.addToTomoInventory(card.ch as number, item.getId as number, 1);
+          
+          await this.DBUser.updateInventory()
+          await this.DBUser.updateTomo()
         }
       },
       this.novel
     );
+    
   }
 
-  async interact(card: Cards = this.cards[this.curChar]) {}
+  async interact(card: Cards = this.cards[this.index]) {}
 
   async start() {
-    /*
-    this.cards[0].built_img
-    this.interaction.editReply({ files: [this.cards[0].built_img]})*/
+    this.interaction.editReply({content: "Hi",components: await this.action()})
+    this.message = await this.interaction.fetchReply() as Message
+    
+  }
+
+  async action() {
+    let ret: Array<MessageActionRow> = [], buttonRow = new MessageActionRow(), i = 0;
+
+    const buttons = [
+      {
+        disabled: true,
+        label: "Info",
+        style: 3
+      },
+      {
+        disabled: !this.checkIfActionCanBeDone(this.cards[this.index], "interact"),
+        label: "Interact",
+        style: 1,
+      },
+      {
+        disabled: true,
+        label: "Delete",
+        emj: "<:trash:886429816260280374>",
+        style: 4
+      }
+    ]
+
+    for (const button of buttons) {
+      buttonRow.addComponents(
+        new MessageButton()
+          .setDisabled(
+            button.hasOwnProperty("disabled") ? button.disabled : false
+          )
+          .setCustomId(
+            "TOMO.button_" + i.toString() + "_user_" + this.interaction.user.id
+          )
+          .setLabel(button.hasOwnProperty("label") ? button.label : null)
+          .setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
+          .setStyle(button.style)
+      );
+      i++;
+    }
+    ret.push(buttonRow)
+
+    return ret;
+    
+
+    
   }
 
   async actionOnNovelIndex(
