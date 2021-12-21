@@ -24,7 +24,11 @@ class Test extends Commands {
       description: "For pinging the bot.",
       data: new SlashCommandBuilder().addSubcommand((subc) =>
       subc.setName("flush").setDescription("flush")
-    ),
+    ).addSubcommand((subc) =>
+    subc.setName("hset").setDescription("set")
+  ).addSubcommand((subc) =>
+  subc.setName("hget").setDescription("get")
+),
       dbRequired: false,
       ownerOnly: false,
     });
@@ -52,13 +56,7 @@ class Test extends Commands {
     x.once("ready", (d => {
       console.timeEnd("Novel")
       return x.start()
-    }))
-      
-
-
-      
-      
-    
+    }))      
     /*
 
     
@@ -79,6 +77,17 @@ class Test extends Commands {
 
     await Red.flushAll()
     interaction.reply("Flushed Redis")
+  }
+
+  async hset(bot:CustomClient, interaction) {
+    await Red.memory().hset("lol", "ok", 1);
+    await Red.memory().expire("lol", 5);
+  }
+
+  async hget(bot: CustomClient, interaction: CommandInteraction) {
+
+    console.log(await Red.memory().hget("lol", "ok"))
+    
   }
 
 

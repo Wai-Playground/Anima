@@ -21,8 +21,8 @@ export default class Red extends Amadeus_Base {
     }
 
     static async flushAll() {
-        let status = await memory.flushall();
-        memory.flushdb();
+        let status = await memory.flushdb();
+        //memory.flushall()
         console.log(status)
     }
 

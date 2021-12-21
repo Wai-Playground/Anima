@@ -53,6 +53,7 @@ class Queries {
         let payload: BaseUniversePayload, cache: string, redis = Red.memory();
         try {
             cache = await redis.hget(db, _id.toString());
+            console.log(cache)
             if (cache) {
                 console.log("Cached! _id: "+ _id + " db: " + db);
                 payload = JSON.parse(cache) as BaseUniversePayload;
@@ -117,7 +118,7 @@ class Queries {
         return await this.getVariantType(originalID, name, "backgrounds") as BackgroundPayload
 
     }
-    /**
+    /** 
      * Should not be used outside of this class.
      * @param _id priv
      * @param db priv

@@ -4,8 +4,14 @@ import DBUsers from "../tomoClasses/users";
 export type BasicUniverseType = "characters" | "backgrounds" | "users" | "items" | "stories";
 export type EngineType = "tomo" | "rpg" | "novel" | "overlord";
 export enum RPG_Classes {
-  warlock,
-  
+  mathematics,
+  literature,
+  history,
+  sciences,
+  arts,
+  home_ed,
+  music,
+  phys_ed
 }
 
 export type RPG_Classes_Strings = keyof typeof RPG_Classes;
@@ -61,7 +67,7 @@ export enum Char_Archetype {
   tsun
 }
 export type Char_Archetype_Strings = keyof typeof Char_Archetype;
-export type Item_Type = "consumables" | "treasures" 
+export type Item_Type = "consumables" | "treasures" | "equipables"
 export enum Rarity_Grade {
   D,
   C,
@@ -107,6 +113,7 @@ export interface BaseUniversePayload {
   emoji?: string;
   spoiler: boolean;
   name: string;
+  class?: RPG_Classes
 }
 
 export interface ItemsPayload extends BaseUniversePayload {

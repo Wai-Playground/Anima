@@ -45,7 +45,7 @@ export abstract class Commands extends Amadeus_Base {
     this.description = settings.description.toString();
     this.inGuildOnly = settings.inGuildOnly;
     this.inMainOnly = settings.inMainOnly;
-    this.coolDown = settings.coolDown;
+    this.coolDown = settings.coolDown / 1000;
 
   }
   

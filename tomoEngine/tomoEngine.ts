@@ -119,6 +119,7 @@ class TomoEngine extends engineBase {
    * Prepares asset to view.
    */
   async prepareAsset() {
+    // Declare assets.
     this.itemDbWheel = [];
     this.itemInWheel = [];
     this.cards = [];
@@ -129,7 +130,9 @@ class TomoEngine extends engineBase {
     this.DBUser = this.interaction.DBUser
 
     for (const characters of this.DBUser.tomodachis) {
+      // For every character in the User's tomodachis, we create a new card and set the bgs and chs to their respective mappings.
       this.cards.push(new Cards(characters))
+
       if (!this.characters.has(characters.originalID)) this.characters.set(characters.originalID, await this.getCharacter(characters.originalID))
       if (!this.backgrounds.has(characters.bg)) this.backgrounds.set(characters.bg, await this.getBackground(characters.bg))
     }
@@ -139,26 +142,14 @@ class TomoEngine extends engineBase {
     });
   }
 
-  /**
-   * buildCard()
-   * @param curTomoID | ID of the current tomo
-   * @param user_id | user id of the author
-   * @returns Card
-   */
-
   static convertNumberToTempMoodType(mood: number) {
     if (mood > Object.keys(Temp_MoodType).length / 2) return; // sad
     return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings;
   }
 
-  static convertNumberToMoodTypeNumber(mood: number) {
-    if (Math.floor(mood / 10) > Object.keys(Mood_States).length / 2) return;
-    return Math.floor(mood) as number;
-  }
-
   /**
-   *
-   * @param card | card to
+   *getStoryJSON
+   * @param card | card to 
    * @param action | action to perform
    * @returns Novel
    */
@@ -166,14 +157,19 @@ class TomoEngine extends engineBase {
     card: Cards = this.cards[this.index],
     action: Tomo_Action
   ): Promise<Story> {
-    let idOfStory: number, story: Story;
+    // Define variables.
+    let idOfStory: number, story: Story, curMood: Temp_MoodTypeStrings;
 
+    // If there is already a novel init and the action cannot be done, return.
     if (this.novel || !this.checkIfActionCanBeDone(card, action)) return;
-    let curMood = TomoEngine.convertNumberToTempMoodType(
+
+    // We get the int representation of the temperature mood.
+    curMood = TomoEngine.convertNumberToTempMoodType(
       card.chInUser.moods.current
     );
 
     try {
+      
       idOfStory = this.characters.get(card.ch).getRandInterStoryId(action);
       console.log(idOfStory);
       if (idOfStory == -1)
@@ -196,24 +192,34 @@ class TomoEngine extends engineBase {
     return story;
   }
 
+  /**
+   * Check if a user can perform the action.
+   * @param card 
+   * @param action 
+   * @returns boolean
+   */
   checkIfActionCanBeDone(
     card: Cards,
     action: Tomo_Action = "interact"
   ): boolean {
     console.log(card.chInUser._flags.includes(action))
-    if (card.chInUser._flags.includes(action)) return true;
+    if (card.chInUser._flags.includes(action)) return true; // if the ch in user has this flag.
     return false;
   }
 
+  /**
+   * If the item is giftable returns true.
+   * @param dbItem | dbItem 
+   * @returns 
+   */
   static checkIfItemIsGiftable(dbItem: Items) {
     return true;
   }
 
   /**
-   *
+   * Fills the select menu with giftable items.
    * @param card
    */
-
   async fillSelectWithInv(
     card: Cards = this.cards[this.index]
     
@@ -253,10 +259,17 @@ class TomoEngine extends engineBase {
     return ret;
   }
 
+  /**
+   * React.
+   * @param receivedItem |the item that is being gifted.
+   * @param card | card you want to base the reaction off.
+   * @returns new NodeSingle Object
+   */
   async react(
     receivedItem: Items | "broke",
     card: Cards = this.cards[this.index]
   ): Promise<NodeSingle> {
+    // Define variables & defaults. + default response (broke).
     let res: keyof Gift_Responses, mood: Temp_MoodTypeStrings = "sad", variantMood: Character, ch = this.characters.get(card.ch),
     response: Single = {
       mood: mood,
@@ -264,41 +277,49 @@ class TomoEngine extends engineBase {
       backable: false
     }
     
-
+    // If the user is broke we return the default response of broke.
     if (receivedItem == "broke") {
-      variantMood = await this.characters.get(card.ch).getVariant(mood)
-      this.novel.deployChar(variantMood)
-      response.character = variantMood.getId;
+      variantMood = await this.characters.get(card.ch).getVariant(mood) // We get the mood of the character.
+      this.novel.deployChar(variantMood) // We inject the character into the this.novel object.
+      response.character = variantMood.getId // The response of character's ID is now the variantMood. Since the mood is 
+      
       return new NodeSingle(response);
     }
 
+    let itemGrade: number = receivedItem.gradeInt // We get the item Grade of the item to compare against the character.
     
-    let itemGrade: number = receivedItem.gradeInt
+    // This block decides what the response will be. Will override the response.
+    // Res = are Results, they are defined in the orig ch db and is an arr text which the ch says after getting a gift.
+
+    if (itemGrade > ch.gradeInt) mood = "happy", res = "above"; // If item grade > character grade. Mood becomes happy, Res becomes above.
+
+    if (itemGrade == ch.gradeInt) mood = "happy", res = "average"; // If item grade == char grade. Mood becomes happy. Res becomes average.
+
+    if (itemGrade < ch.gradeInt) res = "below"; // Mood does not change because default is "sad". Res becomes below.
+
+    if (ch.likes.includes(receivedItem.getId as number)) mood = "happy", res = "likes"; // If the item is included in the character's like sheet.
+    if (card.chInUser.inventory.find(invItem => invItem.itemID == receivedItem.getId)) mood = "sad", res = "duplicate"; // If the item is a duplicate in the character's inv.
+    if (ch.dislikes.includes(receivedItem.getId as number)) mood = "annoyed", res = "dislikes" // If the item is in the dislike category.
+
+    // They perform special functions:
+    // This block is for when the item is a consumable.
+    if (receivedItem.itemType == "consumables") {
+
+    }
+
+    // This block is for when the item is equipable.
+    if (receivedItem.itemType == "equipables") {
+
+    }
     
-    if (itemGrade > ch.gradeInt) mood = "happy", res = "above";
+    variantMood = await ch.getVariant(mood) // We get the variant mood again, since there may have been a change in the mood.
+    this.novel.deployChar(variantMood) // We inject the Character into the novel.
 
-    if (itemGrade == ch.gradeInt) res = "average";
+    response.text = ch.getRandomGiftResponse(res); // Random response.
+    response.mood = mood; // Mood becomes the moode.
+    response.character = variantMood.getId; // The character of the response becomes the mood.
 
-    if (itemGrade < ch.gradeInt) mood = "sad", res = "below";
-
-
-    if (ch.likes.includes(receivedItem.getId as number)) mood = "happy", res = "likes";
-    if (card.chInUser.inventory.find(invItem => invItem.itemID == receivedItem.getId)) mood = "sad", res = "duplicate";
-    if (ch.dislikes.includes(receivedItem.getId as number)) mood = "annoyed", res = "dislikes"
-    
-    
-    
-    variantMood = await ch.getVariant(mood)
-    this.novel.deployChar(variantMood)
-
-
-    response.text = ch.getRandomGiftResponse(res);
-    response.mood = mood;
-    response.character = variantMood.getId;
-
-    
-
-    return new NodeSingle(response)
+    return new NodeSingle(response) // Return a new NodeSingle of response.
   }
 
   appendEndScreen() {
@@ -343,7 +364,9 @@ class TomoEngine extends engineBase {
     
   }
 
-  async interact(card: Cards = this.cards[this.index]) {}
+  async interact(card: Cards = this.cards[this.index]) {
+    
+  }
 
   async start() {
     this.interaction.editReply({content: "Hi",components: await this.action()})
