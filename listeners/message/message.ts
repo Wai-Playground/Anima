@@ -1,6 +1,6 @@
 
-import CustomClient from "../client/Amadeus_Client";
-import { Listeners } from "../client/Amadeus_listeners";
+import CustomClient from "../../client/Amadeus_Client";
+import Listeners from "../../client/Amadeus_listeners";
 import { request } from "http";
 const fetch = require("node-fetch")
 

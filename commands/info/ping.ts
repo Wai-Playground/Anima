@@ -23,7 +23,7 @@ class Ping extends Commands {
         ,
       dbRequired: true,
       ownerOnly: false,
-      coolDown: 4000,
+      coolDown: 4,
     });
   }
 

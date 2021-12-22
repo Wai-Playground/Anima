@@ -5,7 +5,7 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 import Momonga from "./Amadeus_Mongo"
 import Red from "./Amadeus_Redis"
-
+import Listeners from "./Amadeus_listeners"
 export default class CustomClient extends Client {
   /**
    * Description | Custom Client.
@@ -40,7 +40,7 @@ export default class CustomClient extends Client {
    */
   async loadCog(this: CustomClient, cPath: string = `./commands`) {
 
-    let files = fs.readdirSync(cPath);
+    const files = fs.readdirSync(cPath);
     let newPath: string
 
     files.forEach((file: string) => {
@@ -124,24 +124,36 @@ export default class CustomClient extends Client {
     }
   }
 
-  async eventsLoader(this: CustomClient, path: string = "./listeners") {
-    const eventFiles = fs
-      .readdirSync(path)
-      .filter((file) => file.endsWith(".js"));
+  async loadEvents(this: CustomClient, ePath: string = "./listeners") {
+    const files = fs.readdirSync(ePath)
+    let newPath: string
 
-    for (const file of eventFiles) {
-      const event = require(`.${path}/${file}`);
-      const ev = new event();
-
-      console.log("[l] " + `${this.name} has loaded listener: ${ev.name}.`);
-
-      if (ev.once) {
-        super.once(ev.name, (...args) => ev.execute(this, ...args));
+    files.forEach((file: string) => {
+      newPath = ePath + "/" + file;
+      if (fs.statSync(newPath).isDirectory()) {
+        this.loadEvents(newPath);
       } else {
-        super.on(ev.name, (...args) => ev.execute(this, ...args));
+        if (file.endsWith(".js")) {
+          
+          const event = require(`.${newPath}`);
+          const ev: Listeners = new event();
+
+          if (ev.once) {
+            super.once(ev.name, (...args) => ev.execute(this, ...args));
+          } else {
+            super.on(ev.name, (...args) => ev.execute(this, ...args));
+          }
+
+          console.info(
+            "[e] " + this.name + " has loaded event: " + ev.name + "."
+          );
+        }
       }
-    }
+    });
+
   }
+
+
 
   /**
    * Description: Connect to mongodb.
@@ -164,7 +176,7 @@ export default class CustomClient extends Client {
   async run(this: CustomClient) {
     await this.redLoader();
     this.commandLoader();
-    this.eventsLoader();
+    this.loadEvents();
     this.mangoLoader();
     
     await super.login(this.token);

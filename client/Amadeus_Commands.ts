@@ -45,27 +45,43 @@ export abstract class Commands extends Amadeus_Base {
     this.description = settings.description.toString();
     this.inGuildOnly = settings.inGuildOnly;
     this.inMainOnly = settings.inMainOnly;
-    this.coolDown = settings.coolDown / 1000;
+    this.coolDown = settings.coolDown;
+
+  }
+
+  async isUserInCooldown(interaction: CommandInteraction) {
+    // Definition block.
+    const key = interaction.user.id, redis = red.memory()
+
+    // If the user id exists in the cooldown.
+    if (await redis.exists("cooldown", key)) return true; // If it does, return true.
+    await redis.hset("cooldown", key, this.name); // Add the user to the cooldown cluster.
+    redis.expire("cooldown", this.coolDown); // TTL is the command's cooldown property.
+    return false; // Return false since the user was not in the cooldown.
+  }
+
+  async checkIfInteractionCanRun(interaction: AmadeusInteraction) {
+    if (this.disabled) return interaction.reply("Sorry, this command is disabled.")
+
+    if (this.ownerOnly) {
+      console.log(interaction.user.id == process.env.OWNER_ID) // if true then bottom is false
+      //CHANGE SIGN
+      if (interaction.user.id != process.env.OWNER_ID ? false : true) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
+      
+    }
+
+    if (this.coolDown > 0 && interaction.user.id != process.env.OWNER_ID) {
+      if (await this.isUserInCooldown(interaction)) return interaction.reply("Sorry, your are on cooldown.")
+    }
+
+
+    if (this.dbRequired) await this.checkDB(interaction)
+
+    return true;
 
   }
   
-  async checkCoolDown(interaction: CommandInteraction) {
-    const key = interaction.user.id, redis = red.memory()
-    console.log(await redis.hgetall("cooldown"))
-    // check if redis cache has the key in it
-    if (await redis.exists("cooldown", key)) {
-      // if it does, return true
-      console.log("true")
-      return true;
-    }
-    // if it doesn't, set the key and the value will be the interaction command name
-    await redis.hset("cooldown", key, this.name);
-    redis.expire("cooldown", this.coolDown);
-    // then return false
-    console.log("false")
-    return false;
-    
-  }
+
 
   
   async execute(bot: CustomClient, interaction: AmadeusInteraction): Promise<any> {
@@ -111,43 +127,5 @@ export abstract class Commands extends Amadeus_Base {
 
   }
 
-  async default_checks(bot: CustomClient, interaction: AmadeusInteraction) {
-    
-    if (this.disabled) return interaction.reply("Sorry, this command is disabled.")
 
-    if (this.ownerOnly) {
-      console.log(interaction.user.id == process.env.OWNER_ID) // if true then bottom is false
-      //CHANGE SIGN
-      if (interaction.user.id != process.env.OWNER_ID ? false : true) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
-      
-    }
-
-    if (this.coolDown > 0 && interaction.user.id != process.env.OWNER_ID) {
-      if (await this.checkCoolDown(interaction)) return interaction.reply("Sorry, your are on cooldown.")
-    }
-    /*
-    if (this.dbRequired) {
-      try {
-        const author = await user.findOne({_id: interaction.user.id});
-        if (!author) throw new UserNotFoundError(interaction.user.id, "user");
-        
-
-      } catch (error) {
-
-        const author_db = new user({
-          _id: interaction.user.id,
-          name: interaction.user.username,
-          xp: 0,
-          lvl: 1
-        }) 
-        await author_db.save();
-        
-      
-      }
-    }*/
-
-    if (this.dbRequired) await this.checkDB(interaction)
-
-    return true;
-  }
 }

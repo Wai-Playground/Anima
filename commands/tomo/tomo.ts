@@ -45,7 +45,7 @@ class Tomo extends Commands {
       .setDescription("itneract")
     ),
       dbRequired: true,
-      ownerOnly: false,
+      ownerOnly: true,
     });
   }
 

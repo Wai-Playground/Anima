@@ -35,6 +35,8 @@
     "ioredis": "^4.28.2",
     "mongodb": "^4.2.0",
     "node-fetch": "^2.6.1",
+    "sharp": "^0.29.3",
+    "stackblur-canvas": "^2.5.0",
     "svg-captcha": "^1.4.0",
     "time-stamp": "^2.2.0",
     "ts-node": "^10.2.0"

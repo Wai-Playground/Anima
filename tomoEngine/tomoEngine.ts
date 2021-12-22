@@ -18,6 +18,11 @@ import {
   loadImage,
   NodeCanvasRenderingContext2D,
 } from "canvas";
+import {
+  canvasRGB,
+  image,
+  imageDataRGB
+} from "stackblur-canvas"
 import engineBase from "./base";
 import Character from "./tomoClasses/characters";
 import DBUsers from "./tomoClasses/users";
@@ -104,6 +109,7 @@ class TomoEngine extends engineBase {
       this.backgrounds.get(card.bg).link // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
       // card.bg is the ID of the background.
     );
+
     const ch: Image = await loadImage(
       this.characters.get(card.ch).link // Property "characters" is an internal cache of the Characters objects with their IDs as the key. -
       // card.ch is the ID of the character.
@@ -112,13 +118,14 @@ class TomoEngine extends engineBase {
     // This block draws the image.
 
     ctx.drawImage(bg, 0, 0); // Draw the background. (TODO: EDIT AESTHETICS)
+    
     ctx.drawImage(ch, 0, 0, ch.naturalWidth, ch.naturalHeight); // Draw the character (TODO: EDIT AESTHETICS)
     
     // This block sets the card's "build_img" property with the message attachment of the rendered image.
 
     card.built_img = new MessageAttachment(
       canvas.toBuffer("image/jpeg"),
-      `tomo_userID_${this.DBUser._id}_node_${this.index}_CH${card.ch}+BG${card.bg}.jpg`
+      `tomo_userID_${this.DBUser._id}_node_${this.index}_CH${card.ch}_BG${card.bg}.jpg`
     );
 
     return card; // return the card once it has done it's job.
@@ -448,7 +455,9 @@ class TomoEngine extends engineBase {
   }
 
   async start() {
-    this.interaction.editReply({content: "Hi",components: await this.action()})
+    await this.buildCharacterCard(this.cards[0])
+    this.interaction.editReply({ files: [this.cards[0].built_img], attachments: [], components: await this.action()})
+    
     this.message = await this.interaction.fetchReply() as Message
     
   }
