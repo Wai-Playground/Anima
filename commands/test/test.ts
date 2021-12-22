@@ -30,7 +30,7 @@ class Test extends Commands {
   subc.setName("hget").setDescription("get")
 ),
       dbRequired: false,
-      ownerOnly: false,
+      ownerOnly: true,
     });
   }
 

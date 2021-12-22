@@ -18,7 +18,7 @@ class Help extends Commands {
         ),
       dbRequired: true,
       ownerOnly: false,
-      coolDown: 100,
+      coolDown: 2,
     });
     
   }
@@ -33,11 +33,11 @@ class Help extends Commands {
       
       ret.push({
         emoji: "<:trash:886429816260280374>",
-        disableSelect: true,
+        disableSelect: false,
         embed: {
           title: i + `. ${cObj.name.charAt(0).toUpperCase() + cObj.name.slice(1)}`,
           description: cObj.description,
-          color: "#23aa8f",
+          color: "#36393F",
           footer: {
             text: "Help menu"
           },
@@ -79,7 +79,7 @@ class Help extends Commands {
       embed: {
         title: "Help Menu",
         description: "Use the buttons or select menu to navigate.",
-        color: "#23aa8f",
+        color: "#36393F",
         fields: [
           {
             inline: true,

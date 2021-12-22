@@ -26,6 +26,7 @@ import {
   loadImage,
   NodeCanvasRenderingContext2D,
 } from "canvas";
+
 import { NovelError, TomoError } from "./statics/errors";
 
 export class NodeSingle implements Single {

@@ -1,6 +1,6 @@
 import { Interaction } from "discord.js";
 import CustomClient from "../../client/Amadeus_Client";
-import { Listeners } from "../../client/Amadeus_listeners";
+import Listeners from "../../client/Amadeus_listeners";
 import { Commands } from "../../client/Amadeus_Commands"
 import DBUsers from "../../tomoEngine/tomoClasses/users";
 import Queries from "../../tomoEngine/queries";
@@ -26,10 +26,10 @@ class interactionCreate extends Listeners {
 
       if (
         (await cmd.check(bot, interaction)) &&
-        (await cmd.default_checks(bot, interaction))
+        (await cmd.checkIfInteractionCanRun(interaction))
       ) {
-        //console.log(interaction.options.data)
-        if (interaction.options.data?.[0].type == "SUB_COMMAND") {
+        console.log(interaction.options.data[0]?.type)
+        if (interaction.options.data[0]?.type == "SUB_COMMAND") {
           let sub = interaction.options.getSubcommand();
           
           if (typeof cmd[sub] === "function") {
