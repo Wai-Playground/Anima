@@ -120,16 +120,18 @@ class TomoEngine extends engineBase {
    */
   async prepareAsset() {
     // Declare assets.
-    this.itemDbWheel = [];
-    this.itemInWheel = [];
-    this.cards = [];
+    this.itemDbWheel = []; // itemDbWheel is an internal inventory db array of the User which we use in conjunction with the novel select to point what item was chosen during a-
+    // gifting sequence.
+    this.itemInWheel = []; // Item in wheel is the User's inventory filtered to have only amount > than 0.
+    this.cards = []; // Each card contains a bg and chInUser. A bg to fill the background of the gui and a ch which is the user's tomos.
 
-    this.backgrounds = new Map()
-    this.characters = new Map()
+    this.backgrounds = new Map() // Internal cache of the backgrounds. (k, v) k = uniBaseID, v = Background object.
+    this.characters = new Map() // Internal cache of the characters. (k, v) k = uniBaseID, v = Character object.
 
-    this.DBUser = this.interaction.DBUser
+    this.DBUser = this.interaction.DBUser; // Shortened version of the DBUser.
 
     for (const characters of this.DBUser.tomodachis) {
+
       // For every character in the User's tomodachis, we create a new card and set the bgs and chs to their respective mappings.
       this.cards.push(new Cards(characters))
 
@@ -179,10 +181,10 @@ class TomoEngine extends engineBase {
     }
 
 
-    story = await this.getStoryUniverse(idOfStory); // get the json of the story
-    if (curMood != "main" && action != "gift") {
+    story = await this.getStoryUniverse(idOfStory); // Get the json of the story.
+    if (curMood != "main" && action != "gift") { // If the current mood is main and the action is not gift then-
       try {
-        let payload: Story = await story.getVariant(curMood); // then get the variant of the story if needed
+        let payload: Story = await story.getVariant(curMood); // Then get the variant of the story if needed.
         story = payload;
       } catch (e) {
         console.log(e);
@@ -204,7 +206,7 @@ class TomoEngine extends engineBase {
   ): boolean {
     console.log(card.chInUser._flags.includes(action))
     if (card.chInUser._flags.includes(action)) return true; // if the ch in user has this flag.
-    return false;
+    return false; 
   }
 
   /**
@@ -218,45 +220,53 @@ class TomoEngine extends engineBase {
 
   /**
    * Fills the select menu with giftable items.
-   * @param card
+   * @returns Array of Drop down menu Arguments. @see Argument types.
    */
-  async fillSelectWithInv(
-    card: Cards = this.cards[this.index]
-    
-  ): Promise<Array<Argument>> {
-    let dbItem: Items, i: number = 1,
+  async fillSelectWithInv(): Promise<Array<Argument>> {
+
+    // Definition block.
+    let dbItem: Items, i: number = 1, // Start at "1" because we are pre-defining it in the default return Array<Argument> below.
       ret: Array<Argument> = [
         {
+          // This is the very first option that the user will have. Which is to say that they have nothing.
           route: "$next",
           label: "I have nothing...",
           value: i.toString(),
         },
       ]
-      
-    this.itemDbWheel.push("broke");
-    this.itemInWheel = this.DBUser.inventory.filter((items) => items.amount > 0);
-
-    if (this.itemInWheel.length <= 0) return ret;
     
+    
+    this.itemDbWheel.push("broke"); // Push the "broke" item into the itemdbwheel which is a property of this class, to help manipulate it later in the future.
 
-    // when the user has an inventory
+    this.itemInWheel = this.DBUser.inventory.filter((items) => items.amount > 0); // If the items in the inventory are more than "0". 
+
+    if (this.itemInWheel.length <= 0) return ret; // If there is no items just return the default Array of Arguments. Which is just the "I am broke" selection.
+    
+    // When the user has an inventory.
     for (const items of this.itemInWheel) {
-      dbItem = await this.getItemUniverse(items.itemID);
-      if (TomoEngine.checkIfItemIsGiftable(dbItem)) {
-        if (i <= 25) {
-          this.itemDbWheel.push(dbItem);
-          ret.push({
-            route: "$next",
+      dbItem = await this.getItemUniverse(items.itemID); // Get dbItem from the db. Since every iteration should be unique (should be), we don't have to check for duplicates.
+      if (TomoEngine.checkIfItemIsGiftable(dbItem)) { // Currently every item is giftable.
+        if (i <= 25) { // The limit for a selection menu arguments is 25. 
+          this.itemDbWheel.push(dbItem); // We push it into our look up table of "itemDBWheel" property.
+          ret.push({ // Push it into the return array.
+            route: "$next", // Every single route has to be next because its going straight to the buffer then to the response.*
             label: `(x${items.amount}) `+ dbItem.formattedName,
-            emoji: dbItem.emoji,
-            value: i.toString(),
+            emoji: dbItem.emoji, // Emojis :)
+            value: i.toString(), // The value of the argument is their index in the itemDBWheel which is going to come handy later when we get a selection.
           });
 
           i++;
         } else break;
       }
     }
+
+    // After all the looping is done and the giftable items are accounted for we return the final inventory.
     return ret;
+
+    //*
+    // Buffer is a space between the two gift nodes ($gift) and ($response).
+    // It allows for the bot to build the node of $response right after a $gift selection is made.
+    // Normally, it should be 
   }
 
   /**
@@ -327,45 +337,60 @@ class TomoEngine extends engineBase {
   }
 
   async gift(card: Cards = this.cards[this.index]) {
-    let story = await this.getStoryJSON(card, "gift");
-    let find = story.multiples.findIndex(
+    // Declare variables.
+    let story: Story, find: number, responseIndex: number;
+
+    story = await this.getStoryJSON(card, "gift"); // Get the story json of the action "gift".
+    find = story.multiples.findIndex( // In the story, we find the "$gift" script which indicates a gift node.
       (single) => single.args?.toString() == "$gift"
     );
-    let responseIndex = story.multiples.findIndex(
-      (single) => single.args?.toString() == "$response"
+    responseIndex = story.multiples.findIndex(
+      (single) => single.args?.toString() == "$response" // In the story, we find the "$response" script which indicates the response sacrificial lamb node to be written over.
     );
 
-    if (find > -1)
-      story.multiples[find].args = await this.fillSelectWithInv(card);
+    if (find > -1) // If the find comes out positive (no error, we found "$gift")
+      story.multiples[find].args = await this.fillSelectWithInv(); // Then we fill the selection with the user's inventory.
 
-    this.novel = new Novel(story, this.interaction, true);
+    this.novel = new Novel(story, this.interaction, true); // Initiate a new Novel (see story variable.).
     console.log(story);
+
     this.novel.once("ready", () => {
-      this.novel.start();
+      this.novel.start(); // Start the novel when ready.
     });
 
+    // This block is the main part of the gifting sequence, this:
+    // 1. Sacrifices a node to become the response.
+    // 2. Makes the inventory and tomodachi changes to reflect what was gifted.
+
     this.actionOnNovelIndex(
-      find + 1,
+      find + 1, // Variable "find" is a number that has the index of "$gift" node. So we want to run the function AFTER an item is selected and the user has-
+      // -pressed the "Confirm Selection" button.
       async () => {
+        // Const var "item" contains the Items object of the selection. Since the item selection was built here and added into the novel object, we can map the-
+        // -novel selection number to the itemDBWheel here.
         const item = this.itemDbWheel[this.novel.selection];
         console.log(item)
-        this.novel.deployNode(await this.react(item, card), responseIndex, true);
-        if (item != "broke") {
-          // Inventory management
+        this.novel.deployNode(await this.react(item, card), responseIndex, true); // Inject the node that has the reaction in it to the response index. True is for destructive.
+        
+        if (item != "broke") { // If the item is not "broke" as in nothing is being given.
+          // Inventory management.
           this.DBUser.removeFromInventory(item.getId as number, 1);
-          this.DBUser.addToTomoInventory(card.ch as number, item.getId as number, 1);
+          this.DBUser.addToTomoInventory(card.ch as number, item.getId as number, 1); // Add to chInUser inventory.
+
+          //TODO: Tomo managements?? Or just leave it to the react function.
           
+          // Updates.
           await this.DBUser.updateInventory()
           await this.DBUser.updateTomo()
         }
       },
-      this.novel
+      this.novel // Novel parameter for function.
     );
     
   }
 
   async interact(card: Cards = this.cards[this.index]) {
-    
+
   }
 
   async start() {
@@ -419,14 +444,21 @@ class TomoEngine extends engineBase {
     
   }
 
+  /**
+   * actionOnNovelIndex
+   * Performs an action when a novel hits a certain page.
+   * @param index | Index you want the function to perform at.
+   * @param action | The action (function) you want to perform.
+   * @param novel | the novel that is being used, normally defaults to this.novel;
+   */
   async actionOnNovelIndex(
     index: number,
     action: Function,
     novel: Novel = this.novel
   ) {
     novel.on("pageChange", (page: NodeSingle) => {
-      if (page.index == index) {
-        action(page);
+      if (page.index == index) { // If it matches the index.
+        action(page); // Run a predefined function.
       }
     });
   }
