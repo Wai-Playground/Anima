@@ -87,35 +87,54 @@ class TomoEngine extends engineBase {
     this.prepareAsset();
   }
   
+  /**
+   * Name | buildCharacterCard.
+   * @param card | Card to build an image of.
+   * @returns Card object. (will have built image but the original object will also have the built img)
+   */
   async buildCharacterCard(card: Cards): Promise<Cards> {
-    const canvas: Canvas = createCanvas(this.width, this.height);
-    const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
+    // Prepare canvas.
+
+    const canvas: Canvas = createCanvas(this.width, this.height); // Create Canvas.
+    const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d"); // Get context.
+
+    // Prepare the image objects.
 
     const bg: Image = await loadImage(
-      this.backgrounds.get(card.bg).link
+      this.backgrounds.get(card.bg).link // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
+      // card.bg is the ID of the background.
     );
     const ch: Image = await loadImage(
-      this.characters.get(card.ch).link
+      this.characters.get(card.ch).link // Property "characters" is an internal cache of the Characters objects with their IDs as the key. -
+      // card.ch is the ID of the character.
     );
 
-    ctx.drawImage(bg, 0, 0);
-    ctx.drawImage(ch, 0, 0, ch.naturalWidth, ch.naturalHeight);
+    // This block draws the image.
+
+    ctx.drawImage(bg, 0, 0); // Draw the background. (TODO: EDIT AESTHETICS)
+    ctx.drawImage(ch, 0, 0, ch.naturalWidth, ch.naturalHeight); // Draw the character (TODO: EDIT AESTHETICS)
     
+    // This block sets the card's "build_img" property with the message attachment of the rendered image.
 
     card.built_img = new MessageAttachment(
       canvas.toBuffer("image/jpeg"),
       `tomo_userID_${this.DBUser._id}_node_${this.index}_CH${card.ch}+BG${card.bg}.jpg`
     );
 
-    return card;
+    return card; // return the card once it has done it's job.
   }
   
-
+  /**
+   * Name | get_tree.
+   * @param archetype | The character archetype you want to get the tree of. eg. Tsundere, I am dying of cringe, etc.
+   * @returns from the Tomo_Dictionaries where the tree is stored as a static object.
+   */
   get_tree(archetype: Char_Archetype_Strings): Ship_Tree {
     return Tomo_Dictionaries.char_tree(archetype);
   }
 
   /**
+   * Name | prepareAsset.
    * Prepares asset to view.
    */
   async prepareAsset() {
@@ -135,24 +154,30 @@ class TomoEngine extends engineBase {
       // For every character in the User's tomodachis, we create a new card and set the bgs and chs to their respective mappings.
       this.cards.push(new Cards(characters))
 
-      if (!this.characters.has(characters.originalID)) this.characters.set(characters.originalID, await this.getCharacter(characters.originalID))
-      if (!this.backgrounds.has(characters.bg)) this.backgrounds.set(characters.bg, await this.getBackground(characters.bg))
+      // This block adds the characters/backgrounds to the mapping if it's not already mapped.
+      if (!this.characters.has(characters.originalID)) this.characters.set(characters.originalID, await this.getCharacter(characters.originalID)) // Ch mappings.
+      if (!this.backgrounds.has(characters.bg)) this.backgrounds.set(characters.bg, await this.getBackground(characters.bg)) // Bg mappings.
     }
 
     process.nextTick(() => {
-      this.emitReady();
+      this.emitReady(); // Emit ready when everything is setup.
     });
   }
 
+  /**
+   * Name | convertNumberToTempMoodType.
+   * @param mood | int of the mood you want to turn into a string.
+   * @returns | string representation of the temp mood.
+   */
   static convertNumberToTempMoodType(mood: number) {
-    if (mood > Object.keys(Temp_MoodType).length / 2) return; // sad
-    return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings;
+    if (mood > Object.keys(Temp_MoodType).length / 2) return; // Since the enums have both int and string representations, we cut down the length of it by half.
+    return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it. 
   }
 
   /**
-   *getStoryJSON
-   * @param card | card to 
-   * @param action | action to perform
+   * Name | getStoryJSON.
+   * @param card | Card to get the ch story of.
+   * @param action | Action to perform. (Tomo_Action)
    * @returns Novel
    */
   async getStoryJSON(
@@ -195,6 +220,7 @@ class TomoEngine extends engineBase {
   }
 
   /**
+   * Name | checkIfActionCanBeDone.
    * Check if a user can perform the action.
    * @param card 
    * @param action 
@@ -210,6 +236,7 @@ class TomoEngine extends engineBase {
   }
 
   /**
+   * Name | checkIfItemIsGiftable.
    * If the item is giftable returns true.
    * @param dbItem | dbItem 
    * @returns 
@@ -219,6 +246,7 @@ class TomoEngine extends engineBase {
   }
 
   /**
+   * Name | fillSelectWithInv.
    * Fills the select menu with giftable items.
    * @returns Array of Drop down menu Arguments. @see Argument types.
    */
@@ -264,13 +292,15 @@ class TomoEngine extends engineBase {
     return ret;
 
     //*
-    // Buffer is a space between the two gift nodes ($gift) and ($response).
+    // A Buffer is a space between the two gift nodes ($gift) and ($response).
     // It allows for the bot to build the node of $response right after a $gift selection is made.
-    // Normally, it should be 
+    // Normally, it is disguised as the character's "turn" to speak as they receive the gift like: "What you give?" or if its the user's turn: "Here's your gift."
+    // Then the $response node should have been built and ready to be shown which will contain the actual response of the character.
+    //*
   }
 
   /**
-   * React.
+   * Name | react.
    * @param receivedItem |the item that is being gifted.
    * @param card | card you want to base the reaction off.
    * @returns new NodeSingle Object
@@ -336,6 +366,11 @@ class TomoEngine extends engineBase {
 
   }
 
+  /**
+   * Name | gift
+   * The gift block where the user can gift items to their tomos.
+   * @param card | The card we want to draw the ch and bg from (draw as in take not like render card)
+   */
   async gift(card: Cards = this.cards[this.index]) {
     // Declare variables.
     let story: Story, find: number, responseIndex: number;
