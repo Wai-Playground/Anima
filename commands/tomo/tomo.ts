@@ -39,7 +39,11 @@ class Tomo extends Commands {
       subc
       .setName("dachi")
       .setDescription("lol")
-      ),
+      ).addSubcommand((subc) =>
+      subc
+      .setName("interact")
+      .setDescription("itneract")
+    ),
       dbRequired: true,
       ownerOnly: false,
     });
@@ -79,6 +83,14 @@ class Tomo extends Commands {
     })
   }
 
+  async interact(bot: CustomClient, interaction: AmadeusInteraction) {
+    
+    let menu = await this.getNewTomoEngine(interaction, false);
+    
+    menu.once("ready", async () => {
+        menu.interact();
+    })
+  }
 }
 
 export = Tomo;

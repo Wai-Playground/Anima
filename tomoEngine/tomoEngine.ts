@@ -197,10 +197,10 @@ class TomoEngine extends engineBase {
 
     try {
       
-      idOfStory = this.characters.get(card.ch).getRandInterStoryId(action);
+      idOfStory = this.characters.get(card.ch).getRandInterStoryId(action); // Get a random story from the character's object. 
       console.log(idOfStory);
       if (idOfStory == -1)
-        throw new TomoError("No story found for this action.");
+        throw new TomoError("No story found for this action." + `Ch: ${card.ch}, User: ${this.DBUser._id}`); 
     } catch (e) {
       console.log(e);
     }
@@ -329,7 +329,7 @@ class TomoEngine extends engineBase {
     let itemGrade: number = receivedItem.gradeInt // We get the item Grade of the item to compare against the character.
     
     // This block decides what the response will be. Will override the response.
-    // Res = are Results, they are defined in the orig ch db and is an arr text which the ch says after getting a gift.
+    // Res = are Results, they are defined in the orig ch db and is an arr of text which the ch says after getting a gift.
 
     if (itemGrade > ch.gradeInt) mood = "happy", res = "above"; // If item grade > character grade. Mood becomes happy, Res becomes above.
 
@@ -425,6 +425,25 @@ class TomoEngine extends engineBase {
   }
 
   async interact(card: Cards = this.cards[this.index]) {
+    // Declare block.
+    let story: Story;
+
+    story = await this.getStoryJSON(card, "interact");
+
+    // If there is no story, we throw an error.
+    if (!story) throw new TomoError("Story not found for interaction. " + `Ch: ${card.ch}, interact.`)
+
+    // Set property to new instance of Novel. getStoryJson would have thrown an error if there was already a Novel already running.
+    this.novel = new Novel(story, this.interaction, true);
+
+    this.novel.once("ready", () => {
+      this.novel.start() // When ready, start the novel.
+    })
+
+
+    
+
+
 
   }
 
