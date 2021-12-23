@@ -30,6 +30,7 @@
     "enum": "^3.0.4",
     "events": "^3.3.0",
     "fs": "0.0.1-security",
+    "fuzzysort": "^1.1.4",
     "gif-encoder-2": "^1.0.5",
     "gifencoder": "^2.0.1",
     "ioredis": "^4.28.2",

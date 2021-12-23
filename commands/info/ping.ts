@@ -28,16 +28,12 @@ class Ping extends Commands {
   }
 
   async execute(bot: CustomClient, interaction: AmadeusInteraction) {
-    console.log('exculted')
-    
-
 
 
 
   }
 
   async test(bot: CustomClient, interaction: AmadeusInteraction) {
-    console.log(interaction.DBUser)
 
   }
 }

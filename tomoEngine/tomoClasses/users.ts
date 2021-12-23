@@ -143,6 +143,7 @@ export default class DBUsers extends universeBase {
 
 
 
+
     /**
      * Remember to call update!
      * @param itemID 
@@ -171,6 +172,10 @@ export default class DBUsers extends universeBase {
     }
     async updateInventory() {
       await Queries.updateUserInventory(this._id, this.inventory)
+    }
+
+    async validateTomoInventory() {
+     
     }
     async update() {
       /**TODO: Theres a more elegant solution to this. */

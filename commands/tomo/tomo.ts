@@ -18,9 +18,9 @@ import Character from "../../tomoEngine/tomoClasses/characters";
 import Background from "../../tomoEngine/tomoClasses/backgrounds";
 import Cards from "../../tomoEngine/tomoEngine";
 import DBUsers from "../../tomoEngine/tomoClasses/users";
-import { AmadeusInteraction } from "../../tomoEngine/statics/types";
+import { AmadeusInteraction, CharacterInUser } from "../../tomoEngine/statics/types";
 import CustomClient from "../../client/Amadeus_Client";
-
+import { goAsync } from "fuzzysort";
 const json = require("../../assets/tale.json");
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
@@ -39,6 +39,13 @@ class Tomo extends Commands {
       subc
       .setName("dachi")
       .setDescription("lol")
+      .addStringOption((option) =>
+      option
+        .setName('tomo_name')
+        .setDescription('duh')
+        .setRequired(false),
+    )
+      
       ).addSubcommand((subc) =>
       subc
       .setName("interact")
@@ -75,11 +82,41 @@ class Tomo extends Commands {
   }
 
   async dachi(bot: CustomClient, interaction: AmadeusInteraction) {
+    let menu: TomoEngine
     
-    let menu = await this.getNewTomoEngine(interaction, false);
+    const option = interaction.options.getString("tomo_name");
+    
+    menu = await this.getNewTomoEngine(interaction, false);
     
     menu.once("ready", async () => {
-        menu.start();
+      if (option) {
+        // Define stuff.
+        let arrOfChs: Character[], arrOfChsNames: Array<string>, fuzzySearched: Fuzzysort.Results, finalFuzzyString: string, finalFuzzyId: number, nodeIndex: number = 0, fuzzyFind: Character;
+
+        arrOfChs = Array.from(menu.characters.values()) // Firstly, we smash the map values(k = id of ch, v = ch obj) into just array of values, [...ch];
+        arrOfChsNames = arrOfChs.map(ch => ch.getName); // Array of ch names are just the names of ch like ["guide", "whoever"].
+        fuzzySearched = await goAsync(option, arrOfChsNames, { allowTypo: true}) // A fuzzy search of the 
+
+        finalFuzzyString = fuzzySearched[0]?.target;
+
+        fuzzyFind = arrOfChs.find(ch => ch.name == finalFuzzyString) 
+
+        if (fuzzyFind) finalFuzzyId = arrOfChs.find(ch => ch.name == finalFuzzyString).getId as number;
+        else finalFuzzyId = interaction.DBUser.getMainTomoDachi().originalID;
+
+        nodeIndex = menu.cards.findIndex(value => value.chInUser.originalID == finalFuzzyId);
+        console.log(nodeIndex + "_" + finalFuzzyString)
+
+        menu.start(nodeIndex);
+        
+      
+
+      } else menu.start();
+      
+      
+      
+      
+      
     })
   }
 
@@ -88,7 +125,7 @@ class Tomo extends Commands {
     let menu = await this.getNewTomoEngine(interaction, false);
     
     menu.once("ready", async () => {
-        menu.interact();
+      menu.interact();
     })
   }
 }

@@ -18,11 +18,6 @@ import {
   loadImage,
   NodeCanvasRenderingContext2D,
 } from "canvas";
-import {
-  canvasRGB,
-  image,
-  imageDataRGB
-} from "stackblur-canvas"
 import engineBase from "./base";
 import Character from "./tomoClasses/characters";
 import DBUsers from "./tomoClasses/users";
@@ -71,18 +66,19 @@ class Cards {
  * @description | final complete package for the engine.
  */
 class TomoEngine extends engineBase {
-  width: number = 800;
-  height: number = 920;
+  width: number = 564;
+  height: number = 670;
   cards: Array<Cards>;
   novel: Novel;
   DBUser: DBUsers;
   itemInWheel: Array<ItemInUser>;
   itemDbWheel: Array<Items | "broke">;
   index: number = 0;
-  message: Message | APIMessage
 
-  characters: Map<number, Character>
-  backgrounds: Map<number, Background>
+  message: Message | APIMessage;
+
+  characters: Map<number, Character>;
+  backgrounds: Map<number, Background>;
 
   buttonCollector: InteractionCollector<ButtonInteraction>;
   selectCollector: InteractionCollector<SelectMenuInteraction>;
@@ -91,7 +87,7 @@ class TomoEngine extends engineBase {
     this.interaction = interaction as AmadeusInteraction;
     this.prepareAsset();
   }
-  
+
   /**
    * Name | buildCharacterCard.
    * @param card | Card to build an image of.
@@ -118,9 +114,9 @@ class TomoEngine extends engineBase {
     // This block draws the image.
 
     ctx.drawImage(bg, 0, 0); // Draw the background. (TODO: EDIT AESTHETICS)
-    
+
     ctx.drawImage(ch, 0, 0, ch.naturalWidth, ch.naturalHeight); // Draw the character (TODO: EDIT AESTHETICS)
-    
+
     // This block sets the card's "build_img" property with the message attachment of the rendered image.
 
     card.built_img = new MessageAttachment(
@@ -130,7 +126,7 @@ class TomoEngine extends engineBase {
 
     return card; // return the card once it has done it's job.
   }
-  
+
   /**
    * Name | get_tree.
    * @param archetype | The character archetype you want to get the tree of. eg. Tsundere, I am dying of cringe, etc.
@@ -151,19 +147,27 @@ class TomoEngine extends engineBase {
     this.itemInWheel = []; // Item in wheel is the User's inventory filtered to have only amount > than 0.
     this.cards = []; // Each card contains a bg and chInUser. A bg to fill the background of the gui and a ch which is the user's tomos.
 
-    this.backgrounds = new Map() // Internal cache of the backgrounds. (k, v) k = uniBaseID, v = Background object.
-    this.characters = new Map() // Internal cache of the characters. (k, v) k = uniBaseID, v = Character object.
+    this.backgrounds = new Map(); // Internal cache of the backgrounds. (k, v) k = uniBaseID, v = Background object.
+    this.characters = new Map(); // Internal cache of the characters. (k, v) k = uniBaseID, v = Character object.
+    
 
     this.DBUser = this.interaction.DBUser; // Shortened version of the DBUser.
 
     for (const characters of this.DBUser.tomodachis) {
-
       // For every character in the User's tomodachis, we create a new card and set the bgs and chs to their respective mappings.
-      this.cards.push(new Cards(characters))
+      this.cards.push(new Cards(characters));
 
       // This block adds the characters/backgrounds to the mapping if it's not already mapped.
-      if (!this.characters.has(characters.originalID)) this.characters.set(characters.originalID, await this.getCharacter(characters.originalID)) // Ch mappings.
-      if (!this.backgrounds.has(characters.bg)) this.backgrounds.set(characters.bg, await this.getBackground(characters.bg)) // Bg mappings.
+      if (!this.characters.has(characters.originalID))
+        this.characters.set(
+          characters.originalID,
+          await this.getCharacter(characters.originalID)
+        ); // Ch mappings.
+      if (!this.backgrounds.has(characters.bg))
+        this.backgrounds.set(
+          characters.bg,
+          await this.getBackground(characters.bg)
+        ); // Bg mappings.
     }
 
     process.nextTick(() => {
@@ -178,7 +182,7 @@ class TomoEngine extends engineBase {
    */
   static convertNumberToTempMoodType(mood: number) {
     if (mood > Object.keys(Temp_MoodType).length / 2) return; // Since the enums have both int and string representations, we cut down the length of it by half.
-    return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it. 
+    return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it.
   }
 
   /**
@@ -203,18 +207,20 @@ class TomoEngine extends engineBase {
     );
 
     try {
-      
-      idOfStory = this.characters.get(card.ch).getRandInterStoryId(action); // Get a random story from the character's object. 
+      idOfStory = this.characters.get(card.ch).getRandInterStoryId(action); // Get a random story from the character's object.
       console.log(idOfStory);
       if (idOfStory == -1)
-        throw new TomoError("No story found for this action." + `Ch: ${card.ch}, User: ${this.DBUser._id}`); 
+        throw new TomoError(
+          "No story found for this action." +
+            `Ch: ${card.ch}, User: ${this.DBUser._id}`
+        );
     } catch (e) {
       console.log(e);
     }
 
-
     story = await this.getStoryUniverse(idOfStory); // Get the json of the story.
-    if (curMood != "main" && action != "gift") { // If the current mood is main and the action is not gift then-
+    if (curMood != "main" && action != "gift") {
+      // If the current mood is main and the action is not gift then-
       try {
         let payload: Story = await story.getVariant(curMood); // Then get the variant of the story if needed.
         story = payload;
@@ -229,24 +235,24 @@ class TomoEngine extends engineBase {
   /**
    * Name | checkIfActionCanBeDone.
    * Check if a user can perform the action.
-   * @param card 
-   * @param action 
+   * @param card
+   * @param action
    * @returns boolean
    */
   checkIfActionCanBeDone(
     card: Cards,
     action: Tomo_Action = "interact"
   ): boolean {
-    console.log(card.chInUser._flags.includes(action))
+    console.log(card.chInUser._flags.includes(action));
     if (card.chInUser._flags.includes(action)) return true; // if the ch in user has this flag.
-    return false; 
+    return false;
   }
 
   /**
    * Name | checkIfItemIsGiftable.
    * If the item is giftable returns true.
-   * @param dbItem | dbItem 
-   * @returns 
+   * @param dbItem | dbItem
+   * @returns
    */
   static checkIfItemIsGiftable(dbItem: Items) {
     return true;
@@ -258,9 +264,9 @@ class TomoEngine extends engineBase {
    * @returns Array of Drop down menu Arguments. @see Argument types.
    */
   async fillSelectWithInv(): Promise<Array<Argument>> {
-
     // Definition block.
-    let dbItem: Items, i: number = 1, // Start at "1" because we are pre-defining it in the default return Array<Argument> below.
+    let dbItem: Items,
+      i: number = 1, // Start at "1" because we are pre-defining it in the default return Array<Argument> below.
       ret: Array<Argument> = [
         {
           // This is the very first option that the user will have. Which is to say that they have nothing.
@@ -268,29 +274,33 @@ class TomoEngine extends engineBase {
           label: "I have nothing...",
           value: i.toString(),
         },
-      ]
-    
-    
+      ];
+
     this.itemDbWheel.push("broke"); // Push the "broke" item into the itemdbwheel which is a property of this class, to help manipulate it later in the future.
 
-    this.itemInWheel = this.DBUser.inventory.filter((items) => items.amount > 0); // If the items in the inventory are more than "0". 
+    this.itemInWheel = this.DBUser.inventory.filter(
+      (items) => items.amount > 0
+    ); // If the items in the inventory are more than "0".
 
     if (this.itemInWheel.length <= 0) return ret; // If there is no items just return the default Array of Arguments. Which is just the "I am broke" selection.
-    
+
     // When the user has an inventory.
     for (const items of this.itemInWheel) {
       dbItem = await this.getItemUniverse(items.itemID); // Get dbItem from the db. Since every iteration should be unique (should be), we don't have to check for duplicates.
-      if (TomoEngine.checkIfItemIsGiftable(dbItem)) { // Currently every item is giftable.
-        if (i <= 25) { // The limit for a selection menu arguments is 25. 
+      if (TomoEngine.checkIfItemIsGiftable(dbItem)) {
+        // Currently every item is giftable.
+        if (i <= 25) {
+          // The limit for a selection menu arguments is 25.
           this.itemDbWheel.push(dbItem); // We push it into our look up table of "itemDBWheel" property.
-          ret.push({ // Push it into the return array.
+          ret.push({
+            // Push it into the return array.
             route: "$next", // Every single route has to be next because its going straight to the buffer then to the response.*
-            label: `(x${items.amount}) `+ dbItem.formattedName,
+            label: `(x${items.amount}) ` + dbItem.formattedName,
             emoji: dbItem.emoji, // Emojis :)
             value: i.toString(), // The value of the argument is their index in the itemDBWheel which is going to come handy later when we get a selection.
           });
 
-          i++;
+          i++; // Increment.
         } else break;
       }
     }
@@ -317,61 +327,67 @@ class TomoEngine extends engineBase {
     card: Cards = this.cards[this.index]
   ): Promise<NodeSingle> {
     // Define variables & defaults. + default response (broke).
-    let res: keyof Gift_Responses, mood: Temp_MoodTypeStrings = "sad", variantMood: Character, ch = this.characters.get(card.ch),
-    response: Single = {
-      mood: mood,
-      text: this.characters.get(card.ch).getRandomGiftResponse("none"),
-      backable: false
-    }
-    
+    let res: keyof Gift_Responses,
+      mood: Temp_MoodTypeStrings = "sad",
+      variantMood: Character,
+      ch = this.characters.get(card.ch),
+      response: Single = {
+        mood: mood,
+        text: this.characters.get(card.ch).getRandomGiftResponse("none"),
+        backable: false,
+      };
+
     // If the user is broke we return the default response of broke.
     if (receivedItem == "broke") {
-      variantMood = await this.characters.get(card.ch).getVariant(mood) // We get the mood of the character.
-      this.novel.deployChar(variantMood) // We inject the character into the this.novel object.
-      response.character = variantMood.getId // The response of character's ID is now the variantMood. Since the mood is 
-      
+      variantMood = await this.characters.get(card.ch).getVariant(mood); // We get the mood of the character.
+      this.novel.deployChar(variantMood); // We inject the character into the this.novel object.
+      response.character = variantMood.getId; // The response of character's ID is now the variantMood. Since the mood is
+
       return new NodeSingle(response);
     }
 
-    let itemGrade: number = receivedItem.gradeInt // We get the item Grade of the item to compare against the character.
-    
+    let itemGrade: number = receivedItem.gradeInt; // We get the item Grade of the item to compare against the character.
+
     // This block decides what the response will be. Will override the response.
     // Res = are Results, they are defined in the orig ch db and is an arr of text which the ch says after getting a gift.
 
-    if (itemGrade > ch.gradeInt) mood = "happy", res = "above"; // If item grade > character grade. Mood becomes happy, Res becomes above.
+    if (itemGrade > ch.gradeInt) (mood = "happy"), (res = "above"); // If item grade > character grade. Mood becomes happy, Res becomes above.
 
-    if (itemGrade == ch.gradeInt) mood = "happy", res = "average"; // If item grade == char grade. Mood becomes happy. Res becomes average.
+    if (itemGrade == ch.gradeInt) (mood = "happy"), (res = "average"); // If item grade == char grade. Mood becomes happy. Res becomes average.
 
     if (itemGrade < ch.gradeInt) res = "below"; // Mood does not change because default is "sad". Res becomes below.
 
-    if (ch.likes.includes(receivedItem.getId as number)) mood = "happy", res = "likes"; // If the item is included in the character's like sheet.
-    if (card.chInUser.inventory.find(invItem => invItem.itemID == receivedItem.getId)) mood = "sad", res = "duplicate"; // If the item is a duplicate in the character's inv.
-    if (ch.dislikes.includes(receivedItem.getId as number)) mood = "annoyed", res = "dislikes" // If the item is in the dislike category.
+    if (ch.likes.includes(receivedItem.getId as number))
+      (mood = "happy"), (res = "likes"); // If the item is included in the character's like sheet.
+    if (
+      card.chInUser.inventory.find(
+        (invItem) => invItem.itemID == receivedItem.getId
+      )
+    )
+      (mood = "sad"), (res = "duplicate"); // If the item is a duplicate in the character's inv.
+    if (ch.dislikes.includes(receivedItem.getId as number))
+      (mood = "annoyed"), (res = "dislikes"); // If the item is in the dislike category.
 
     // They perform special functions:
     // This block is for when the item is a consumable.
     if (receivedItem.itemType == "consumables") {
-
     }
 
     // This block is for when the item is equipable.
     if (receivedItem.itemType == "equipables") {
-
     }
-    
-    variantMood = await ch.getVariant(mood) // We get the variant mood again, since there may have been a change in the mood.
-    this.novel.deployChar(variantMood) // We inject the Character into the novel.
+
+    variantMood = await ch.getVariant(mood); // We get the variant mood again, since there may have been a change in the mood.
+    this.novel.deployChar(variantMood); // We inject the Character into the novel.
 
     response.text = ch.getRandomGiftResponse(res); // Random response.
     response.mood = mood; // Mood becomes the moode.
     response.character = variantMood.getId; // The character of the response becomes the mood.
 
-    return new NodeSingle(response) // Return a new NodeSingle of response.
+    return new NodeSingle(response); // Return a new NodeSingle of response.
   }
 
-  appendEndScreen() {
-
-  }
+  appendEndScreen() {}
 
   /**
    * Name | gift
@@ -383,14 +399,16 @@ class TomoEngine extends engineBase {
     let story: Story, find: number, responseIndex: number;
 
     story = await this.getStoryJSON(card, "gift"); // Get the story json of the action "gift".
-    find = story.multiples.findIndex( // In the story, we find the "$gift" script which indicates a gift node.
+    find = story.multiples.findIndex(
+      // In the story, we find the "$gift" script which indicates a gift node.
       (single) => single.args?.toString() == "$gift"
     );
     responseIndex = story.multiples.findIndex(
       (single) => single.args?.toString() == "$response" // In the story, we find the "$response" script which indicates the response sacrificial lamb node to be written over.
     );
 
-    if (find > -1) // If the find comes out positive (no error, we found "$gift")
+    if (find > -1)
+      // If the find comes out positive (no error, we found "$gift")
       story.multiples[find].args = await this.fillSelectWithInv(); // Then we fill the selection with the user's inventory.
 
     this.novel = new Novel(story, this.interaction, true); // Initiate a new Novel (see story variable.).
@@ -411,24 +429,32 @@ class TomoEngine extends engineBase {
         // Const var "item" contains the Items object of the selection. Since the item selection was built here and added into the novel object, we can map the-
         // -novel selection number to the itemDBWheel here.
         const item = this.itemDbWheel[this.novel.selection];
-        console.log(item)
-        this.novel.deployNode(await this.react(item, card), responseIndex, true); // Inject the node that has the reaction in it to the response index. True is for destructive.
-        
-        if (item != "broke") { // If the item is not "broke" as in nothing is being given.
+        console.log(item);
+        this.novel.deployNode(
+          await this.react(item, card),
+          responseIndex,
+          true
+        ); // Inject the node that has the reaction in it to the response index. True is for destructive.
+
+        if (item != "broke") {
+          // If the item is not "broke" as in nothing is being given.
           // Inventory management.
           this.DBUser.removeFromInventory(item.getId as number, 1);
-          this.DBUser.addToTomoInventory(card.ch as number, item.getId as number, 1); // Add to chInUser inventory.
+          this.DBUser.addToTomoInventory(
+            card.ch as number,
+            item.getId as number,
+            1
+          ); // Add to chInUser inventory.
 
           //TODO: Tomo managements?? Or just leave it to the react function.
-          
+
           // Updates.
-          await this.DBUser.updateInventory()
-          await this.DBUser.updateTomo()
+          await this.DBUser.updateInventory();
+          await this.DBUser.updateTomo();
         }
       },
       this.novel // Novel parameter for function.
     );
-    
   }
 
   async interact(card: Cards = this.cards[this.index]) {
@@ -438,51 +464,79 @@ class TomoEngine extends engineBase {
     story = await this.getStoryJSON(card, "interact");
 
     // If there is no story, we throw an error.
-    if (!story) throw new TomoError("Story not found for interaction. " + `Ch: ${card.ch}, interact.`)
+    if (!story)
+      throw new TomoError(
+        "Story not found for interaction. " + `Ch: ${card.ch}, interact.`
+      );
 
     // Set property to new instance of Novel. getStoryJson would have thrown an error if there was already a Novel already running.
     this.novel = new Novel(story, this.interaction, true);
 
     this.novel.once("ready", () => {
-      this.novel.start() // When ready, start the novel.
-    })
+      this.novel.start(); // When ready, start the novel.
+    });
+  }
 
+  async start(index: number = 0) {
+    await this.setPage(index);
+    if (!this.message) this.message = (await this.interaction.fetchReply()) as Message;
+  }
 
+  async setPage(index: number = 0) {
+    await this.buildCharacterCard(this.cards[index]);
+    const payload = {
+      files: [this.cards[index].built_img],
+      attachments: [],
+      components: await this.action(),
+    }
+    this.index = index;
+    await this.interaction.editReply(payload);
     
+  }
 
+  // Interaction Block.
 
+  /**
+   * 
+   */
+
+  async state() {
 
   }
 
-  async start() {
-    await this.buildCharacterCard(this.cards[0])
-    this.interaction.editReply({ files: [this.cards[0].built_img], attachments: [], components: await this.action()})
-    
-    this.message = await this.interaction.fetchReply() as Message
-    
+  async move() {
+
+  }
+
+  async listen() {
+
   }
 
   async action() {
-    let ret: Array<MessageActionRow> = [], buttonRow = new MessageActionRow(), i = 0;
+    let ret: Array<MessageActionRow> = [],
+      buttonRow = new MessageActionRow(),
+      i = 0;
 
     const buttons = [
       {
         disabled: true,
         label: "Info",
-        style: 3
+        style: 3,
       },
       {
-        disabled: !this.checkIfActionCanBeDone(this.cards[this.index], "interact"),
+        disabled: !this.checkIfActionCanBeDone(
+          this.cards[this.index],
+          "interact"
+        ),
         label: "Interact",
         style: 1,
       },
       {
         disabled: true,
-        label: "Delete",
-        emj: "<:trash:886429816260280374>",
-        style: 4
-      }
-    ]
+        label: "Move",
+        style: 4,
+      },
+    ];
 
     for (const button of buttons) {
       buttonRow.addComponents(
@@ -494,17 +548,43 @@ class TomoEngine extends engineBase {
             "TOMO.button_" + i.toString() + "_user_" + this.interaction.user.id
           )
           .setLabel(button.hasOwnProperty("label") ? button.label : null)
-          .setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
+          //.setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
           .setStyle(button.style)
       );
       i++;
     }
-    ret.push(buttonRow)
+    ret.push(buttonRow);
+
+    // Select Menu block.
+
+    // Define variables.
+    let choices: Array<MessageSelectOptionData> = [];
+
+    for (const card of this.cards) {
+      choices.push({
+        label: this.characters.get(card.chInUser.originalID).getName,
+        emoji: this.characters.get(card.chInUser.originalID).emoji,
+        value: card.chInUser.originalID.toString()
+      });
+    }
+    const selectRow = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
+        .setCustomId(
+          "TOMO.select_" +
+            this.index.toString() +
+            "_user_" +
+            this.interaction.user.id
+        )
+        .setPlaceholder(
+          "SELECT YO B"
+        )
+        .addOptions(choices)
+        
+    );
+
+    ret.push(selectRow);
 
     return ret;
-    
-
-    
   }
 
   /**
@@ -520,7 +600,8 @@ class TomoEngine extends engineBase {
     novel: Novel = this.novel
   ) {
     novel.on("pageChange", (page: NodeSingle) => {
-      if (page.index == index) { // If it matches the index.
+      if (page.index == index) {
+        // If it matches the index.
         action(page); // Run a predefined function.
       }
     });

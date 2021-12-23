@@ -49,15 +49,28 @@ export abstract class Commands extends Amadeus_Base {
 
   }
 
-  async isUserInCooldown(interaction: CommandInteraction) {
+  async isUserInCooldown(interaction: AmadeusInteraction) {
     // Definition block.
-    const key = interaction.user.id, redis = red.memory()
+    const key = interaction.user.id, redis = red.memory();
 
     // If the user id exists in the cooldown.
     if (await redis.exists("cooldown", key)) return true; // If it does, return true.
-    await redis.hset("cooldown", key, this.name); // Add the user to the cooldown cluster.
-    redis.expire("cooldown", this.coolDown); // TTL is the command's cooldown property.
+    this.addUserToCoolDown(interaction);
     return false; // Return false since the user was not in the cooldown.
+  }
+
+  async addUserToCoolDown(interaction: AmadeusInteraction, command: string = this.name, cooldown: number = this.coolDown) {
+    const redis = red.memory(), key = interaction.user.id;
+
+    await redis.hset("cooldown", key, command); // Add the user to the cooldown cluster.
+    redis.expire("cooldown", cooldown); // TTL is the command's cooldown property.
+
+  }
+
+  async removeUserFromCoolDown(interaction: AmadeusInteraction) {
+    const key = interaction.user.id, redis = red.memory();
+
+    if (this.isUserInCooldown(interaction)) redis.hdel("cooldown", key);
   }
 
   async checkIfInteractionCanRun(interaction: AmadeusInteraction) {
