@@ -79,7 +79,7 @@ export abstract class Commands extends Amadeus_Base {
     if (this.ownerOnly) {
       console.log(interaction.user.id == process.env.OWNER_ID) // if true then bottom is false
       //CHANGE SIGN
-      if (interaction.user.id != process.env.OWNER_ID ? false : true) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
+      if (interaction.user.id !== process.env.OWNER_ID) return interaction.reply("Sorry, this is an owner only command. Try again when you become the owner?")
       
     }
 

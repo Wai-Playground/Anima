@@ -74,12 +74,15 @@ class TomoEngine extends engineBase {
   itemInWheel: Array<ItemInUser>;
   itemDbWheel: Array<Items | "broke">;
   index: number = 0;
-
-  message: Message | APIMessage;
+  message: any;
 
   characters: Map<number, Character>;
   backgrounds: Map<number, Background>;
 
+  filter: Function = async (i: any) => {
+    await i.deferUpdate();
+    return i.user.id === this.interaction.user.id;
+  };
   buttonCollector: InteractionCollector<ButtonInteraction>;
   selectCollector: InteractionCollector<SelectMenuInteraction>;
   constructor(interaction: AmadeusInteraction) {
@@ -243,7 +246,6 @@ class TomoEngine extends engineBase {
     card: Cards,
     action: Tomo_Action = "interact"
   ): boolean {
-    console.log(card.chInUser._flags.includes(action));
     if (card.chInUser._flags.includes(action)) return true; // if the ch in user has this flag.
     return false;
   }
@@ -387,6 +389,20 @@ class TomoEngine extends engineBase {
     return new NodeSingle(response); // Return a new NodeSingle of response.
   }
 
+  calculateEndRewards() {
+
+  }
+
+  private refreshCoolDown() {
+    if (this.buttonCollector) this.buttonCollector.resetTimer();
+    if (this.selectCollector) this.selectCollector.resetTimer();
+  }
+
+  private async disableComponents() {
+    if (this.buttonCollector) this.buttonCollector.stop()
+    if (this.selectCollector) this.selectCollector.stop()
+  }
+
   appendEndScreen() {}
 
   /**
@@ -394,14 +410,13 @@ class TomoEngine extends engineBase {
    * The gift block where the user can gift items to their tomos.
    * @param card | The card we want to draw the ch and bg from (draw as in take not like render card)
    */
-  async gift(card: Cards = this.cards[this.index]) {
+  async gift(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
     // Declare variables.
     let story: Story, find: number, responseIndex: number;
 
     story = await this.getStoryJSON(card, "gift"); // Get the story json of the action "gift".
     find = story.multiples.findIndex(
-      // In the story, we find the "$gift" script which indicates a gift node.
-      (single) => single.args?.toString() == "$gift"
+      (single) => single.args?.toString() == "$gift" // In the story, we find the "$gift" script which indicates a gift node.
     );
     responseIndex = story.multiples.findIndex(
       (single) => single.args?.toString() == "$response" // In the story, we find the "$response" script which indicates the response sacrificial lamb node to be written over.
@@ -411,7 +426,7 @@ class TomoEngine extends engineBase {
       // If the find comes out positive (no error, we found "$gift")
       story.multiples[find].args = await this.fillSelectWithInv(); // Then we fill the selection with the user's inventory.
 
-    this.novel = new Novel(story, this.interaction, true); // Initiate a new Novel (see story variable.).
+    this.novel = new Novel(story, interaction, true); // Initiate a new Novel (see story variable.).
     console.log(story);
 
     this.novel.once("ready", () => {
@@ -457,7 +472,7 @@ class TomoEngine extends engineBase {
     );
   }
 
-  async interact(card: Cards = this.cards[this.index]) {
+  async interact(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
     // Declare block.
     let story: Story;
 
@@ -470,7 +485,7 @@ class TomoEngine extends engineBase {
       );
 
     // Set property to new instance of Novel. getStoryJson would have thrown an error if there was already a Novel already running.
-    this.novel = new Novel(story, this.interaction, true);
+    this.novel = new Novel(story, interaction, true);
 
     this.novel.once("ready", () => {
       this.novel.start(); // When ready, start the novel.
@@ -480,9 +495,13 @@ class TomoEngine extends engineBase {
   async start(index: number = 0) {
     await this.setPage(index);
     if (!this.message) this.message = (await this.interaction.fetchReply()) as Message;
+    
+    if (this.buttonCollector == undefined) this.collectButton(this.filter);
+    if (this.selectCollector == undefined) this.collectSelect(this.filter);
   }
 
   async setPage(index: number = 0) {
+    if (index < 0 || index > this.cards.length - 1) return;
     await this.buildCharacterCard(this.cards[index]);
     const payload = {
       files: [this.cards[index].built_img],
@@ -496,20 +515,91 @@ class TomoEngine extends engineBase {
 
   // Interaction Block.
 
-  /**
-   * 
-   */
+  async getStatsOfCard(card: Cards = this.cards[this.index]) {
+    
 
-  async state() {
+    
 
-  }
-
-  async move() {
 
   }
 
-  async listen() {
+  private async collectButton(filter: Function) {
+    this.buttonCollector = this.message.createMessageComponentCollector({
+      filter,
+      componentType: "BUTTON",
+      time: 60000,
+      max: 1,
+    });
+    this.buttonCollector.on("collect", async (interaction: ButtonInteraction) => {
+      const button = parseInt(interaction.customId.match(/(\d{1,1})/g)[0]);
+      console.log(button)
+      await this.disableComponents();
 
+      switch (button) {
+        case 0:
+          break;
+
+        case 1:
+          this.interact()
+          break;
+
+        case 2:
+          this.gift()
+          break;
+      }
+
+    });
+
+    this.buttonCollector.on("end", () => {
+      this.emit("end");
+    });
+  }
+  private async collectSelect(filter: Function) {
+    this.selectCollector = this.message.createMessageComponentCollector({
+      filter,
+      componentType: "SELECT_MENU",
+      time: 60000,
+    });
+    this.selectCollector.on(
+      "collect",
+      async (interaction: SelectMenuInteraction) => {
+        let value = parseInt(interaction.values[0]); // value[1] = selection
+        if (value == this.index) return;
+
+        //this.selection = parseInt(value);
+
+        this.emit("selectCollected", value);
+        this.setPage(value)
+      }
+    );
+
+    this.selectCollector.on("end", () => {
+      console.log("select ended!");
+      this.emit("end");
+    });
+  }
+
+  public async end() {
+    this.emit("end");
+    if (/*!this.selectCollector.ended ||*/ !this.buttonCollector.ended) {
+      /*(await this.selectCollector.stop()*/
+      this.buttonCollector.stop();
+    }
+  }
+
+  async fillSelectWithUserTomos() {
+    let choices: Array<MessageSelectOptionData> = [], i: number = 0;
+
+    for (const card of this.cards) {
+      choices.push({
+        label: this.characters.get(card.chInUser.originalID).getName,
+        emoji: this.characters.get(card.chInUser.originalID).emoji,
+        value: i.toString()
+      });
+      i++;
+    }
+
+    return choices;
   }
 
   async action() {
@@ -519,8 +609,8 @@ class TomoEngine extends engineBase {
 
     const buttons = [
       {
-        disabled: true,
-        label: "Info",
+        disabled: false,
+        label: "Stats",
         style: 3,
       },
       {
@@ -529,12 +619,17 @@ class TomoEngine extends engineBase {
           "interact"
         ),
         label: "Interact",
+        emj: "💬",
         style: 1,
       },
       {
-        disabled: true,
-        label: "Move",
-        style: 4,
+        disabled:!this.checkIfActionCanBeDone(
+          this.cards[this.index],
+          "gift"
+        ),
+        label: "Gift",
+        emj: "🎁",
+        style: 1,
       },
     ];
 
@@ -548,7 +643,7 @@ class TomoEngine extends engineBase {
             "TOMO.button_" + i.toString() + "_user_" + this.interaction.user.id
           )
           .setLabel(button.hasOwnProperty("label") ? button.label : null)
-          //.setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
+          .setEmoji(button.hasOwnProperty("emj") ? button.emj : null)
           .setStyle(button.style)
       );
       i++;
@@ -558,15 +653,6 @@ class TomoEngine extends engineBase {
     // Select Menu block.
 
     // Define variables.
-    let choices: Array<MessageSelectOptionData> = [];
-
-    for (const card of this.cards) {
-      choices.push({
-        label: this.characters.get(card.chInUser.originalID).getName,
-        emoji: this.characters.get(card.chInUser.originalID).emoji,
-        value: card.chInUser.originalID.toString()
-      });
-    }
     const selectRow = new MessageActionRow().addComponents(
       new MessageSelectMenu()
         .setCustomId(
@@ -578,7 +664,7 @@ class TomoEngine extends engineBase {
         .setPlaceholder(
           "SELECT YO B"
         )
-        .addOptions(choices)
+        .addOptions(await this.fillSelectWithUserTomos())
         
     );
 

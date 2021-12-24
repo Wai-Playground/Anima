@@ -5,7 +5,6 @@
 
 import {
   ButtonInteraction,
-  CommandInteraction,
   MessageAttachment,
   MessageActionRow,
   SelectMenuInteraction,
@@ -307,6 +306,7 @@ export default class Novel extends engineBase {
       content: `>>> **${
         this.characters.get(this.nodes[this.index].character).name
       }**: ${this.nodes[this.index].text}`,
+      attachments: [],
       files: [
         this.nodes[this.index].built
           ? this.nodes[this.index].built_img
