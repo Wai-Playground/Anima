@@ -122,6 +122,7 @@ export default class Novel extends engineBase {
 
 
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
+    console.time("build_"+index)
     const canvas: Canvas = createCanvas(this.width, this.height);
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
     const customID: string = `novel_userID_${this.interaction.user.id}_node_${index}_${this.name}.jpeg`
@@ -156,6 +157,8 @@ export default class Novel extends engineBase {
       canvas.toBuffer("image/jpeg"),
       customID
     );
+    console.timeEnd("build_"+index)
+    
     
     return this.nodes[index].built_img;
   }

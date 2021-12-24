@@ -97,6 +97,7 @@ class TomoEngine extends engineBase {
    * @returns Card object. (will have built image but the original object will also have the built img)
    */
   async buildCharacterCard(card: Cards): Promise<Cards> {
+    console.time("build")
     // Prepare canvas.
 
     const canvas: Canvas = createCanvas(this.width, this.height); // Create Canvas.
@@ -126,6 +127,7 @@ class TomoEngine extends engineBase {
       canvas.toBuffer("image/jpeg"),
       `tomo_userID_${this.DBUser._id}_node_${this.index}_CH${card.ch}_BG${card.bg}.jpg`
     );
+    console.timeEnd("build")
 
     return card; // return the card once it has done it's job.
   }
@@ -502,7 +504,7 @@ class TomoEngine extends engineBase {
 
   async setPage(index: number = 0) {
     if (index < 0 || index > this.cards.length - 1) return;
-    await this.buildCharacterCard(this.cards[index]);
+    if (!this.cards[index].built_img) await this.buildCharacterCard(this.cards[index]);
     const payload = {
       files: [this.cards[index].built_img],
       attachments: [],
@@ -614,19 +616,13 @@ class TomoEngine extends engineBase {
         style: 3,
       },
       {
-        disabled: !this.checkIfActionCanBeDone(
-          this.cards[this.index],
-          "interact"
-        ),
+        disabled: true,
         label: "Interact",
         emj: "💬",
         style: 1,
       },
       {
-        disabled:!this.checkIfActionCanBeDone(
-          this.cards[this.index],
-          "gift"
-        ),
+        disabled: true,
         label: "Gift",
         emj: "🎁",
         style: 1,

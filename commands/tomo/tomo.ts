@@ -34,12 +34,16 @@ class Tomo extends Commands {
       data: new SlashCommandBuilder().addSubcommand((subc) =>
         subc
         .setName("gift")
-        .setDescription("hug")
+        .setDescription("hug").addStringOption((option) =>
+        option
+          .setName('tomo_name')
+          .setDescription('duh')
+          .setRequired(false),
+      )
       ).addSubcommand((subc) =>
       subc
       .setName("dachi")
-      .setDescription("lol")
-      .addStringOption((option) =>
+      .setDescription("lol").addStringOption((option) =>
       option
         .setName('tomo_name')
         .setDescription('duh')
@@ -49,10 +53,15 @@ class Tomo extends Commands {
       ).addSubcommand((subc) =>
       subc
       .setName("interact")
-      .setDescription("itneract")
+      .setDescription("itneract").addStringOption((option) =>
+      option
+        .setName('tomo_name')
+        .setDescription('duh')
+        .setRequired(false),
+    )
     ),
       dbRequired: true,
-      ownerOnly: true,
+      ownerOnly: false,
     });
   }
 
@@ -62,33 +71,10 @@ class Tomo extends Commands {
     
   }
 
-  async getNewTomoEngine(interaction: AmadeusInteraction, ephemeral: boolean = true) {
-    await interaction.deferReply({ ephemeral: ephemeral });
-    return new TomoEngine(interaction)
-
-  }
-
-  /**
-   *  JUST PROOF OF CONCEPT< REWRITE >
-   * @param bot 
-   * @param interaction 
-   */
-  async gift(bot: CustomClient, interaction: AmadeusInteraction) {
-    let menu = await this.getNewTomoEngine(interaction, true);
-    
-    menu.once("ready", async () => {
-        menu.gift()
-    })
-  }
-
-  async dachi(bot: CustomClient, interaction: AmadeusInteraction) {
-    let menu: TomoEngine
-    
+  async getCardIDofChInUser(menu: TomoEngine, interaction: AmadeusInteraction) {
     const option = interaction.options.getString("tomo_name");
+    let ret = 0;
     
-    menu = await this.getNewTomoEngine(interaction, false);
-    
-    menu.once("ready", async () => {
       if (option) {
         // Define stuff.
         let arrOfChs: Character[], arrOfChsNames: Array<string>, fuzzySearched: Fuzzysort.Results, finalFuzzyString: string, finalFuzzyId: number, nodeIndex: number = 0, fuzzyFind: Character;
@@ -106,27 +92,59 @@ class Tomo extends Commands {
 
         nodeIndex = menu.cards.findIndex(value => value.chInUser.originalID == finalFuzzyId);
         console.log(nodeIndex + "_" + finalFuzzyString)
+        ret = nodeIndex;
+      }   
+      return ret;
+    
+  }
+  async getNewTomoEngine(interaction: AmadeusInteraction, ephemeral: boolean = true) {
 
-        menu.start(nodeIndex);
-        
-      
+    await interaction.deferReply({ ephemeral: ephemeral });
+    const menu = new TomoEngine(interaction)
+    
+    return menu;
 
-      } else menu.start();
+    
+
+  }
+
+  /**
+   *  JUST PROOF OF CONCEPT< REWRITE >
+   * @param bot 
+   * @param interaction 
+   */
+  async gift(bot: CustomClient, interaction: AmadeusInteraction) {
+    let menu = await this.getNewTomoEngine(interaction, true);
+
+    
+    menu.once("ready", async () => {
       
-      
-      
-      
-      
+        menu.gift(interaction, menu.cards[await this.getCardIDofChInUser(menu, interaction)])
     })
+  }
+
+  async dachi(bot: CustomClient, interaction: AmadeusInteraction) {
+    let menu: TomoEngine
+    
+    menu = await this.getNewTomoEngine(interaction, false);
+
+    menu.once("ready", async () => {
+
+      menu.start()
+  })
+
   }
 
   async interact(bot: CustomClient, interaction: AmadeusInteraction) {
     
     let menu = await this.getNewTomoEngine(interaction, false);
-    
+
     menu.once("ready", async () => {
-      menu.interact();
+      
+      menu.interact(interaction, menu.cards[await this.getCardIDofChInUser(menu, interaction)]);
+      
     })
+    
   }
 }
 

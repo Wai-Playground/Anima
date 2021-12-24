@@ -55,7 +55,7 @@ class Queries {
             cache = await redis.hget(db, _id.toString());
             console.log(cache)
             if (cache) {
-                console.log("Cached! _id: "+ _id + " db: " + db);
+
                 payload = JSON.parse(cache) as BaseUniversePayload;
                 if (!payload) throw new UniBaseNotFoundError(_id, db);
                 return payload;
@@ -129,7 +129,7 @@ class Queries {
         try {
             cache = await redis.hget(hashKey, query);
             if (cache) {
-                console.log("Cached Variant! o_id: "+ originalID + " db: " + db);
+
                 payload = JSON.parse(cache) as BaseUniversePayload;
                 return payload;
             }
