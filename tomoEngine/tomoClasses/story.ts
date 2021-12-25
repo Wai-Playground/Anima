@@ -12,6 +12,7 @@ export default class Story extends universeBase {
       _id,
       "stories",
       payload.name,
+      payload.description,
       payload.emoji || "📜",
       payload.spoiler,
       payload.grade,

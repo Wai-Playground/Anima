@@ -45,16 +45,11 @@ export enum Mood_States {
 }
 
 export enum Mood_Emojis {
-  "🖤",
-  "💔",
+  "💟",
+  "😄",
+  "⛈️",
   "💢",
-  "😑",
-  "💛",
-  "🧭",
-  "😊",
-  "❤️",
-  "💖",
-  "🎎"
+  "💞"
 }
 export type Mood_States_Strings = keyof typeof Mood_States
 export type Tomo_Action = "gift" | "interact" 
@@ -77,6 +72,28 @@ export enum Rarity_Grade {
   SS,
   SSS,
   X
+}
+
+export enum Rarity_Emoji {
+  "🇩",
+  "🇨",
+  "🇧",
+  "🇦",
+  "🇸",
+  "🇸🇸",
+  "🇸🇸🇸",
+  "🇽"
+}
+
+export enum Rarity_Color {
+  "#d0f9ff",
+  "#7fb9e7",
+  "#40da90",
+  "#ed5050",
+  "#f4ac4a",
+  "#ff4500",
+  "#c13dff",
+  "#000000"
 }
 export type Rarity_Grade_Strings= keyof typeof Rarity_Grade; 
 
@@ -109,7 +126,7 @@ export interface BaseUniversePayload {
     variantUse?: string;
     originalID?: number;
   };
-  description?: string;
+  description: string;
   emoji?: string;
   spoiler: boolean;
   name: string;
@@ -128,7 +145,7 @@ export interface BackgroundPayload extends BaseUniversePayload {
 export interface CharacterPayload extends BaseUniversePayload {
   age?: number;
   bloodtype?: string;
-  description?: string;
+  title: string;
   personality?: CharacterPersonality;
   link: string;
 }

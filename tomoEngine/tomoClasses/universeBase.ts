@@ -15,25 +15,25 @@ export default abstract class universeBase {
     spoiler?: boolean;
     _grade?: Rarity_Grade_Strings
     emoji?: string
+    description: string
 
     /**
      * Base class for all in-universe classes. 
      * @param _id 
      * @param basicImagetype |
      */
-    constructor(_id: number | string, type: BasicUniverseType, name: string, emoji: string = "📦", spoiler: boolean = false, grade: Rarity_Grade_Strings = null, variant: boolean = null, link: string = null) {
+    constructor(_id: number | string, type: BasicUniverseType, name: string, description: string = "No Description Found.", emoji: string = "📦", spoiler: boolean = false, grade: Rarity_Grade_Strings = null, variant: boolean = null, link: string = null) {
         this._id = _id;
         this.name = name
         this.type = type;
         this.variant = variant;
         this.link = link;
+        this.description = description.trim();
         this.spoiler = spoiler;
         this._grade = grade;
         this.emoji = emoji;
 
     }
-
-    
 
     /**
      * 

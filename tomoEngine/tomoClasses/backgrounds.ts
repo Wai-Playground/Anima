@@ -7,7 +7,7 @@ import universeBase from "./universeBase";
 
 export default class Background extends universeBase {
     constructor(_id: number | string, payload: BackgroundPayload) {
-        super(_id, 'backgrounds', payload.name, payload.emoji || "🗻", payload.spoiler, payload.grade, payload.variant.isVariant, payload.link);
+        super(_id, 'backgrounds', payload.name, payload.description, payload.emoji || "🗻", payload.spoiler, payload.grade, payload.variant.isVariant, payload.link);
         
 
       }

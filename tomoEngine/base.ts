@@ -122,6 +122,15 @@ class engineBase extends EventEmitter {
 
   }
 
+  capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  periodTheString(string: string) {
+    return (string.endsWith('.') ? string : string + '.');
+
+  }
+
   
 
   parseCharacterScript(str: string, character: Character): string {

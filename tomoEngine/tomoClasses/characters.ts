@@ -9,10 +9,12 @@ import universeBase from "./universeBase";
 export default class Character extends universeBase {
 
     personality: CharacterPersonality
+    title?: string
     isNarrator: boolean
     constructor(_id: number | string, payload: CharacterPayload) {
-        super(_id, 'characters', payload.name, payload.emoji || "✨", payload.spoiler, payload.grade, payload.variant.isVariant, payload.link)
+        super(_id, 'characters', payload.name, payload.description, payload.emoji || "✨", payload.spoiler, payload.grade, payload.variant.isVariant, payload.link)
         this.personality = payload.personality;
+        this.title = payload?.title;
         this.isNarrator = payload._id == 1 ? true : false;
     }
     /**

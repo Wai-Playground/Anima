@@ -8,7 +8,7 @@
  export default class Items extends universeBase {
    _itemType: Item_Type
      constructor(_id: number | string, payload: ItemsPayload) {
-         super(_id, 'items', payload.name, payload.emoji, payload.spoiler, payload.grade);
+         super(_id, 'items', payload.name, payload.description, payload.emoji, payload.spoiler, payload.grade);
 
          
        }

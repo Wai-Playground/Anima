@@ -1,6 +1,5 @@
 import {
   ButtonInteraction,
-  CommandInteraction,
   MessageAttachment,
   MessageActionRow,
   SelectMenuInteraction,
@@ -8,8 +7,9 @@ import {
   InteractionCollector,
   MessageSelectMenu,
   MessageSelectOptionData,
-  User,
   Message,
+  MessageEmbed,
+  ColorResolvable,
 } from "discord.js";
 import {
   Canvas,
@@ -24,30 +24,30 @@ import DBUsers from "./tomoClasses/users";
 import {
   CharacterInUser,
   Temp_MoodTypeStrings,
-  Mood_States_Strings,
   Ship_Tree,
   Temp_MoodType,
   Tomo_Action,
   Single,
   Argument,
-  Mood_States,
   Char_Archetype_Strings,
-  User_Flags,
-  Char_Flags,
-  Ship_Branch,
   ItemInUser,
   Gift_Responses,
   AmadeusInteraction,
+  Rarity_Color,
+  Mood_Emojis,
+  Rarity_Grade_Strings,
+  Rarity_Grade,
+  Rarity_Emoji,
+  Mood_States,
+  Mood_States_Strings,
 } from "./statics/types";
 import Tomo_Dictionaries from "./statics/tomo_dict";
 import Novel from "./novel";
 import { TomoError } from "./statics/errors";
-import Queries from "./queries";
 import Story from "./tomoClasses/story";
 import { NodeSingle } from "./novel";
 import Items from "./tomoClasses/items";
 import Background from "./tomoClasses/backgrounds";
-import { APIMessage } from "discord-api-types";
 
 class Cards {
   ch: number;
@@ -103,6 +103,10 @@ class TomoEngine extends engineBase {
     const canvas: Canvas = createCanvas(this.width, this.height); // Create Canvas.
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d"); // Get context.
 
+    let chObj: Character = this.characters.get(card.chInUser.originalID), cur_mood = TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current);
+
+    if (cur_mood != "main") chObj = await chObj.getVariant(cur_mood);
+
     // Prepare the image objects.
 
     const bg: Image = await loadImage(
@@ -111,8 +115,7 @@ class TomoEngine extends engineBase {
     );
 
     const ch: Image = await loadImage(
-      this.characters.get(card.ch).link // Property "characters" is an internal cache of the Characters objects with their IDs as the key. -
-      // card.ch is the ID of the character.
+      chObj.link
     );
 
     // This block draws the image.
@@ -515,12 +518,55 @@ class TomoEngine extends engineBase {
     
   }
 
+  static async rarityColor(grade: number) {
+    if (grade > 8) throw new TomoError("Rarity color grade bigger than total rarity level (8).");
+    console.log(grade)
+    return Rarity_Color[grade];
+  }
+
+  static async convertIntMoodToEmj(mood: number) {
+    return Mood_Emojis[mood];
+  }
+
+  static async convertIntGradeToEmj(rarity: Rarity_Grade) {
+    return Rarity_Emoji[rarity]
+  }
+
+  static async heartGUI(total_hearts: number = 0) {
+    const filled: string = "\\▰", empty: string = "▱", total: number = 10;
+    let ret: string = "";
+
+    for (let i = 0; i < total; i++) {
+      ret += (total_hearts <= 0 ? empty : filled);
+      total_hearts--;
+    }
+
+    return ret;
+    
+  }
+
   // Interaction Block.
 
-  async getStatsOfCard(card: Cards = this.cards[this.index]) {
-    
+  async stats(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
+    const characterObject: Character = this.characters.get(card.ch), content: string = `${characterObject.emoji} ${this.interaction.user.username}\'s Character •`, 
+    user_hearts = Math.floor(card.chInUser.moods.overall / 10), gui = await TomoEngine.heartGUI(user_hearts);
+  
+    // create a rich embed with the character's stats.
+    const embed = new MessageEmbed()
+      .setTitle(characterObject.formattedName)
+      .setDescription(`${await TomoEngine.convertIntGradeToEmj(characterObject.gradeInt)} **${characterObject.title}** • ${this.periodTheString(characterObject.description)}`)
+      .addField("Relationship", 
+      `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** • ${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}\n` +
+      `💕 **Ship** • ` + gui + ` [**${card.chInUser.moods.overall}**/**100** ♡]\n`)
+      .setColor(await TomoEngine.rarityColor(characterObject.gradeInt) as ColorResolvable)
+      .setThumbnail(characterObject.link)
 
-    
+    return interaction.editReply({
+      content: content,
+      attachments: [],
+      embeds: [embed],
+      components: []
+    })
 
 
   }
@@ -539,6 +585,7 @@ class TomoEngine extends engineBase {
 
       switch (button) {
         case 0:
+          this.stats()
           break;
 
         case 1:
