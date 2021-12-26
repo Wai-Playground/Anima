@@ -10,7 +10,8 @@ export default class Tomo_Dictionaries {
             hunger: 100,
             stability: 100,
             available: true,
-            level: 1
+            level: 1,
+            xp: 0
         }
     }
 

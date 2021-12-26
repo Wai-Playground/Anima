@@ -14,7 +14,7 @@ export enum RPG_Classes {
   phys_ed
 }
 
-export type RPG_Classes_Strings = keyof typeof RPG_Classes;
+export type RPG_Classes_Strings = keyof typeof RPG_Classes | "any";
 
 /** Basic types (end) */
 
@@ -130,7 +130,7 @@ export interface BaseUniversePayload {
   emoji?: string;
   spoiler: boolean;
   name: string;
-  class?: RPG_Classes
+  class?: RPG_Classes_Strings
 }
 
 export interface ItemsPayload extends BaseUniversePayload {
@@ -162,6 +162,7 @@ export interface Being {
   stability: number,
   available: boolean,
   level: number,
+  xp: number
 }
 
 export interface CharacterInUser {

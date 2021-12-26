@@ -193,6 +193,13 @@ class TomoEngine extends engineBase {
     return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it.
   }
 
+  static convertNumberToMainType(points: number) {
+    points = Math.floor(points / 10);
+    if (points > Object.keys(Mood_States).length / 2) return Mood_States[Object.keys(Mood_States).length - 1] as Mood_States_Strings;
+    return Mood_States[points] as Mood_States_Strings;
+
+  }
+
   /**
    * Name | getStoryJSON.
    * @param card | Card to get the ch story of.
@@ -532,32 +539,56 @@ class TomoEngine extends engineBase {
     return Rarity_Emoji[rarity]
   }
 
-  static async heartGUI(total_hearts: number = 0) {
-    const filled: string = "\\▰", empty: string = "▱", total: number = 10;
+  static async levelGUI(total_filled: number = 0, total: number = 100) {
+    const filled: string = "▰", empty: string = "▱"
     let ret: string = "";
 
     for (let i = 0; i < total; i++) {
-      ret += (total_hearts <= 0 ? empty : filled);
-      total_hearts--;
+      ret += (total_filled <= 0 ? empty : filled);
+      total_filled--;
     }
 
     return ret;
     
   }
 
-  // Interaction Block.
+  static convertIntHungerToText(hunger: number) {
+    if (hunger >= 50) return true;
+    return false;
+  }
 
+  static async converIntHealthToEmj(healthArr: Array<number> = [0, 100]) {
+    const converted_health_ratio = (healthArr[0] / healthArr[1]) * 100;
+
+    if (converted_health_ratio > 50) return "🟢"
+    else if (converted_health_ratio < 30) return "🔴"
+    else if (converted_health_ratio <= 50) return "🟡"
+  }
+
+  // Interaction Block.
   async stats(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
     const characterObject: Character = this.characters.get(card.ch), content: string = `${characterObject.emoji} ${this.interaction.user.username}\'s Character •`, 
-    user_hearts = Math.floor(card.chInUser.moods.overall / 10), gui = await TomoEngine.heartGUI(user_hearts);
+    user_hearts = Math.floor(card.chInUser.moods.overall / 10)
   
     // create a rich embed with the character's stats.
     const embed = new MessageEmbed()
       .setTitle(characterObject.formattedName)
-      .setDescription(`${await TomoEngine.convertIntGradeToEmj(characterObject.gradeInt)} **${characterObject.title}** • ${this.periodTheString(characterObject.description)}`)
+      .setDescription(`${await TomoEngine.convertIntGradeToEmj(characterObject.gradeInt)} **${characterObject.title}** • 「\`\`${this.periodTheString(characterObject.description)}\`\`」\n` +
+      `\n📚 **Subject Specialty** •` + "「\`\`" + this.capitalizeFirstLetter(characterObject.class) + "\`\`」")
       .addField("Relationship", 
-      `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** • ${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}\n` +
-      `💕 **Ship** • ` + gui + ` [**${card.chInUser.moods.overall}**/**100** ♡]\n`)
+      `💕 **${this.capitalizeFirstLetter(TomoEngine.convertNumberToMainType(card.chInUser.moods.overall))}** • \n\`\`` + await TomoEngine.levelGUI(user_hearts, 10) + `\`\`「**${card.chInUser.moods.overall}**/**100** ♡」\n`,
+      true)
+      //.addField("Combat Stats", 
+      //`${await TomoEngine.converIntHealthToEmj(card.chInUser.being.health)} **HP** • ` + await TomoEngine.levelGUI((Math.floor(card.chInUser.being.health[0] / card.chInUser.being.health[1]) * 100), 10) +`\n[**${card.chInUser.being.health[0]}**/**${card.chInUser.being.health[1]}** hp]`,
+      //true)
+      .addField("Advancements", 
+      `🇪 **XP** • \n\`\`` + await TomoEngine.levelGUI(Math.floor((card.chInUser.being.xp <= 0 ? 0 : card.chInUser.being.xp / 10)), 10) + `\`\`\n「**${card.chInUser.being.xp}**/**100** xp」⦋__**Level** ${card.chInUser.being.level}__⦌`,
+      true)
+      .addField("Mood", 
+      `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** •「\`\`${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}\`\`」\n` +
+      `🍖 **Hungry?** •「\`\`${this.capitalizeFirstLetter(TomoEngine.convertIntHungerToText(card.chInUser.being.hunger).toString())}\`\`」` +
+      ``
+      )
       .setColor(await TomoEngine.rarityColor(characterObject.gradeInt) as ColorResolvable)
       .setThumbnail(characterObject.link)
 
@@ -567,8 +598,6 @@ class TomoEngine extends engineBase {
       embeds: [embed],
       components: []
     })
-
-
   }
 
   private async collectButton(filter: Function) {

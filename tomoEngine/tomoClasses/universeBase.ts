@@ -2,7 +2,7 @@
  * @author Shokkunn
  */
 
-import { BackgroundPayload, BackgroundType, BasicUniverseType, CharacterPayload, ItemsPayload, Rarity_Grade, Rarity_Grade_Strings, StoryPayload, Temp_MoodTypeStrings } from "../statics/types";
+import { BackgroundPayload, BackgroundType, BasicUniverseType, CharacterPayload, ItemsPayload, Rarity_Grade, Rarity_Grade_Strings, RPG_Classes_Strings, StoryPayload, Temp_MoodTypeStrings } from "../statics/types";
 import Queries from "../queries";
 import { OriginalReqVarError } from "../statics/errors";
 
@@ -13,6 +13,7 @@ export default abstract class universeBase {
     variant?: boolean;
     link?: string;
     spoiler?: boolean;
+    _class: string;
     _grade?: Rarity_Grade_Strings
     emoji?: string
     description: string
@@ -22,11 +23,12 @@ export default abstract class universeBase {
      * @param _id 
      * @param basicImagetype |
      */
-    constructor(_id: number | string, type: BasicUniverseType, name: string, description: string = "No Description Found.", emoji: string = "📦", spoiler: boolean = false, grade: Rarity_Grade_Strings = null, variant: boolean = null, link: string = null) {
+    constructor(_id: number | string, type: BasicUniverseType, name: string, description: string = "No Description Found.", _class: RPG_Classes_Strings = "any", emoji: string = "📦", spoiler: boolean = false, grade: Rarity_Grade_Strings = null, variant: boolean = null, link: string = null) {
         this._id = _id;
         this.name = name
         this.type = type;
         this.variant = variant;
+        this._class = _class.toLowerCase().trim();
         this.link = link;
         this.description = description.trim();
         this.spoiler = spoiler;

@@ -12,7 +12,7 @@ export default class Character extends universeBase {
     title?: string
     isNarrator: boolean
     constructor(_id: number | string, payload: CharacterPayload) {
-        super(_id, 'characters', payload.name, payload.description, payload.emoji || "✨", payload.spoiler, payload.grade, payload.variant.isVariant, payload.link)
+        super(_id, 'characters', payload.name, payload.description, payload.class, payload.emoji || "✨", payload.spoiler, payload.grade, payload.variant.isVariant, payload.link)
         this.personality = payload.personality;
         this.title = payload?.title;
         this.isNarrator = payload._id == 1 ? true : false;
@@ -65,6 +65,10 @@ export default class Character extends universeBase {
 
     get likes() {
         return this.personality.likes;
+    }
+
+    get class() {
+        return this._class;
     }
 
     get dislikes() {
