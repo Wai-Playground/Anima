@@ -35,7 +35,6 @@ import {
   AmadeusInteraction,
   Rarity_Color,
   Mood_Emojis,
-  Rarity_Grade_Strings,
   Rarity_Grade,
   Rarity_Emoji,
   Mood_States,
@@ -403,6 +402,7 @@ class TomoEngine extends engineBase {
 
   calculateEndRewards() {
 
+
   }
 
   private refreshCoolDown() {
@@ -573,24 +573,27 @@ class TomoEngine extends engineBase {
     // create a rich embed with the character's stats.
     const embed = new MessageEmbed()
       .setTitle(characterObject.formattedName)
-      .setDescription(`${await TomoEngine.convertIntGradeToEmj(characterObject.gradeInt)} **${characterObject.title}** • 「\`\`${this.periodTheString(characterObject.description)}\`\`」\n` +
-      `\n📚 **Subject Specialty** •` + "「\`\`" + this.capitalizeFirstLetter(characterObject.class) + "\`\`」")
+      .setDescription(`${await TomoEngine.convertIntGradeToEmj(characterObject.gradeInt)} **${characterObject.title}** • ${this.periodTheString(characterObject.description)}\n` +
+      `\n📚 **Subject Specialty** •` + "「" + this.capitalizeFirstLetter(characterObject.class) + "」\nㅤ")// invis char at last string
       .addField("Relationship", 
-      `💕 **${this.capitalizeFirstLetter(TomoEngine.convertNumberToMainType(card.chInUser.moods.overall))}** • \n\`\`` + await TomoEngine.levelGUI(user_hearts, 10) + `\`\`「**${card.chInUser.moods.overall}**/**100** ♡」\n`,
+      `💕 **${this.capitalizeFirstLetter(TomoEngine.convertNumberToMainType(card.chInUser.moods.overall))}** • \n` + await TomoEngine.levelGUI(user_hearts, 10) + `「**${card.chInUser.moods.overall}**/**100** ♡」\n`,
       true)
       //.addField("Combat Stats", 
       //`${await TomoEngine.converIntHealthToEmj(card.chInUser.being.health)} **HP** • ` + await TomoEngine.levelGUI((Math.floor(card.chInUser.being.health[0] / card.chInUser.being.health[1]) * 100), 10) +`\n[**${card.chInUser.being.health[0]}**/**${card.chInUser.being.health[1]}** hp]`,
       //true)
       .addField("Advancements", 
-      `🇪 **XP** • \n\`\`` + await TomoEngine.levelGUI(Math.floor((card.chInUser.being.xp <= 0 ? 0 : card.chInUser.being.xp / 10)), 10) + `\`\`\n「**${card.chInUser.being.xp}**/**100** xp」⦋__**Level** ${card.chInUser.being.level}__⦌`,
+      `🆙 **XP** • \n` + await TomoEngine.levelGUI(Math.floor((card.chInUser.being.xp <= 0 ? 0 : card.chInUser.being.xp / 10)), 10) + `\n「**${card.chInUser.being.xp}**/**100** xp」\n「Level • **__${card.chInUser.being.level}__**」`,
       true)
       .addField("Mood", 
-      `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** •「\`\`${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}\`\`」\n` +
-      `🍖 **Hungry?** •「\`\`${this.capitalizeFirstLetter(TomoEngine.convertIntHungerToText(card.chInUser.being.hunger).toString())}\`\`」` +
+      `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** •「${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}」\n` +
+      `🍖 **Hungry?** •「${this.capitalizeFirstLetter(TomoEngine.convertIntHungerToText(card.chInUser.being.hunger).toString())}」` +
       ``
       )
       .setColor(await TomoEngine.rarityColor(characterObject.gradeInt) as ColorResolvable)
       .setThumbnail(characterObject.link)
+      .setTimestamp()
+      .setFooter(`${this.interaction.user.username}\'s ${characterObject.formattedName}`, this.interaction.user.avatarURL())
+
 
     return interaction.editReply({
       content: content,
