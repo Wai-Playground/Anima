@@ -59,6 +59,10 @@ export default abstract class universeBase {
         return Rarity_Grade[this._grade];
     }
 
+    get class() {
+        return this._class;
+    }
+
     /**
      * @returns if the base is spoiler or not.
      */

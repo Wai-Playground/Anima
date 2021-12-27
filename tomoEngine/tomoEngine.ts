@@ -40,7 +40,7 @@ import {
   Mood_States,
   Mood_States_Strings,
 } from "./statics/types";
-import Tomo_Dictionaries from "./statics/tomo_dict";
+import Tomo_Dictionaries, { Equations } from "./statics/tomo_dict";
 import Novel from "./novel";
 import { TomoError } from "./statics/errors";
 import Story from "./tomoClasses/story";
@@ -400,7 +400,10 @@ class TomoEngine extends engineBase {
     return new NodeSingle(response); // Return a new NodeSingle of response.
   }
 
-  calculateEndRewards() {
+  private calculateEndRewards(card = this.cards[this.index]) {
+    const userLvl = this.DBUser.level, chLvl = card.chInUser.being.level, chXP = card.chInUser.being.xp, userXP = this.DBUser.xp;
+    
+
 
 
   }
@@ -415,7 +418,7 @@ class TomoEngine extends engineBase {
     if (this.selectCollector) this.selectCollector.stop()
   }
 
-  appendEndScreen() {}
+  private appendEndScreen() {}
 
   /**
    * Name | gift
@@ -568,7 +571,11 @@ class TomoEngine extends engineBase {
   // Interaction Block.
   async stats(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
     const characterObject: Character = this.characters.get(card.ch), content: string = `${characterObject.emoji} ${this.interaction.user.username}\'s Character •`, 
-    user_hearts = Math.floor(card.chInUser.moods.overall / 10)
+    user_hearts = Math.floor(card.chInUser.moods.overall / 10),
+    ch_xp_needed = Equations.calculate_ch_xp(card.chInUser.being.level),
+    ch_xp_needed_until = (ch_xp_needed - card.chInUser.being.xp)
+    console.log(ch_xp_needed)
+
   
     // create a rich embed with the character's stats.
     const embed = new MessageEmbed()
@@ -576,18 +583,17 @@ class TomoEngine extends engineBase {
       .setDescription(`${await TomoEngine.convertIntGradeToEmj(characterObject.gradeInt)} **${characterObject.title}** • ${this.periodTheString(characterObject.description)}\n` +
       `\n📚 **Subject Specialty** •` + "「" + this.capitalizeFirstLetter(characterObject.class) + "」\nㅤ")// invis char at last string
       .addField("Relationship", 
-      `💕 **${this.capitalizeFirstLetter(TomoEngine.convertNumberToMainType(card.chInUser.moods.overall))}** • \n` + await TomoEngine.levelGUI(user_hearts, 10) + `「**${card.chInUser.moods.overall}**/**100** ♡」\n`,
+      `💕 「**${this.capitalizeFirstLetter(TomoEngine.convertNumberToMainType(card.chInUser.moods.overall))}**」 • \n` + await TomoEngine.levelGUI(user_hearts, 10) + `「**${Math.floor(card.chInUser.moods.overall / 10)}** ♡」\n`,
       true)
       //.addField("Combat Stats", 
       //`${await TomoEngine.converIntHealthToEmj(card.chInUser.being.health)} **HP** • ` + await TomoEngine.levelGUI((Math.floor(card.chInUser.being.health[0] / card.chInUser.being.health[1]) * 100), 10) +`\n[**${card.chInUser.being.health[0]}**/**${card.chInUser.being.health[1]}** hp]`,
       //true)
       .addField("Advancements", 
-      `🆙 **XP** • \n` + await TomoEngine.levelGUI(Math.floor((card.chInUser.being.xp <= 0 ? 0 : card.chInUser.being.xp / 10)), 10) + `\n「**${card.chInUser.being.xp}**/**100** xp」\n「Level • **__${card.chInUser.being.level}__**」`,
+      `🆙 **XP** •「${card.chInUser.being.xp}」\n` + await TomoEngine.levelGUI(Math.floor((card.chInUser.being.xp <= 0 ? 0 : (card.chInUser.being.xp / ch_xp_needed)* 10)), 10) + `\n**${ch_xp_needed_until}** XP needed to level up.\n「Current Level • **__${card.chInUser.being.level}__**」`,
       true)
       .addField("Mood", 
       `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** •「${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}」\n` +
-      `🍖 **Hungry?** •「${this.capitalizeFirstLetter(TomoEngine.convertIntHungerToText(card.chInUser.being.hunger).toString())}」` +
-      ``
+      `\n🍖 **Hungry?** •「${this.capitalizeFirstLetter(TomoEngine.convertIntHungerToText(card.chInUser.being.hunger).toString())}」`
       )
       .setColor(await TomoEngine.rarityColor(characterObject.gradeInt) as ColorResolvable)
       .setThumbnail(characterObject.link)
@@ -665,7 +671,7 @@ class TomoEngine extends engineBase {
     if (/*!this.selectCollector.ended ||*/ !this.buttonCollector.ended) {
       /*(await this.selectCollector.stop()*/
       this.buttonCollector.stop();
-    }
+    } 
   }
 
   async fillSelectWithUserTomos() {
@@ -695,13 +701,13 @@ class TomoEngine extends engineBase {
         style: 3,
       },
       {
-        disabled: true,
+        disabled: false,
         label: "Interact",
         emj: "💬",
         style: 1,
       },
       {
-        disabled: true,
+        disabled: false,
         label: "Gift",
         emj: "🎁",
         style: 1,

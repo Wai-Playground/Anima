@@ -35,7 +35,7 @@ export enum Mood_States {
   detest,
   hate,
   annoyed,
-  main,
+  classmates,
   friendly,
   passionate,
   close,

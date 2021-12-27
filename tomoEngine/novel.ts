@@ -81,6 +81,8 @@ export default class Novel extends engineBase {
   json: any;
   backgrounds: Map<number | string, Background>;
   characters: Map<number | string, Character>;
+  loaded_ch: Map<number | string, Image>;
+  loaded_bg: Map<number | string, Image>;
   multiples: Array<Single>;
   nodes: Array<NodeSingle>;
   index: number;
@@ -114,6 +116,8 @@ export default class Novel extends engineBase {
     this.interaction = interaction;
     this.backgrounds = new Map();
     this.characters = new Map();
+    this.loaded_ch = new Map();
+    this.loaded_bg = new Map();
     this.index = 0;
     this.ephemeral = ephemeral;
     this.nodes = [];
@@ -121,21 +125,42 @@ export default class Novel extends engineBase {
   }
 
 
+
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
+    console.log("RENDERING_NODE_" + index)
     console.time("build_"+index)
     const canvas: Canvas = createCanvas(this.width, this.height);
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
-    const customID: string = `novel_userID_${this.interaction.user.id}_node_${index}_${this.name}.jpeg`
+    ctx.quality = "fast";
+    ctx.patternQuality = "fast";
+    const customID: string = `novel_userID_${this.interaction.user.id}_node_${index}_${this.name}.jpeg`,
+    find_similar_node: NodeSingle = this.nodes.find(node => node.character == this.nodes[index].character && node.background == this.nodes[index].background && node.built == true)
+    let bg: Image, ch: Image;
+    //console.log(find_similar_node.text)
 
-    const bg: Image = await loadImage(
-      this.backgrounds.get(this.nodes[index].background).link
-    );
-    const ch: Image = await loadImage(
-      this.characters.get(this.nodes[index].character).link
-    );
+    // Check if there is already a built image like this in our class.
+    if (find_similar_node) {
+      this.nodes[index].built = true;
+      this.nodes[index].built_img = find_similar_node.built_img;
+      console.log("FOUND SAME CH AND BG")
+      console.timeEnd("build_"+index)
+      
+      
+      return this.nodes[index].built_img;
+    }
+    if (this.loaded_bg.has(this.nodes[index].background)) {
+      bg = this.loaded_bg.get(this.nodes[index].background)
+
+    }
+
+    if (this.loaded_ch.has(this.nodes[index].character)) {
+      ch = this.loaded_ch.get(this.nodes[index].character)
+      
+    }
 
     ctx.drawImage(bg, 0, 0, this.width, this.height);
-    ctx.drawImage(ch, 0, 0, ch.naturalWidth, ch.naturalHeight);
+    //ctx.clearRect(0, 0, this.width, this.height)
+    ctx.drawImage(ch, 0, 0);
 
     /** Draw pfp */
     /*
@@ -154,7 +179,7 @@ export default class Novel extends engineBase {
 
     this.nodes[index].built = true;
     this.nodes[index].built_img = new MessageAttachment(
-      canvas.toBuffer("image/jpeg"),
+      canvas.toBuffer("image/jpeg", {quality: 0.5}),
       customID
     );
     console.timeEnd("build_"+index)
@@ -211,19 +236,21 @@ export default class Novel extends engineBase {
 
   }
 
-  deployChar(char: Character, id: number | string = undefined) {
+  async deployChar(char: Character, id: number | string = char.getId) {
     //if (this.characters.has(char.getId)) throw new TomoError("Found duplicate char in memory bank.")
-    if (id == undefined) return this.characters.set(char.getId, char);
-    return this.characters.set(id, char)
+    console.log("DEPLOYING CHAR")
+    this.characters.set(id, char)
+    this.loaded_ch.set(id, await loadImage(char.link))
+    return;
 
   }
+
 
   /**
    * Name | prepareAssets();
    * Purpose | prepares the assets.
    * Description | gets called from the constructor.
    */
-
   async prepareAssets() {
     // Purpose | process the multiples.
     this.multiples = this.json.hasOwnProperty("multiples")
@@ -244,8 +271,8 @@ export default class Novel extends engineBase {
       if (!this.backgrounds.has(single.bg)) {
         // If the background map has this specific background ID already we skip. If not...
         payload = await this.getBackground(single.bg); // we store the payload of the db request
-
-        this.backgrounds.set(single.bg, payload); // we set it in this map
+        this.loaded_bg.set(single.bg, await loadImage(payload.link))
+        this.backgrounds.set(single.bg, payload);
       }
 
       if (!this.characters.has(single.character) || single.mood != undefined) {
@@ -254,13 +281,12 @@ export default class Novel extends engineBase {
         if (!this.characters.has(single.character))
           console.log(
             "[ch] Char not logged, getting the payload. Payload ID:" +
-              single.character
+            single.character
           );
 
         // If the character mpa has the char id already we skip.
         payload = await this.getCharacter(single.character);
         
-
         if (single.mood) {
           if (payload.narrator) throw new TomoError("Narrator found within a character only clause. (mood)")
           payload = await payload.getVariant(single.mood); // If the character is a variant, we can substitute the main payload with this.
@@ -269,10 +295,10 @@ export default class Novel extends engineBase {
         }
         if (payload.link == null) { // If the link is null:
           if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link; //get from past character if we are index > 0;
-          if (i <= 0) payload.link = "https://images.hasgeek.com/embed/file/65c4929262a84c78b29ad37321df2eca?size=700"// just transparnt png if we we are at index 0;
+          if (i <= 0) payload.link = "https://i.imgur.com/lqyxFhX.png"// just transparnt png if we we are at index 0;
         } 
 
-        this.deployChar(payload, single.character)
+        await this.deployChar(payload, single.character)
 
 
       }
@@ -283,14 +309,13 @@ export default class Novel extends engineBase {
       i++;
     }
     // Build the node length if the legnth is less than or equal to 10.
-
     if (this.nodes.length <= 10) {
       for (const node of this.nodes) {
         // for every node in here
-        this.buildNode(node.index); // call the build function
+        if (node.index != 0) this.buildNode(node.index); // call the build function
       }
     }
-    
+
     process.nextTick(() => {
       this.emit("ready");
       
@@ -311,9 +336,9 @@ export default class Novel extends engineBase {
       }**: ${this.nodes[this.index].text}`,
       attachments: [],
       files: [
-        this.nodes[this.index].built
-          ? this.nodes[this.index].built_img
-          : await this.buildNode(this.index),
+        this.nodes[0].built
+          ? this.nodes[0].built_img
+          : await this.buildNode(0),
       ],
       //attachments: [build],
       components: await this.action(),

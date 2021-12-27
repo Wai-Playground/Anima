@@ -3,6 +3,7 @@
  */
 
 import Queries from "../queries";
+import { Equations } from "../statics/tomo_dict";
 import { CharacterInUser, ItemInUser, UserUniversePayload } from "../statics/types";
 import universeBase from "./universeBase";
  
@@ -70,6 +71,17 @@ export default class DBUsers extends universeBase {
       return tomo.inventory.find(item => item.itemID == itemID);
       
     }
+    /**
+     * @see REMEMBER TO TOMOUPDATE
+     * @param tomoID 
+     * @returns 
+     */
+    tomoToLevelUp(tomoID: number) {
+      let tomo = this.getTomoFromDachis(tomoID), xp_needed = Equations.calculate_ch_xp(tomo.being.level)//, go_into = (xp_needed / tomo.being.xp);
+      if (!tomo) return;
+      
+      if (xp_needed <= tomo.being.xp) tomo.being.level += 1;
+    }
 
 
 
@@ -105,6 +117,12 @@ export default class DBUsers extends universeBase {
       
       tomo.inventory[index].amount = res;
       return tomo.inventory;
+    }
+
+    userToLevelUp() {
+      let xp_needed = Equations.calculate_user_xp(this.level)//, go_into = (xp_needed / tomo.being.xp);
+      
+      if (xp_needed <= this.level) this._level += 1;
     }
 
 
@@ -175,7 +193,7 @@ export default class DBUsers extends universeBase {
     }
 
     async validateTomoInventory() {
-     
+     /**TODO */
     }
     async update() {
       /**TODO: Theres a more elegant solution to this. */
