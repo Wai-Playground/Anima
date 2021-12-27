@@ -4,7 +4,7 @@
 
 import Queries from "../queries";
 import { Equations } from "../statics/tomo_dict";
-import { CharacterInUser, ItemInUser, UserUniversePayload } from "../statics/types";
+import { CharacterInUser, ItemInUser, Tomo_Action, UserUniversePayload } from "../statics/types";
 import universeBase from "./universeBase";
  
 export default class DBUsers extends universeBase {
@@ -76,14 +76,47 @@ export default class DBUsers extends universeBase {
      * @param tomoID 
      * @returns 
      */
-    tomoToLevelUp(tomoID: number) {
-      let tomo = this.getTomoFromDachis(tomoID), xp_needed = Equations.calculate_ch_xp(tomo.being.level)//, go_into = (xp_needed / tomo.being.xp);
-      if (!tomo) return;
+    tomoToLevelUp(tomo: number | CharacterInUser) {
+      /**@TODO Better way to do this. Like actually. */
+      let xp_needed: number;
+
+      if (typeof tomo == "number") tomo = this.getTomoFromDachis(tomo)
+      
+      xp_needed = Equations.calculate_ch_xp(tomo.being.level + 1)
       
       if (xp_needed <= tomo.being.xp) tomo.being.level += 1;
+      if ((xp_needed - tomo.being.xp) < 0) this.tomoToLevelUp(tomo);
+    }
+    
+    addToXP(amount: number) {
+      this._xp += amount;
+      console.log("USR IS GETTING XP: " + this._xp);
+      this.userToLevelUp();
     }
 
+    addToTomoXP(tomoID: number, amount: number) {
+      let tomo = this.getTomoFromDachis(tomoID)
+      if (!tomo) return;
+      console.log("TOMO IS GETTING XP: " + amount)
 
+      tomo.being.xp += amount;
+      this.tomoToLevelUp(tomo);
+    }
+
+    addToTomoLP(tomoID: number, amount: number) {
+      let tomo = this.getTomoFromDachis(tomoID)
+      if (!tomo) return;
+      console.log("TOMO IS GETTING LP: " + amount)
+
+      tomo.moods.overall += amount;
+    }
+
+    setUserLastInteraction(tomoID: number, action: Tomo_Action) {
+      let tomo = this.getTomoFromDachis(tomoID)
+      tomo._last_interaction.interaction = action;
+      tomo._last_interaction.interaction_date = new Date()
+      
+    }
 
     addToTomoInventory(tomoOrigID: number, itemID: number, amount: number) {
       let tomo = this.getTomoFromDachis(tomoOrigID), itemInInv: ItemInUser, index: number;
@@ -120,9 +153,10 @@ export default class DBUsers extends universeBase {
     }
 
     userToLevelUp() {
+      /**@TODO Better way to do this. Like actually. */
       let xp_needed = Equations.calculate_user_xp(this.level)//, go_into = (xp_needed / tomo.being.xp);
-      
       if (xp_needed <= this.level) this._level += 1;
+      console.log("USR IS LEVELING UP: " + this._level);
     }
 
 

@@ -183,9 +183,9 @@ class Queries {
     }
 
     public static async updateUserUniverse(_id: string | number, payload: UserUniversePayload) {
-        console.log(payload)
+        console.log(payload.characters[0])
         try {            
-            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: {payload} }); 
+            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: payload }); 
     
         } catch(e) {
             console.log(e);

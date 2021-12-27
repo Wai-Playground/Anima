@@ -193,19 +193,13 @@ export default class Novel extends engineBase {
     console.log(this.index + " INDX")
     console.log(this.index + 1)
     switch (str) {
-      case "$end":
-        this.end();
-        break;
-      case "$flag_b":
-        this.setPage(this.index + 1);
+      case "$flag_b" || "$flag_g":
+        this.end()
         break;
       case "$beginEnd":
         this.setPage(this.nodes.findIndex(node => node.script == "$beginEnd") || this.nodes.length - 1);
         break;
       case "$next":
-        this.setPage(this.index + 1);
-        break;
-      case "$flag_g":
         this.setPage(this.index + 1);
         break;
     }
@@ -302,7 +296,10 @@ export default class Novel extends engineBase {
 
 
       }
-      if (single.text.includes("$")) single.text = this.parseCharacterScript(single.text, payload as Character); // If this single has a $ in it we run it through this funcion and replace it with this.
+      if (single.text.includes("$")) {
+        console.log(single.text + "_TEXT_TO_PARSE")
+        single.text = this.parseCharacterScript(single.text, payload as Character)
+      }; // If this single has a $ in it we run it through this funcion and replace it with this.
 
       this.nodes.push(new NodeSingle(single, i)); // Push it into our arra of nodes.
 
@@ -380,6 +377,7 @@ export default class Novel extends engineBase {
       components: await this.action(),
     };
     await this.interaction.editReply(payload);
+    if (index == this.nodes.length - 1) return this.end();
     this.refreshCoolDown();
     
 
@@ -433,7 +431,7 @@ export default class Novel extends engineBase {
     });
 
     this.buttonCollector.on("end", () => {
-      this.emit("end");
+      this.emit("end", "timed_out");
     });
   }
 
@@ -537,12 +535,12 @@ export default class Novel extends engineBase {
 
     this.selectCollector.on("end", () => {
       console.log("select ended!");
-      this.emit("end");
+      this.emit("end", "timed_out");
     });
   }
 
-  public async end() {
-    this.emit("end");
+  public async end(reason: string = "none") {
+    this.emit("end", reason);
     if (/*!this.selectCollector.ended ||*/ !this.buttonCollector.ended) {
       /*(await this.selectCollector.stop()*/
       this.buttonCollector.stop();

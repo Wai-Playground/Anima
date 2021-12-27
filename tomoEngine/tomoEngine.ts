@@ -39,6 +39,7 @@ import {
   Rarity_Emoji,
   Mood_States,
   Mood_States_Strings,
+  Scripts,
 } from "./statics/types";
 import Tomo_Dictionaries, { Equations } from "./statics/tomo_dict";
 import Novel from "./novel";
@@ -65,6 +66,8 @@ class Cards {
  * @description | final complete package for the engine.
  */
 class TomoEngine extends engineBase {
+  item: Items | "broke" = "broke";
+  response: keyof Gift_Responses;
   width: number = 564;
   height: number = 670;
   cards: Array<Cards>;
@@ -104,7 +107,7 @@ class TomoEngine extends engineBase {
 
     let chObj: Character = this.characters.get(card.chInUser.originalID), cur_mood = TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current);
 
-    if (cur_mood != "main") chObj = await chObj.getVariant(cur_mood);
+    if (cur_mood != "normal") chObj = await chObj.getVariant(cur_mood);
 
     // Prepare the image objects.
 
@@ -222,7 +225,6 @@ class TomoEngine extends engineBase {
 
     try {
       idOfStory = this.characters.get(card.ch).getRandInterStoryId(action); // Get a random story from the character's object.
-      console.log(idOfStory);
       if (idOfStory == -1)
         throw new TomoError(
           "No story found for this action." +
@@ -233,7 +235,7 @@ class TomoEngine extends engineBase {
     }
 
     story = await this.getStoryUniverse(idOfStory); // Get the json of the story.
-    if (curMood != "main" && action != "gift") {
+    if (curMood != "normal" && action != "gift") {
       // If the current mood is main and the action is not gift then-
       try {
         let payload: Story = await story.getVariant(curMood); // Then get the variant of the story if needed.
@@ -242,7 +244,6 @@ class TomoEngine extends engineBase {
         console.log(e);
       }
     }
-    console.log(story);
     return story;
   }
 
@@ -340,7 +341,7 @@ class TomoEngine extends engineBase {
     card: Cards = this.cards[this.index]
   ): Promise<NodeSingle> {
     // Define variables & defaults. + default response (broke).
-    let res: keyof Gift_Responses,
+    let res: keyof Gift_Responses = "none",
       mood: Temp_MoodTypeStrings = "sad",
       variantMood: Character,
       ch = this.characters.get(card.ch),
@@ -355,6 +356,8 @@ class TomoEngine extends engineBase {
       variantMood = await this.characters.get(card.ch).getVariant(mood); // We get the mood of the character.
       this.novel.deployChar(variantMood); // We inject the character into the this.novel object.
       response.character = variantMood.getId; // The response of character's ID is now the variantMood. Since the mood is
+      response.script = res;
+      this.response = res; // For when we use it in the calc gift rewards section later.
 
       return new NodeSingle(response);
     }
@@ -394,18 +397,12 @@ class TomoEngine extends engineBase {
     this.novel.deployChar(variantMood); // We inject the Character into the novel.
 
     response.text = ch.getRandomGiftResponse(res); // Random response.
+    response.script = res;
+    this.response = res;
     response.mood = mood; // Mood becomes the moode.
     response.character = variantMood.getId; // The character of the response becomes the mood.
 
     return new NodeSingle(response); // Return a new NodeSingle of response.
-  }
-
-  private calculateEndRewards(card = this.cards[this.index]) {
-    const userLvl = this.DBUser.level, chLvl = card.chInUser.being.level, chXP = card.chInUser.being.xp, userXP = this.DBUser.xp;
-    
-
-
-
   }
 
   private refreshCoolDown() {
@@ -418,7 +415,16 @@ class TomoEngine extends engineBase {
     if (this.selectCollector) this.selectCollector.stop()
   }
 
-  private appendEndScreen() {}
+  private async appendEndScreen() {
+    await this.interaction.editReply({
+      content: "Yay you get rewards",
+      components: [],
+      attachments: [],
+
+    });
+  }
+
+  private async 
 
   /**
    * Name | gift
@@ -442,11 +448,16 @@ class TomoEngine extends engineBase {
       story.multiples[find].args = await this.fillSelectWithInv(); // Then we fill the selection with the user's inventory.
 
     this.novel = new Novel(story, interaction, true); // Initiate a new Novel (see story variable.).
-    console.log(story);
 
     this.novel.once("ready", () => {
       this.novel.start(); // Start the novel when ready.
     });
+
+    this.novel.once("end", (reason) => {
+      if (reason == "timed_out") return;
+      this.calculateRewards("gift")
+      this.appendEndScreen();
+    })
 
     // This block is the main part of the gifting sequence, this:
     // 1. Sacrifices a node to become the response.
@@ -458,21 +469,20 @@ class TomoEngine extends engineBase {
       async () => {
         // Const var "item" contains the Items object of the selection. Since the item selection was built here and added into the novel object, we can map the-
         // -novel selection number to the itemDBWheel here.
-        const item = this.itemDbWheel[this.novel.selection];
-        console.log(item);
+        this.item = this.itemDbWheel[this.novel.selection];
         this.novel.deployNode(
-          await this.react(item, card),
+          await this.react(this.item, card),
           responseIndex,
           true
         ); // Inject the node that has the reaction in it to the response index. True is for destructive.
 
-        if (item != "broke") {
+        if (this.item != "broke") {
           // If the item is not "broke" as in nothing is being given.
           // Inventory management.
-          this.DBUser.removeFromInventory(item.getId as number, 1);
+          this.DBUser.removeFromInventory(this.item.getId as number, 1);
           this.DBUser.addToTomoInventory(
             card.ch as number,
-            item.getId as number,
+            this.item.getId as number,
             1
           ); // Add to chInUser inventory.
 
@@ -505,6 +515,13 @@ class TomoEngine extends engineBase {
     this.novel.once("ready", () => {
       this.novel.start(); // When ready, start the novel.
     });
+
+    this.novel.once("end", (reason) => {
+      if (reason == "timed_out") return;
+      this.calculateRewards("interact")
+      this.appendEndScreen();
+
+    })
   }
 
   async start(index: number = 0) {
@@ -572,9 +589,9 @@ class TomoEngine extends engineBase {
   async stats(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
     const characterObject: Character = this.characters.get(card.ch), content: string = `${characterObject.emoji} ${this.interaction.user.username}\'s Character •`, 
     user_hearts = Math.floor(card.chInUser.moods.overall / 10),
-    ch_xp_needed = Equations.calculate_ch_xp(card.chInUser.being.level),
+    ch_xp_needed = Equations.calculate_ch_xp(card.chInUser.being.level + 1),
     ch_xp_needed_until = (ch_xp_needed - card.chInUser.being.xp)
-    console.log(ch_xp_needed)
+    console.log(card.chInUser.being.level + "CH_LVL")
 
   
     // create a rich embed with the character's stats.
@@ -666,8 +683,10 @@ class TomoEngine extends engineBase {
     });
   }
 
-  public async end() {
-    this.emit("end");
+
+
+  public async end(reason: string = "timed_out") {
+    this.emit("end", reason);
     if (/*!this.selectCollector.ended ||*/ !this.buttonCollector.ended) {
       /*(await this.selectCollector.stop()*/
       this.buttonCollector.stop();
@@ -697,12 +716,13 @@ class TomoEngine extends engineBase {
     const buttons = [
       {
         disabled: false,
-        label: "Stats",
+        label: "Info",
+        emj: "📚",
         style: 3,
       },
       {
         disabled: false,
-        label: "Interact",
+        label: "Talk",
         emj: "💬",
         style: 1,
       },
@@ -754,6 +774,78 @@ class TomoEngine extends engineBase {
     return ret;
   }
 
+  async calculateRewards(action: Tomo_Action, card: Cards = this.cards[this.index]) {
+    /**@TODO Finish this. USE THIS IN CONJECTURE WITH THE TOMO TYPE (TSUN ETC..)*/
+    let user_reward_xp: number = 0, ch_reward_xp: number = 0, ch_reward_lp: number = 0//, characterObj = this.characters.get(card.chInUser.originalID);
+
+    async function gift_rewards(item: Items | "broke", response: keyof Gift_Responses) {
+      if (response == "none") return;
+      switch(response) {
+        case "likes":
+          ch_reward_lp = 3;
+          ch_reward_xp = 400;
+          user_reward_xp = 500;
+          break;
+        case "above":
+          ch_reward_lp = 1;
+          ch_reward_xp = 200;
+          user_reward_xp = 300;
+          break;
+        case "average":
+          ch_reward_xp = 100;
+          user_reward_xp = 200;
+          
+          break;
+        case "below": 
+          ch_reward_lp = -1;
+          ch_reward_xp = 50;
+          user_reward_xp = 50;
+          break;
+        case "dislikes":
+          ch_reward_lp = -5;
+          ch_reward_xp = 15;
+          user_reward_xp = 2;
+          break;
+      }
+    }
+
+    async function interact_rewards(end_type: Scripts) {
+      console.log(end_type + " END TYPE")
+      if (end_type == "$flag_b") {
+        user_reward_xp = 20;
+        ch_reward_lp = -1;
+
+      }
+      else if (end_type == "$flag_g") {
+        ch_reward_lp = 0.5;
+        user_reward_xp = 100;
+      }
+
+    }
+
+
+    switch(action) {
+      case "gift":
+        if (this.item == undefined) throw new TomoError("Even though we are in $gift section of calculateRewards, we cannot access this.item property.");
+        if (this.response == undefined) throw new TomoError("Even though we are in $gift section of calculateRewards, we cannot access this.response property.");
+        await gift_rewards(this.item, this.response);
+
+        break;
+
+      case "interact":
+
+        await interact_rewards(this.novel.nodes[this.novel.index].script);
+        break;
+    }
+    if (user_reward_xp > 0) this.DBUser.addToXP(user_reward_xp) // User's XP
+    if (ch_reward_lp != 0) this.DBUser.addToTomoLP(card.chInUser.originalID, ch_reward_lp); // Tomodachi's LP
+    if (ch_reward_xp > 0) this.DBUser.addToTomoXP(card.chInUser.originalID, ch_reward_xp); // Tomodachi's XP
+    this.DBUser.update()
+    this.DBUser.updateTomo()
+
+    
+  }
+
   /**
    * actionOnNovelIndex
    * Performs an action when a novel hits a certain page.
@@ -773,6 +865,7 @@ class TomoEngine extends engineBase {
       }
     });
   }
+
 }
 
 export = TomoEngine;

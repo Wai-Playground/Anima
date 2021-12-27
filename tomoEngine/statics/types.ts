@@ -20,7 +20,7 @@ export type RPG_Classes_Strings = keyof typeof RPG_Classes | "any";
 
 /** Tomo Types (start) */
 export enum Temp_MoodType {
-  main,
+  normal,
   happy,
   sad,
   annoyed,
@@ -28,7 +28,7 @@ export enum Temp_MoodType {
 }
 
 export type Temp_MoodTypeStrings = keyof typeof Temp_MoodType;
-export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$end" | "$beginEnd" | "$gift" | "$response"
+export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$beginEnd" | "$gift" | "$response" | keyof Gift_Responses
 export type User_Scripts = "$nickname" | "$suffix" | "$greetings" | "$farewells";
 export type BackgroundType = "day" | "evening" | "night";
 export enum Mood_States {
@@ -175,6 +175,10 @@ export interface CharacterInUser {
     current: number
   },
   being: Being;
+  _last_interaction: {
+    interaction: Tomo_Action
+    interaction_date: Date
+  }
   inventory: Array<ItemInUser>
   
   //TODO: Add more when RPG begins 
@@ -210,9 +214,9 @@ export interface CharacterPersonality {
     interact: Array<number>
     gift?: Array<number>
   }
-  interaction_gift_responses?: Gift_Responses
+  interaction_gift_responses?: keyof Gift_Responses
   likes?: Array<number>,
-  dislikes?: Array<number>,
+  dislikes?: Array<number>
 }
 
 

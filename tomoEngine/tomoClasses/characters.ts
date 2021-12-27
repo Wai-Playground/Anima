@@ -83,11 +83,12 @@ export default class Character extends universeBase {
     }
 
     getRandGreetings() {
-        return (this.greetings.length > 0 ? this.greetings.length[this.randIntFromZero(this.greetings.length)] : null) 
+        return (this.greetings.length > 0 ? this.greetings[this.randIntFromZero(this.greetings.length)] : null) 
+
     }
 
     getRandFarewells() {
-        return (this.farewells.length > 0 ? this.farewells.length[this.randIntFromZero(this.farewells.length)] : null) 
+        return (this.farewells.length > 0 ? this.farewells[this.randIntFromZero(this.farewells.length)] : null) 
 
     }
 

@@ -109,14 +109,6 @@ class engineBase extends EventEmitter {
 
   }
 
-  async getEndScreen(user) {
-    
-  }
-
-  async 
-
-
-
   parseUserScript(str: string): string {
 
     return str;
@@ -137,7 +129,7 @@ class engineBase extends EventEmitter {
     if (str.includes("$")) {
       let beg = str.indexOf("$"), end = str.indexOf(' ', beg) == -1 ? str.length : str.indexOf(' ', beg);
       let sub = str.substring(beg, end) as User_Scripts
-      console.log(sub)
+
       switch (sub) {
         case "$greetings":
           str = str.replace(sub, character.getRandGreetings())
