@@ -4,6 +4,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 import CustomClient from "../../client/Amadeus_Client";
 
 import Menu from "../../utils/menuEngine";
+import { goAsync } from "fuzzysort";
 class Help extends Commands {
   bot: CustomClient
   constructor() {
@@ -66,10 +67,20 @@ class Help extends Commands {
   public async execute(bot: CustomClient, interaction: CommandInteraction) {
     
 
-    let data = [];
-    let commandOption = interaction.options.getString("command");
+    let data = [], command: Commands, commandOption: string, fuzzySearch: Fuzzysort.Results;
+    commandOption = interaction.options.getString("command");
 
-    let command: Commands = bot.commands.get(commandOption) || null
+    const commands = bot.commands.map(val => val.name);
+
+    fuzzySearch = await goAsync(commandOption, commands, { allowTypo: true });
+
+    commandOption = fuzzySearch[0]?.target || undefined;
+
+    console.log(commandOption)
+
+    command = bot.commands.get(commandOption) || null
+
+    console.log(command)
     
   
     data = await this.makeFullCommandData(bot.commands, command)
@@ -94,7 +105,7 @@ class Help extends Commands {
     let menu = new Menu({multiples: data[0], ephemeral: false}, interaction)
     
     menu.once("ready", () => {
-
+      menu.index = data[1];
       menu.start();
     })
 

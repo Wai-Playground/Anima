@@ -55,7 +55,7 @@ class Queries {
             cache = await redis.hget(db, _id.toString());
             console.log(cache)
             if (cache) {
-                console.log("Cached! _id: "+ _id + " db: " + db);
+
                 payload = JSON.parse(cache) as BaseUniversePayload;
                 if (!payload) throw new UniBaseNotFoundError(_id, db);
                 return payload;
@@ -129,7 +129,7 @@ class Queries {
         try {
             cache = await redis.hget(hashKey, query);
             if (cache) {
-                console.log("Cached Variant! o_id: "+ originalID + " db: " + db);
+
                 payload = JSON.parse(cache) as BaseUniversePayload;
                 return payload;
             }
@@ -183,9 +183,9 @@ class Queries {
     }
 
     public static async updateUserUniverse(_id: string | number, payload: UserUniversePayload) {
-        console.log(payload)
+        console.log(payload.characters[0])
         try {            
-            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: {payload} }); 
+            await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: payload }); 
     
         } catch(e) {
             console.log(e);

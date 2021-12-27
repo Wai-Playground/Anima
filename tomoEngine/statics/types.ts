@@ -14,13 +14,13 @@ export enum RPG_Classes {
   phys_ed
 }
 
-export type RPG_Classes_Strings = keyof typeof RPG_Classes;
+export type RPG_Classes_Strings = keyof typeof RPG_Classes | "any";
 
 /** Basic types (end) */
 
 /** Tomo Types (start) */
 export enum Temp_MoodType {
-  main,
+  normal,
   happy,
   sad,
   annoyed,
@@ -28,14 +28,14 @@ export enum Temp_MoodType {
 }
 
 export type Temp_MoodTypeStrings = keyof typeof Temp_MoodType;
-export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$end" | "$beginEnd" | "$gift" | "$response"
+export type Scripts = "$next" | "$flag_g" | "$flag_b" | "$beginEnd" | "$gift" | "$response" | keyof Gift_Responses
 export type User_Scripts = "$nickname" | "$suffix" | "$greetings" | "$farewells";
 export type BackgroundType = "day" | "evening" | "night";
 export enum Mood_States {
   detest,
   hate,
   annoyed,
-  main,
+  classmates,
   friendly,
   passionate,
   close,
@@ -45,16 +45,11 @@ export enum Mood_States {
 }
 
 export enum Mood_Emojis {
-  "🖤",
-  "💔",
+  "💟",
+  "😄",
+  "⛈️",
   "💢",
-  "😑",
-  "💛",
-  "🧭",
-  "😊",
-  "❤️",
-  "💖",
-  "🎎"
+  "💞"
 }
 export type Mood_States_Strings = keyof typeof Mood_States
 export type Tomo_Action = "gift" | "interact" 
@@ -77,6 +72,28 @@ export enum Rarity_Grade {
   SS,
   SSS,
   X
+}
+
+export enum Rarity_Emoji {
+  "🇩",
+  "🇨",
+  "🇧",
+  "🇦",
+  "🇸",
+  "🇸🇸",
+  "🇸🇸🇸",
+  "🇽"
+}
+
+export enum Rarity_Color {
+  "#d0f9ff",
+  "#7fb9e7",
+  "#40da90",
+  "#ed5050",
+  "#f4ac4a",
+  "#ff4500",
+  "#c13dff",
+  "#000000"
 }
 export type Rarity_Grade_Strings= keyof typeof Rarity_Grade; 
 
@@ -109,11 +126,11 @@ export interface BaseUniversePayload {
     variantUse?: string;
     originalID?: number;
   };
-  description?: string;
+  description: string;
   emoji?: string;
   spoiler: boolean;
   name: string;
-  class?: RPG_Classes
+  class?: RPG_Classes_Strings
 }
 
 export interface ItemsPayload extends BaseUniversePayload {
@@ -128,7 +145,7 @@ export interface BackgroundPayload extends BaseUniversePayload {
 export interface CharacterPayload extends BaseUniversePayload {
   age?: number;
   bloodtype?: string;
-  description?: string;
+  title: string;
   personality?: CharacterPersonality;
   link: string;
 }
@@ -145,6 +162,7 @@ export interface Being {
   stability: number,
   available: boolean,
   level: number,
+  xp: number
 }
 
 export interface CharacterInUser {
@@ -157,6 +175,10 @@ export interface CharacterInUser {
     current: number
   },
   being: Being;
+  _last_interaction: {
+    interaction: Tomo_Action
+    interaction_date: Date
+  }
   inventory: Array<ItemInUser>
   
   //TODO: Add more when RPG begins 
@@ -192,9 +214,9 @@ export interface CharacterPersonality {
     interact: Array<number>
     gift?: Array<number>
   }
-  interaction_gift_responses?: Gift_Responses
+  interaction_gift_responses?: keyof Gift_Responses
   likes?: Array<number>,
-  dislikes?: Array<number>,
+  dislikes?: Array<number>
 }
 
 

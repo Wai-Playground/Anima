@@ -109,26 +109,27 @@ class engineBase extends EventEmitter {
 
   }
 
-  async getEndScreen(user, ) {
-    
-  }
-
-
   parseUserScript(str: string): string {
-    
-    
 
     return str;
 
   }
 
+  capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  periodTheString(string: string) {
+    return (string.endsWith('.') ? string : string + '.');
+
+  }
   
 
   parseCharacterScript(str: string, character: Character): string {
     if (str.includes("$")) {
       let beg = str.indexOf("$"), end = str.indexOf(' ', beg) == -1 ? str.length : str.indexOf(' ', beg);
-      let sub = str.substr(beg, end) as User_Scripts
-      console.log(sub)
+      let sub = str.substring(beg, end) as User_Scripts
+
       switch (sub) {
         case "$greetings":
           str = str.replace(sub, character.getRandGreetings())

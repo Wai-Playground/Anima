@@ -1,5 +1,22 @@
-import { Being, CharacterInUser, Char_Archetype, Char_Archetype_Strings, Char_Flags, Ship_Tree, Tomo_Action, User_Flags } from "./types";
+import { Being, CharacterInUser, Char_Archetype_Strings, Char_Flags, Ship_Tree, User_Flags } from "./types";
+export class Equations {
+    static calculate_ch_xp(ch_lvl: number) {
+        return ((7 * (ch_lvl ^ 2)) + (70 * ch_lvl));
+    }
 
+    static calculate_ch_xp_until(ch_xp: number, ch_lvl: number) {
+        return (Equations.calculate_ch_xp(ch_lvl) - ch_xp)
+        
+    }
+    static calculate_user_xp(user_lvl: number) {
+        return ((5 * (user_lvl ^ 2)) + (50 * user_lvl));
+    }
+
+    static calculate_user_xp_until(user_xp: number, user_lvl: number) {
+        return (Equations.calculate_user_xp(user_lvl) - user_xp)
+    }
+
+}
 
 export default class Tomo_Dictionaries {
 
@@ -10,7 +27,8 @@ export default class Tomo_Dictionaries {
             hunger: 100,
             stability: 100,
             available: true,
-            level: 1
+            level: 1,
+            xp: 0
         }
     }
 
@@ -20,17 +38,35 @@ export default class Tomo_Dictionaries {
             bg: 0,
             _flags: ["gift", "interact"] as Array<Char_Flags>,
             moods: {
-                pictureToUse: "main",
+                pictureToUse: "normal",
                 overall: 30,
                 current: 0,
             },
             being: Tomo_Dictionaries.default_BeingInUser(),
+            _last_interaction: {
+                interaction: null,
+                interaction_date: new Date()
+            },
             inventory: []
     
         }
         return default_CharInUser;
         
 
+    }
+
+    static char_timings(i: Char_Archetype_Strings) {
+        switch (i) {
+            case "kuu": 
+                break;
+            case "dan":
+                break;
+            case "dere":
+                break;
+            case "tsun":
+                break;
+
+        }
     }
 
     static char_tree(i: Char_Archetype_Strings): Ship_Tree {
