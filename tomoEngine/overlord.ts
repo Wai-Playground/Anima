@@ -15,6 +15,10 @@ class Overlord extends engineBase {
     super(user, interaction);
   }
 
+  static async verify_character() {
+
+  }
+
   async runNovel() {
 
   }
