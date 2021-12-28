@@ -48,6 +48,7 @@ import Story from "./tomoClasses/story";
 import { NodeSingle } from "./novel";
 import Items from "./tomoClasses/items";
 import Background from "./tomoClasses/backgrounds";
+import { timingSafeEqual } from "crypto";
 
 class Cards {
   ch: number;
@@ -420,12 +421,15 @@ class TomoEngine extends engineBase {
     if (this.selectCollector) this.selectCollector.stop()
   }
 
-  private async appendEndScreen() {
+  private async appendEndScreen(Arr: Array<number>) {
+    let embed = new MessageEmbed()
+    .addField("Gained XP", Arr[0].toString())
+    .addField("Gained LP", Arr[2].toString())
+    .addField("Character Gained", Arr[1].toString())
     //Update User
     await this.interaction.editReply({
-      content: "Yay you get rewards",
+      embeds: [embed],
       components: [],
-      attachments: [],
 
     });
 
@@ -436,15 +440,22 @@ class TomoEngine extends engineBase {
    * ":)"
    */
   private async moodChanger9000(chInUser: CharacterInUser) {
-    const HOUR = 1000 * 60 * 60, DAY = 1000 * HOUR * 24, TICK_DATE = chInUser._last_tick, NOW = Date.now(),
+    const HOUR = 1000 * 60 * 60, DAY = 1000 * HOUR * 24, TICK_DATE = chInUser._last_tick, NOW = Date.now(), NOW_DATE = new Date(),
     RAND_MIN = Math.floor(this.randIntFromZero(60000)), RAND_MOOD = this.randIntFromZero(Math.floor(Object.keys(Temp_MoodType).length / 2)),
     RATE_OF_HUNGER_DECAY = 10;
 
-    if (!(TICK_DATE.mood_date.getTime() > (NOW - (HOUR + RAND_MIN)))) chInUser.moods.current = RAND_MOOD;
+    if (!(TICK_DATE.mood_date.getTime() > (NOW - (HOUR + RAND_MIN)))) {
+      chInUser.moods.current = RAND_MOOD;
+      chInUser._last_tick.mood_date = NOW_DATE;
+    }
 
-    if (!(TICK_DATE.hunger_date.getTime() > (NOW - (DAY)))) chInUser.being.hunger = (chInUser.being.hunger - RATE_OF_HUNGER_DECAY <= 0 ? chInUser.being.hunger : chInUser.being.hunger - RATE_OF_HUNGER_DECAY);
+    if (!(TICK_DATE.hunger_date.getTime() > (NOW - (DAY)))) {
+      chInUser._last_tick.hunger_date = NOW_DATE;
+      chInUser.being.hunger = (chInUser.being.hunger - RATE_OF_HUNGER_DECAY <= 0 ? chInUser.being.hunger : chInUser.being.hunger - RATE_OF_HUNGER_DECAY);
 
+    }
     this.DBUser.updateTomoState(chInUser)
+    this.DBUser.update()
 
 
 
@@ -576,21 +587,8 @@ class TomoEngine extends engineBase {
     return Rarity_Emoji[rarity]
   }
 
-  static async levelGUI(total_filled: number = 0, total: number = 100) {
-    const filled: string = "▰", empty: string = "▱"
-    let ret: string = "";
-
-    for (let i = 0; i < total; i++) {
-      ret += (total_filled <= 0 ? empty : filled);
-      total_filled--;
-    }
-
-    return ret;
-    
-  }
-
   static convertIntHungerToText(hunger: number) {
-    if (hunger >= 50) return true;
+    if (hunger <= 50) return true;
     return false;
   }
 
@@ -855,6 +853,8 @@ class TomoEngine extends engineBase {
 
     this.DBUser.update()
     this.DBUser.updateTomo()    
+
+    return [user_reward_xp, ch_reward_xp, ch_reward_lp]
   }
 
   /**
@@ -881,8 +881,8 @@ class TomoEngine extends engineBase {
     novel.once("end", async (reason) => {
       if (reason == "timed_out") return;
       this.DBUser.setUserLastInteraction(card.chInUser.originalID, action)
-      this.calculateRewards(action)
-      this.appendEndScreen();
+      let rewards: Array<number> = await this.calculateRewards(action)
+      this.appendEndScreen(rewards);
     })
 
   }
