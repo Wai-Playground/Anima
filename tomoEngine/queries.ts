@@ -1,6 +1,6 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError, UniVariantNotFoundError } from "./statics/errors";
-import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterInUser, CharacterPayload, ItemInUser, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
+import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterInUser, CharacterPayload, Guild, ItemInUser, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 import Red from "../client/Amadeus_Redis";
 const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
@@ -149,6 +149,8 @@ class Queries {
         }
     }
 
+
+
     
     /**
      * Returns the user universe object; Does not use redis for caching because this is very volatile.
@@ -196,7 +198,7 @@ class Queries {
     }
 
     public static async updateUserInventory(_id: string | number, inventory: Array<ItemInUser>) {
-        console.log(inventory)
+        //console.log(inventory)
 
         try {            
             await Monmonga.universeDB().collection<UserUniversePayload>("users").updateOne({_id: _id}, { $set: {"inventory": inventory} }); 
@@ -220,6 +222,9 @@ class Queries {
             return tomo;
         }
     }
+
+    /**@Statistics | DB Calls*/
+
 
 
 

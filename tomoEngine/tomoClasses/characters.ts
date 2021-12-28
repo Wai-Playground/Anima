@@ -2,7 +2,6 @@
  * @author Shokkunn
  */
 
-import { Image } from "canvas";
 import { CharacterPayload, CharacterPersonality, Gift_Responses, Temp_MoodTypeStrings, Tomo_Action } from "../statics/types";
 import universeBase from "./universeBase";
 
@@ -17,7 +16,7 @@ export default class Character extends universeBase {
         this.personality = payload.personality;
         this.title = payload?.title;
         this.isNarrator = payload._id == 1 ? true : false;
-        //this.renderedImage = null;
+
     }
     /**
      * getVariant()

@@ -48,4 +48,8 @@ export default class Monmonga extends Amadeus_Base {
         return momonga.db("discord")
 
     }
+
+    public static statsDB(){
+      return momonga.db("statistics")
+    }
 }

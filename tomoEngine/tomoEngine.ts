@@ -48,6 +48,7 @@ import Story from "./tomoClasses/story";
 import { NodeSingle } from "./novel";
 import Items from "./tomoClasses/items";
 import Background from "./tomoClasses/backgrounds";
+import { timingSafeEqual } from "crypto";
 
 class Cards {
   ch: number;
@@ -164,6 +165,9 @@ class TomoEngine extends engineBase {
     this.DBUser = this.interaction.DBUser; // Shortened version of the DBUser.
 
     for (const characters of this.DBUser.tomodachis) {
+      // Change their mood if it has been an hour or so.
+      this.moodChanger9000(characters)
+
       // For every character in the User's tomodachis, we create a new card and set the bgs and chs to their respective mappings.
       this.cards.push(new Cards(characters));
 
@@ -373,8 +377,10 @@ class TomoEngine extends engineBase {
 
     if (itemGrade < ch.gradeInt) res = "below"; // Mood does not change because default is "sad". Res becomes below.
 
-    if (ch.likes.includes(receivedItem.getId as number))
+    if (ch.likes.includes(receivedItem.getId as number)) {
       (mood = "happy"), (res = "likes"); // If the item is included in the character's like sheet.
+      this.interaction.DBUser.removeFromTomoInventory(ch.getId as number, receivedItem.getId as number, 1);
+    }
     if (
       card.chInUser.inventory.find(
         (invItem) => invItem.itemID == receivedItem.getId
@@ -415,16 +421,46 @@ class TomoEngine extends engineBase {
     if (this.selectCollector) this.selectCollector.stop()
   }
 
-  private async appendEndScreen() {
+  private async appendEndScreen(Arr: Array<number>) {
+    let embed = new MessageEmbed()
+    .addField("Gained XP", Arr[0].toString())
+    .addField("Gained LP", Arr[2].toString())
+    .addField("Character Gained", Arr[1].toString())
+    //Update User
     await this.interaction.editReply({
-      content: "Yay you get rewards",
+      embeds: [embed],
       components: [],
-      attachments: [],
 
     });
+
+    
   }
 
-  private async 
+  /**
+   * ":)"
+   */
+  private async moodChanger9000(chInUser: CharacterInUser) {
+    const HOUR = 1000 * 60 * 60, DAY = 1000 * HOUR * 24, TICK_DATE = chInUser._last_tick, NOW = Date.now(), NOW_DATE = new Date(),
+    RAND_MIN = Math.floor(this.randIntFromZero(60000)), RAND_MOOD = this.randIntFromZero(Math.floor(Object.keys(Temp_MoodType).length / 2)),
+    RATE_OF_HUNGER_DECAY = 10;
+
+    if (!(TICK_DATE.mood_date.getTime() > (NOW - (HOUR + RAND_MIN)))) {
+      chInUser.moods.current = RAND_MOOD;
+      chInUser._last_tick.mood_date = NOW_DATE;
+    }
+
+    if (!(TICK_DATE.hunger_date.getTime() > (NOW - (DAY)))) {
+      chInUser._last_tick.hunger_date = NOW_DATE;
+      chInUser.being.hunger = (chInUser.being.hunger - RATE_OF_HUNGER_DECAY <= 0 ? chInUser.being.hunger : chInUser.being.hunger - RATE_OF_HUNGER_DECAY);
+
+    }
+    this.DBUser.updateTomoState(chInUser)
+    this.DBUser.update()
+
+
+
+
+  }
 
   /**
    * Name | gift
@@ -453,11 +489,8 @@ class TomoEngine extends engineBase {
       this.novel.start(); // Start the novel when ready.
     });
 
-    this.novel.once("end", (reason) => {
-      if (reason == "timed_out") return;
-      this.calculateRewards("gift")
-      this.appendEndScreen();
-    })
+    this.OnNovelEnd("gift")
+
 
     // This block is the main part of the gifting sequence, this:
     // 1. Sacrifices a node to become the response.
@@ -516,12 +549,7 @@ class TomoEngine extends engineBase {
       this.novel.start(); // When ready, start the novel.
     });
 
-    this.novel.once("end", (reason) => {
-      if (reason == "timed_out") return;
-      this.calculateRewards("interact")
-      this.appendEndScreen();
-
-    })
+    this.OnNovelEnd("interact")
   }
 
   async start(index: number = 0) {
@@ -559,21 +587,8 @@ class TomoEngine extends engineBase {
     return Rarity_Emoji[rarity]
   }
 
-  static async levelGUI(total_filled: number = 0, total: number = 100) {
-    const filled: string = "▰", empty: string = "▱"
-    let ret: string = "";
-
-    for (let i = 0; i < total; i++) {
-      ret += (total_filled <= 0 ? empty : filled);
-      total_filled--;
-    }
-
-    return ret;
-    
-  }
-
   static convertIntHungerToText(hunger: number) {
-    if (hunger >= 50) return true;
+    if (hunger <= 50) return true;
     return false;
   }
 
@@ -676,11 +691,6 @@ class TomoEngine extends engineBase {
         this.setPage(value)
       }
     );
-
-    this.selectCollector.on("end", () => {
-      console.log("select ended!");
-      this.emit("end");
-    });
   }
 
 
@@ -840,10 +850,11 @@ class TomoEngine extends engineBase {
     if (user_reward_xp > 0) this.DBUser.addToXP(user_reward_xp) // User's XP
     if (ch_reward_lp != 0) this.DBUser.addToTomoLP(card.chInUser.originalID, ch_reward_lp); // Tomodachi's LP
     if (ch_reward_xp > 0) this.DBUser.addToTomoXP(card.chInUser.originalID, ch_reward_xp); // Tomodachi's XP
-    this.DBUser.update()
-    this.DBUser.updateTomo()
 
-    
+    this.DBUser.update()
+    this.DBUser.updateTomo()    
+
+    return [user_reward_xp, ch_reward_xp, ch_reward_lp]
   }
 
   /**
@@ -864,6 +875,16 @@ class TomoEngine extends engineBase {
         action(page); // Run a predefined function.
       }
     });
+  }
+
+  async OnNovelEnd(action: Tomo_Action, novel: Novel = this.novel, card: Cards = this.cards[this.index]) {
+    novel.once("end", async (reason) => {
+      if (reason == "timed_out") return;
+      this.DBUser.setUserLastInteraction(card.chInUser.originalID, action)
+      let rewards: Array<number> = await this.calculateRewards(action)
+      this.appendEndScreen(rewards);
+    })
+
   }
 
 }

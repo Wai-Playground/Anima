@@ -126,12 +126,12 @@ export default class DBUsers extends universeBase {
           itemID: itemID,
           amount: amount
         })
-        console.log(tomo.inventory + " TOMOINV")
+        //console.log(tomo.inventory + " TOMOINV")
         return tomo.inventory;
       }
       index = tomo.inventory.indexOf(itemInInv);
       tomo.inventory[index].amount += amount;
-      console.log(tomo.inventory + " TOMOINV")
+      //console.log(tomo.inventory + " TOMOINV")
       return tomo.inventory; 
       
     }
@@ -154,9 +154,13 @@ export default class DBUsers extends universeBase {
 
     userToLevelUp() {
       /**@TODO Better way to do this. Like actually. */
-      let xp_needed = Equations.calculate_user_xp(this.level)//, go_into = (xp_needed / tomo.being.xp);
-      if (xp_needed <= this.level) this._level += 1;
+      let xp_needed = Equations.calculate_user_xp(this.level + 1)//, go_into = (xp_needed / tomo.being.xp);
+      if (xp_needed <= this.xp) this._level += 1;
+
+      if ((xp_needed - this.xp) < 0) this.userToLevelUp();
       console.log("USR IS LEVELING UP: " + this._level);
+
+      
     }
 
 

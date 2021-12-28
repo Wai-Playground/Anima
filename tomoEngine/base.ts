@@ -123,6 +123,28 @@ class engineBase extends EventEmitter {
     return (string.endsWith('.') ? string : string + '.');
 
   }
+
+    /**
+     * randIntFromZero
+     * @param max 
+     * @returns a random int from 0 to max (exclusive of max)
+     */
+  randIntFromZero(max: number) {
+      return (Math.floor(Math.random() * max))
+  }  
+
+  static async levelGUI(total_filled: number = 0, total: number = 10) {
+    const filled: string = "▰", empty: string = "▱"
+    let ret: string = "";
+
+    for (let i = 0; i < total; i++) {
+      ret += (total_filled <= 0 ? empty : filled);
+      total_filled--;
+    }
+
+    return ret;
+    
+  }
   
 
   parseCharacterScript(str: string, character: Character): string {
