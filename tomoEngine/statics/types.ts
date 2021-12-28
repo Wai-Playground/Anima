@@ -179,6 +179,10 @@ export interface CharacterInUser {
     interaction: Tomo_Action
     interaction_date: Date
   }
+  _last_tick: {
+    hunger_date: Date
+    mood_date: Date
+  }
   inventory: Array<ItemInUser>
   
   //TODO: Add more when RPG begins 
@@ -219,8 +223,48 @@ export interface CharacterPersonality {
   dislikes?: Array<number>
 }
 
+export interface TomoStats {
+  tomoID: number,
+  gifts_received: {
+    good_gifts: number,
+    bad_gifts: number,
+    like_gifts: number
+    dislike_gifts: number
+  }
+  lifetime_lp_gains: number,
+}
+
+export interface DiscordStats {
+
+}
+
+export interface RPGStats {
+  lifetime_wins: number,
+  lifetime_loses: number
+
+}
+
+export interface BaseStatisticsPayload {
+  _id: string | number,
+  tomodachis: Array<TomoStats>,
+  discord: DiscordStats,
+  rpg: RPGStats
+
+}
+
+export interface UserStatisticsPayload extends BaseStatisticsPayload {
+  username: string
+  
+
+}
 
 
+export interface Guild extends BaseUniversePayload {
+  _id: string | number,
+  owner: string | number,
+  guild_members: Array<string | number>
+
+}
 
 /** Mongodb payload types (end) */
 

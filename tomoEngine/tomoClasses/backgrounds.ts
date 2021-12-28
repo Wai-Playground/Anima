@@ -2,7 +2,6 @@
  * @author Shokkunn
  */
 
-import { Image } from "canvas";
 import { BackgroundPayload, BackgroundType } from "../statics/types";
 import universeBase from "./universeBase";
 

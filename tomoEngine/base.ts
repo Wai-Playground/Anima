@@ -123,6 +123,15 @@ class engineBase extends EventEmitter {
     return (string.endsWith('.') ? string : string + '.');
 
   }
+
+    /**
+     * randIntFromZero
+     * @param max 
+     * @returns a random int from 0 to max (exclusive of max)
+     */
+  randIntFromZero(max: number) {
+      return (Math.floor(Math.random() * max))
+  }  
   
 
   parseCharacterScript(str: string, character: Character): string {

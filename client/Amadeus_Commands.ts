@@ -30,7 +30,8 @@ export abstract class Commands extends Amadeus_Base {
       ownerOnly?: boolean;
       inGuildOnly?: boolean;
       inMainOnly?: boolean ;
-      coolDown?: number;
+      // COOL DOWN IS IN SECONDS
+      coolDown?: number; // SECONDS
     }
   ) {
     super()

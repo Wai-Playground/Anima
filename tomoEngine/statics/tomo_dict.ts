@@ -1,7 +1,7 @@
 import { Being, CharacterInUser, Char_Archetype_Strings, Char_Flags, Ship_Tree, User_Flags } from "./types";
 export class Equations {
     static calculate_ch_xp(ch_lvl: number) {
-        return ((7 * (ch_lvl ^ 2)) + (70 * ch_lvl));
+        return ((7 * (Math.pow(ch_lvl, 2))) + (70 * ch_lvl));
     }
 
     static calculate_ch_xp_until(ch_xp: number, ch_lvl: number) {
@@ -9,7 +9,7 @@ export class Equations {
         
     }
     static calculate_user_xp(user_lvl: number) {
-        return ((5 * (user_lvl ^ 2)) + (50 * user_lvl));
+        return ((5 * (Math.pow(user_lvl, 2))) + (50 * user_lvl));
     }
 
     static calculate_user_xp_until(user_xp: number, user_lvl: number) {
@@ -33,6 +33,7 @@ export default class Tomo_Dictionaries {
     }
 
     static default_CharInUser(): CharacterInUser {
+        const today = new Date()
         const default_CharInUser: CharacterInUser = {
             originalID: 0,
             bg: 0,
@@ -45,7 +46,11 @@ export default class Tomo_Dictionaries {
             being: Tomo_Dictionaries.default_BeingInUser(),
             _last_interaction: {
                 interaction: null,
-                interaction_date: new Date()
+                interaction_date: today
+            },
+            _last_tick: {
+                hunger_date: today,
+                mood_date: today
             },
             inventory: []
     
