@@ -22,6 +22,7 @@ export default class CustomClient extends Client {
         Intents.FLAGS.GUILD_MESSAGE_TYPING,
         Intents.FLAGS.GUILD_MEMBERS,
       ],
+      
     });
 
     (this.name = name), (this.token = token), (this.uri = uri);
