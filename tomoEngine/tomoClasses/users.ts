@@ -78,14 +78,17 @@ export default class DBUsers extends universeBase {
      */
     tomoToLevelUp(tomo: number | CharacterInUser) {
       /**@TODO Better way to do this. Like actually. */
-      let xp_needed: number;
+      let xp_needed: number//, xp_before: number
 
       if (typeof tomo == "number") tomo = this.getTomoFromDachis(tomo)
       
       xp_needed = Equations.calculate_ch_xp(tomo.being.level + 1)
       
-      if (xp_needed <= tomo.being.xp) tomo.being.level += 1;
-      if ((xp_needed - tomo.being.xp) < 0) this.tomoToLevelUp(tomo);
+      if (xp_needed <= tomo.being.xp) {
+        tomo.being.level += 1;
+        this.clearTomoXP(tomo)
+      }
+      //if ((xp_needed - tomo.being.xp) < 0) this.tomoToLevelUp(tomo);
     }
     
     addToXP(amount: number) {
@@ -93,6 +96,16 @@ export default class DBUsers extends universeBase {
       console.log("USR IS GETTING XP: " + this._xp);
       this.userToLevelUp();
     }
+
+    clearTomoXP(tomo: number | CharacterInUser) {
+      if (typeof tomo == "number") tomo = this.getTomoFromDachis(tomo)
+      tomo.being.xp = 0;
+    }
+
+    clearUserXP() {
+      this._xp = 0;
+    }
+
 
     addToTomoXP(tomoID: number, amount: number) {
       let tomo = this.getTomoFromDachis(tomoID)
@@ -155,9 +168,12 @@ export default class DBUsers extends universeBase {
     userToLevelUp() {
       /**@TODO Better way to do this. Like actually. */
       let xp_needed = Equations.calculate_user_xp(this.level + 1)//, go_into = (xp_needed / tomo.being.xp);
-      if (xp_needed <= this.xp) this._level += 1;
+      if (xp_needed <= this.xp) {
+        this._level += 1;
+        this.clearUserXP()
+      }
 
-      if ((xp_needed - this.xp) < 0) this.userToLevelUp();
+      //if ((xp_needed - this.xp) < 0) this.userToLevelUp();
       console.log("USR IS LEVELING UP: " + this._level);
 
       
