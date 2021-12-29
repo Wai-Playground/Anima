@@ -24,7 +24,6 @@ export default class Tomo_Dictionaries {
         return {
             health: [100, 100],
             mana: [100, 100],
-            hunger: 100,
             stability: 100,
             available: true,
             level: 1,
@@ -49,7 +48,6 @@ export default class Tomo_Dictionaries {
                 interaction_date: today
             },
             _last_tick: {
-                hunger_date: today,
                 mood_date: today
             },
             inventory: []

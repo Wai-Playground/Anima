@@ -25,6 +25,7 @@ export enum Temp_MoodType {
   sad,
   annoyed,
   flustered,
+  hungry
 }
 
 export type Temp_MoodTypeStrings = keyof typeof Temp_MoodType;
@@ -49,7 +50,8 @@ export enum Mood_Emojis {
   "😄",
   "⛈️",
   "💢",
-  "💞"
+  "💞",
+  "😋"
 }
 export type Mood_States_Strings = keyof typeof Mood_States
 export type Tomo_Action = "gift" | "interact" 
@@ -158,7 +160,6 @@ export interface ItemInUser {
 export interface Being {
   health: Array<number>,
   mana: Array<number>
-  hunger: number,
   stability: number,
   available: boolean,
   level: number,
@@ -180,7 +181,6 @@ export interface CharacterInUser {
     interaction_date: Date
   }
   _last_tick: {
-    hunger_date: Date
     mood_date: Date
   }
   inventory: Array<ItemInUser>

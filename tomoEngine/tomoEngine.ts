@@ -196,7 +196,8 @@ class TomoEngine extends engineBase {
    */
   static convertNumberToTempMoodType(mood: number) {
     if (mood > Object.keys(Temp_MoodType).length / 2) return; // Since the enums have both int and string representations, we cut down the length of it by half.
-    return Temp_MoodType[Math.floor(mood)] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it.
+    console.log(Temp_MoodType[mood] + "MOOD")
+    return Temp_MoodType[mood] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it.
   }
 
   static convertNumberToMainType(points: number) {
@@ -242,10 +243,18 @@ class TomoEngine extends engineBase {
     if (curMood != "normal" && action != "gift") {
       // If the current mood is main and the action is not gift then-
       try {
-        let payload: Story = await story.getVariant(curMood); // Then get the variant of the story if needed.
-        story = payload;
+        story = await story.getVariant(curMood); // Then get the variant of the story if needed.
+        
       } catch (e) {
         console.log(e);
+      }
+    }
+
+    if (curMood == "hungry" && action == "gift") {
+      try {
+        story = await story.getVariant("hungry");
+      } catch(e) {
+        console.log(e)
       }
     }
     return story;
@@ -441,19 +450,13 @@ class TomoEngine extends engineBase {
    */
   private async moodChanger9000(chInUser: CharacterInUser) {
     const HOUR = 1000 * 60 * 60, DAY = 1000 * HOUR * 24, TICK_DATE = chInUser._last_tick, NOW = Date.now(), NOW_DATE = new Date(),
-    RAND_MIN = Math.floor(this.randIntFromZero(60000)), RAND_MOOD = this.randIntFromZero(Math.floor(Object.keys(Temp_MoodType).length / 2)),
-    RATE_OF_HUNGER_DECAY = 10;
+    RAND_MIN = Math.floor(this.randIntFromZero(60000)), RAND_MOOD = this.randIntFromZero(Math.floor(Object.keys(Temp_MoodType).length / 2))
 
     if (!(TICK_DATE.mood_date.getTime() > (NOW - (HOUR + RAND_MIN)))) {
       chInUser.moods.current = RAND_MOOD;
       chInUser._last_tick.mood_date = NOW_DATE;
     }
 
-    if (!(TICK_DATE.hunger_date.getTime() > (NOW - (DAY)))) {
-      chInUser._last_tick.hunger_date = NOW_DATE;
-      chInUser.being.hunger = (chInUser.being.hunger - RATE_OF_HUNGER_DECAY <= 0 ? chInUser.being.hunger : chInUser.being.hunger - RATE_OF_HUNGER_DECAY);
-
-    }
     this.DBUser.updateTomoState(chInUser)
     this.DBUser.update()
 
@@ -587,11 +590,6 @@ class TomoEngine extends engineBase {
     return Rarity_Emoji[rarity]
   }
 
-  static convertIntHungerToText(hunger: number) {
-    if (hunger <= 50) return true;
-    return false;
-  }
-
   static async converIntHealthToEmj(healthArr: Array<number> = [0, 100]) {
     const converted_health_ratio = (healthArr[0] / healthArr[1]) * 100;
 
@@ -624,8 +622,7 @@ class TomoEngine extends engineBase {
       `🆙 **XP** •「${card.chInUser.being.xp}」\n` + await TomoEngine.levelGUI(Math.floor((card.chInUser.being.xp <= 0 ? 0 : (card.chInUser.being.xp / ch_xp_needed)* 10)), 10) + `\n**${ch_xp_needed_until}** XP needed to level up.\n「Current Level • **__${card.chInUser.being.level}__**」`,
       true)
       .addField("Mood", 
-      `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** •「${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}」\n` +
-      `\n🍖 **Hungry?** •「${this.capitalizeFirstLetter(TomoEngine.convertIntHungerToText(card.chInUser.being.hunger).toString())}」`
+      `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** •「${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}」\n`
       )
       .setColor(await TomoEngine.rarityColor(characterObject.gradeInt) as ColorResolvable)
       .setThumbnail(characterObject.link)
