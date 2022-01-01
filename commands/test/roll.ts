@@ -13,7 +13,7 @@ class Roll extends Commands {
       description: "rol",
       data: new SlashCommandBuilder(),
       dbRequired: true,
-      ownerOnly: true,
+      ownerOnly: false,
     });
   }
 

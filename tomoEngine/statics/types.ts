@@ -64,7 +64,7 @@ export enum Char_Archetype {
   tsun
 }
 export type Char_Archetype_Strings = keyof typeof Char_Archetype;
-export type Item_Type = "consumables" | "treasures" | "equipables" | "boxes"
+export type Item_Type = "consumables" | "treasures" | "equipables" | "boxes" | "edible"
 export enum Rarity_Grade {
   D,
   C,
@@ -220,6 +220,8 @@ export interface Gift_Responses {
   average: Array<string>
   below: Array<string>
   duplicate: Array<string>
+  food: Array<string>
+  not_food: Array<string>
   none: Array<string>
 }
 

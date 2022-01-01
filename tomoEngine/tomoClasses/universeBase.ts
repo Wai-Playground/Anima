@@ -13,7 +13,7 @@ export default abstract class universeBase {
     variant?: boolean;
     link?: string;
     spoiler?: boolean;
-    _class: string;
+    _class: RPG_Classes_Strings
     _grade?: Rarity_Grade_Strings
     emoji?: string
     description: string
@@ -28,7 +28,7 @@ export default abstract class universeBase {
         this.name = name
         this.type = type;
         this.variant = variant;
-        this._class = _class.toLowerCase().trim();
+        this._class = _class
         this.link = link;
         this.description = description.trim();
         this.spoiler = spoiler;

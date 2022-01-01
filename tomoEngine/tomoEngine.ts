@@ -200,6 +200,10 @@ class TomoEngine extends engineBase {
     return Temp_MoodType[mood] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it.
   }
 
+  static convertTempMoodTypeToNumber(mood: Temp_MoodTypeStrings) {
+    return Temp_MoodType[mood] as number || -1;
+  }
+
   static convertNumberToMainType(points: number) {
     points = Math.floor(points / 10);
     if (points > Object.keys(Mood_States).length / 2) return Mood_States[Object.keys(Mood_States).length - 1] as Mood_States_Strings;
@@ -282,6 +286,7 @@ class TomoEngine extends engineBase {
    * @returns
    */
   static checkIfItemIsGiftable(dbItem: Items) {
+    if (dbItem.itemType == "boxes") return false;
     return true;
   }
 
@@ -355,6 +360,7 @@ class TomoEngine extends engineBase {
   ): Promise<NodeSingle> {
     // Define variables & defaults. + default response (broke).
     let res: keyof Gift_Responses = "none",
+      cur_mood = TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current),
       mood: Temp_MoodTypeStrings = "sad",
       variantMood: Character,
       ch = this.characters.get(card.ch),
@@ -408,6 +414,12 @@ class TomoEngine extends engineBase {
     if (receivedItem.itemType == "equipables") {
     }
 
+    // This block is for when the user gives her food.
+    if (cur_mood == "hungry") {
+      if (receivedItem.itemType == "edible") (mood = "happy"), (res = "food");
+      else (mood = (this.characters.get(card.ch).archetype == "tsun" ? "annoyed" : "sad")), (res = "not_food");
+    }
+
     variantMood = await ch.getVariant(mood); // We get the variant mood again, since there may have been a change in the mood.
     this.novel.deployChar(variantMood); // We inject the Character into the novel.
 
@@ -455,6 +467,11 @@ class TomoEngine extends engineBase {
     if (!(TICK_DATE.mood_date.getTime() > (NOW - (HOUR + RAND_MIN)))) {
       chInUser.moods.current = RAND_MOOD;
       chInUser._last_tick.mood_date = NOW_DATE;
+    }
+
+    if (!(TICK_DATE.mood_date.getTime() > (NOW - (DAY * 10)))) {
+      chInUser.moods.overall -= -1;
+      chInUser.moods.current = TomoEngine.convertTempMoodTypeToNumber("sad")
     }
 
     this.DBUser.updateTomoState(chInUser)
