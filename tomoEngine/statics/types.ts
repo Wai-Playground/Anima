@@ -166,7 +166,8 @@ export interface CharacterPayload extends BaseUniversePayload {
 
 export interface ItemInUser {
   itemID: number,
-  amount: number
+  amount: number,
+  date: Date
 }
 
 export interface Being {

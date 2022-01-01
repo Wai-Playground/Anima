@@ -1,27 +1,13 @@
 import {
   ButtonInteraction,
-  Client,
-  CommandInteraction,
-  InteractionCollector,
-  Message,
-  MessageActionRow,
-  MessageButton,
-  PartialMessage,
+  InteractionCollector
 } from "discord.js";
 import { Commands } from "../../client/Amadeus_Commands";
-import engineBase from "../../tomoEngine/base";
 import TomoEngine from "../../tomoEngine/tomoEngine";
-import Novel from "../../tomoEngine/novel";
-import Queries from "../../tomoEngine/queries";
-import { APIMessage } from "discord-api-types";
 import Character from "../../tomoEngine/tomoClasses/characters";
-import Background from "../../tomoEngine/tomoClasses/backgrounds";
-import Cards from "../../tomoEngine/tomoEngine";
-import DBUsers from "../../tomoEngine/tomoClasses/users";
-import { AmadeusInteraction, CharacterInUser } from "../../tomoEngine/statics/types";
+import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 import CustomClient from "../../client/Amadeus_Client";
 import { goAsync } from "fuzzysort";
-const json = require("../../assets/tale.json");
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
@@ -31,7 +17,17 @@ class Tomo extends Commands {
   constructor() {
     super("tomo", {
       description: "Tomo bs",
-      data: new SlashCommandBuilder().addSubcommand((subc) =>
+      data: new SlashCommandBuilder()
+      .addSubcommand((subc) =>
+        subc
+        .setName("info")
+        .setDescription("info").addStringOption((option) =>
+        option
+          .setName('tomo_name')
+          .setDescription('duh')
+          .setRequired(false),
+      )
+      ).addSubcommand((subc) =>
         subc
         .setName("gift")
         .setDescription("hug").addStringOption((option) =>
@@ -121,6 +117,18 @@ class Tomo extends Commands {
       
         menu.gift(interaction, menu.cards[await this.getCardIDofChInUser(menu, interaction)])
     })
+  }
+
+  async info(bot: CustomClient, interaction: AmadeusInteraction) {
+    let menu: TomoEngine
+    
+    menu = await this.getNewTomoEngine(interaction, false);
+
+    menu.once("ready", async () => {
+
+      menu.stats()
+  })
+
   }
 
   async dachi(bot: CustomClient, interaction: AmadeusInteraction) {

@@ -162,7 +162,8 @@ export default class DBUsers extends universeBase {
       if (!itemInInv) {
         tomo.inventory.push({
           itemID: itemID,
-          amount: amount
+          amount: amount,
+          date: new Date()
         })
         //console.log(tomo.inventory + " TOMOINV")
         return tomo.inventory;
@@ -225,7 +226,8 @@ export default class DBUsers extends universeBase {
         this._inventory.push(
           {
             itemID: itemID,
-            amount: amount
+            amount: amount,
+            date: new Date()
           }
         )
         return this._inventory;

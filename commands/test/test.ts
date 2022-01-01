@@ -38,39 +38,11 @@ class Test extends Commands {
 
     
     await interaction.deferReply({ephemeral: true});
-    /*
-    let jsons = JSON.parse(JSON.stringify(json));
-    console.time('Novel')
-    let nvl = new Novel(jsons, interaction, true)
-    //console.log(json)
-    nvl.once("ready", () => {
-      console.timeEnd("Novel")
-      return nvl.start();
-      
-    })*/
-    console.time("Novel")
-    let jsons = JSON.parse(JSON.stringify(json));
-    
-    
-    let x = new Novel(jsons, interaction, true)
-    x.once("ready", (d => {
-      console.timeEnd("Novel")
-      return x.start()
-    }))      
-    /*
 
     
-    console.log("works")
-    let menu = new Novel(json, interaction)
-    
-    menu.once("ready", async () => {
-      await interaction.deferReply()
-      menu.start();
-    })
-    
-    
 
-*/
+
+
   }
 
   async flush(bot: CustomClient, interaction: CommandInteraction) {

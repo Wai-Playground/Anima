@@ -81,6 +81,7 @@ class TomoEngine extends engineBase {
 
   characters: Map<number, Character>;
   backgrounds: Map<number, Background>;
+  result_multiplier: number = 1;
 
   filter: Function = async (i: any) => {
     await i.deferUpdate();
@@ -380,8 +381,9 @@ class TomoEngine extends engineBase {
 
       return new NodeSingle(response);
     }
-
-    let itemGrade: number = receivedItem.gradeInt; // We get the item Grade of the item to compare against the character.
+    const itemInChInv = card.chInUser.inventory.find(invItem => invItem.itemID == receivedItem.getId),
+    itemGrade: number = receivedItem.gradeInt,// We get the item Grade of the item to compare against the character.
+    HOUR = 1000 * 60 * 60, DAY = 1000 * HOUR * 24
 
     // This block decides what the response will be. Will override the response.
     // Res = are Results, they are defined in the orig ch db and is an arr of text which the ch says after getting a gift.
@@ -396,12 +398,13 @@ class TomoEngine extends engineBase {
       (mood = "happy"), (res = "likes"); // If the item is included in the character's like sheet.
       this.interaction.DBUser.removeFromTomoInventory(ch.getId as number, receivedItem.getId as number, 1);
     }
-    if (
-      card.chInUser.inventory.find(
-        (invItem) => invItem.itemID == receivedItem.getId
-      )
-    )
-      (mood = "sad"), (res = "duplicate"); // If the item is a duplicate in the character's inv.
+    
+
+    if (!itemInChInv == undefined) {
+      // Duplicate Interaction.
+      if (itemInChInv.date.getTime() <= DAY * 5) (mood = "sad"), (res = "duplicate"); // If it has been 5 days since the date they gave the item, the char will become sad and res will become duplicate.
+    
+    }
     if (ch.dislikes.includes(receivedItem.getId as number))
       (mood = "annoyed"), (res = "dislikes"); // If the item is in the dislike category.
 
@@ -416,7 +419,10 @@ class TomoEngine extends engineBase {
 
     // This block is for when the user gives her food.
     if (cur_mood == "hungry") {
-      if (receivedItem.itemType == "edible") (mood = "happy"), (res = "food");
+      if (receivedItem.itemType == "edible") {
+        (mood = "happy"), (res = "food");
+        this.result_multiplier = 2;
+      }
       else (mood = (this.characters.get(card.ch).archetype == "tsun" ? "annoyed" : "sad")), (res = "not_food");
     }
 
@@ -800,7 +806,7 @@ class TomoEngine extends engineBase {
 
   async calculateRewards(action: Tomo_Action, card: Cards = this.cards[this.index]) {
     /**@TODO Finish this. USE THIS IN CONJECTURE WITH THE TOMO TYPE (TSUN ETC..)*/
-    let user_reward_xp: number = 0, ch_reward_xp: number = 0, ch_reward_lp: number = 0//, characterObj = this.characters.get(card.chInUser.originalID);
+    let user_reward_xp: number = 20, ch_reward_xp: number = 0, ch_reward_lp: number = 0//, characterObj = this.characters.get(card.chInUser.originalID);
 
     async function gift_rewards(item: Items | "broke", response: keyof Gift_Responses) {
       if (response == "none") return;
@@ -830,6 +836,11 @@ class TomoEngine extends engineBase {
           ch_reward_xp = 15;
           user_reward_xp = 2;
           break;
+        case "food":
+          ch_reward_lp = 10;
+          ch_reward_xp = 200;
+          user_reward_xp = 200;
+          
       }
     }
 
@@ -861,9 +872,9 @@ class TomoEngine extends engineBase {
         await interact_rewards(this.novel.nodes[this.novel.index].script);
         break;
     }
-    if (user_reward_xp > 0) this.DBUser.addToXP(user_reward_xp) // User's XP
+    if (user_reward_xp > 0) this.DBUser.addToXP(user_reward_xp * this.result_multiplier) // User's XP
     if (ch_reward_lp != 0) this.DBUser.addToTomoLP(card.chInUser.originalID, ch_reward_lp); // Tomodachi's LP
-    if (ch_reward_xp > 0) this.DBUser.addToTomoXP(card.chInUser.originalID, ch_reward_xp); // Tomodachi's XP
+    if (ch_reward_xp > 0) this.DBUser.addToTomoXP(card.chInUser.originalID, ch_reward_xp * this.result_multiplier); // Tomodachi's XP
 
     this.DBUser.update()
     this.DBUser.updateTomo()    
