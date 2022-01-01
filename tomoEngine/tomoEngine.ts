@@ -134,7 +134,7 @@ class TomoEngine extends engineBase {
       `tomo_userID_${this.DBUser._id}_node_${this.index}_CH${card.ch}_BG${card.bg}.jpg`
     );
     console.timeEnd("build")
-
+    console.log(card.built_img)
     return card; // return the card once it has done it's job.
   }
 
@@ -627,7 +627,7 @@ class TomoEngine extends engineBase {
       .setColor(await TomoEngine.rarityColor(characterObject.gradeInt) as ColorResolvable)
       .setThumbnail(characterObject.link)
       .setTimestamp()
-      .setFooter(`${this.interaction.user.username}\'s ${characterObject.formattedName}`, this.interaction.user.avatarURL())
+      .setFooter({text: `${this.interaction.user.username}\'s ${characterObject.formattedName}`, iconURL: this.interaction.user.avatarURL()})
 
 
     return interaction.editReply({

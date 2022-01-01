@@ -31,12 +31,12 @@ export default class Tomo_Dictionaries {
         }
     }
 
-    static default_CharInUser(): CharacterInUser {
+    static default_CharInUser(_id: number = 0, bg_id: number = 0, _flags: Array<Char_Flags> = ["gift", "interact"]): CharacterInUser {
         const today = new Date()
         const default_CharInUser: CharacterInUser = {
-            originalID: 0,
-            bg: 0,
-            _flags: ["gift", "interact"] as Array<Char_Flags>,
+            originalID: _id,
+            bg: bg_id,
+            _flags: _flags,
             moods: {
                 pictureToUse: "normal",
                 overall: 30,

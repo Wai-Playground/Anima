@@ -16,6 +16,7 @@ export default class Character extends universeBase {
         this.personality = payload.personality;
         this.title = payload?.title;
         this.isNarrator = payload._id == 1 ? true : false;
+        this.emoji = (this.isNarrator ? "" : this.emoji) 
 
     }
     /**

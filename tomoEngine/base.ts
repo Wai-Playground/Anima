@@ -4,7 +4,7 @@ import {
   Channel,
   CommandInteraction,
   SelectMenuInteraction,
-  TextBasedChannels,
+  TextBasedChannel,
   User,
 } from "discord.js";
 import { EventEmitter } from "events";
@@ -24,7 +24,7 @@ import DBUsers from "./tomoClasses/users"
 class engineBase extends EventEmitter {
   discUserObj: User; // Discord User Object.
   interaction: AmadeusInteraction  // Discord Interactions Objects.
-  channel: Channel & TextBasedChannels; // Discord Channel Object.
+  channel: Channel & TextBasedChannel; // Discord Channel Object.
 
   constructor(
     user: User,
@@ -115,12 +115,28 @@ class engineBase extends EventEmitter {
 
   }
 
+  fillStringForEmbedNovel(string: string) {
+    const hiddenW = "ㅤㅤㅤ", length = string.length, total = 26;
+
+    let ret: string = "", minus = total - length;
+    console.log(minus + "__MINUS")
+
+    if (minus <= 0) return string;
+
+    for (minus <= 0; minus--;) ret += hiddenW;
+    
+    return string + ret;
+
+    
+
+  }
+
   capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
   periodTheString(string: string) {
-    return (string.endsWith('.') ? string : string + '.');
+    return (string.endsWith('.') && !string.endsWith("?") ? string : string + '.');
 
   }
 

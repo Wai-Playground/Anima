@@ -64,7 +64,7 @@ export enum Char_Archetype {
   tsun
 }
 export type Char_Archetype_Strings = keyof typeof Char_Archetype;
-export type Item_Type = "consumables" | "treasures" | "equipables"
+export type Item_Type = "consumables" | "treasures" | "equipables" | "boxes"
 export enum Rarity_Grade {
   D,
   C,
@@ -140,6 +140,18 @@ export interface ItemsPayload extends BaseUniversePayload {
   
 }
 
+export interface Boxes {
+  drop_rate?: number,
+  drop_id: number
+  drop_type: BasicUniverseType
+}
+
+export interface BentoPayload extends ItemsPayload {
+  drops: Array<Boxes>
+  
+  
+}
+
 export interface BackgroundPayload extends BaseUniversePayload {
   link: string;
 }
@@ -194,6 +206,8 @@ export interface UserUniversePayload {
   discord_username: string;
   level: number;
   xp: number;
+  tickets: number;
+  money: number; 
   characters: Array<CharacterInUser>;
   reserved: Array<CharacterInUser>;
   inventory: Array<ItemInUser>

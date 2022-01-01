@@ -117,6 +117,8 @@ export abstract class Commands extends Amadeus_Base {
           _id: author.id,
           level: 1,
           xp: 0,
+          money: 0,
+          tickets: 0,
           discord_username: author.username,
           characters: [
             Tomo_Dictionaries.default_CharInUser()

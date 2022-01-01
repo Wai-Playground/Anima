@@ -12,6 +12,8 @@ import {
   InteractionCollector,
   MessageSelectMenu,
   MessageSelectOptionData,
+  MessageEmbed,
+  ColorResolvable,
 } from "discord.js";
 import engineBase from "./base";
 import { Single, Scripts, Temp_MoodTypeStrings, AmadeusInteraction} from "./statics/types";
@@ -27,6 +29,7 @@ import {
 } from "canvas";
 
 import { NovelError, TomoError } from "./statics/errors";
+import TomoEngine from "./tomoEngine";
 
 export class NodeSingle implements Single {
   index: number;
@@ -82,12 +85,13 @@ export default class Novel extends engineBase {
   backgrounds: Map<number | string, Background>;
   characters: Map<number | string, Character>;
   loaded_ch: Map<number | string, Image>;
+  canvas: Canvas;
   loaded_bg: Map<number | string, Image>;
   multiples: Array<Single>;
   nodes: Array<NodeSingle>;
   index: number;
   height: number = 480;
-  width: number = 720;
+  width: number = 724;
   selection: number;
   ephemeral: boolean;
   filter: Function = async (i: any) => {
@@ -115,6 +119,7 @@ export default class Novel extends engineBase {
     this.name = this.json.hasOwnProperty("name") ? this.json.name : null;
     this.interaction = interaction;
     this.backgrounds = new Map();
+    this.canvas = createCanvas(this.width, this.height);
     this.characters = new Map();
     this.loaded_ch = new Map();
     this.loaded_bg = new Map();
@@ -129,8 +134,9 @@ export default class Novel extends engineBase {
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
     console.log("RENDERING_NODE_" + index)
     console.time("build_"+index)
-    const canvas: Canvas = createCanvas(this.width, this.height);
-    const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d");
+    
+    const ctx: NodeCanvasRenderingContext2D = this.canvas.getContext("2d")
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.quality = "fast";
     ctx.patternQuality = "fast";
     const customID: string = `novel_userID_${this.interaction.user.id}_node_${index}_${this.name}.jpeg`,
@@ -179,7 +185,7 @@ export default class Novel extends engineBase {
 
     this.nodes[index].built = true;
     this.nodes[index].built_img = new MessageAttachment(
-      canvas.toBuffer("image/jpeg", {quality: 0.5}),
+      this.canvas.toBuffer("image/jpeg", {quality: 0.5}),
       customID
     );
     console.timeEnd("build_"+index)
@@ -326,12 +332,13 @@ export default class Novel extends engineBase {
    */
 
   async start() {
-    
+    /*
     const payload = {
-      content: `>>> **${
-        this.characters.get(this.nodes[this.index].character).name
-      }**: ${this.nodes[this.index].text}`,
+      content:  `「**${
+        this.characters.get(this.nodes[0].character).name
+      }**」•  ${this.nodes[0].text}`,
       attachments: [],
+      embeds:[],
       files: [
         this.nodes[0].built
           ? this.nodes[0].built_img
@@ -339,8 +346,9 @@ export default class Novel extends engineBase {
       ],
       //attachments: [build],
       components: await this.action(),
-    };
-    
+    };*/
+    await this.setPage(0);
+    /*
     if (this.interaction.isCommand()) {
       if (this.interaction.deferred) {
         console.log("deferred");
@@ -352,6 +360,7 @@ export default class Novel extends engineBase {
     if (this.interaction.isButton()) {
       if ("update" in this.interaction) await this.interaction.update(payload);
     }
+    */
 
     this.message = await this.interaction.fetchReply();
 
@@ -364,15 +373,25 @@ export default class Novel extends engineBase {
     this.emit("pageChange", this.nodes[index]);
     this.index = index;
     this.selection = undefined;
+    const character = this.characters.get(this.nodes[index].character), text = this.nodes[index].text,
+    final_text = `${text}`
+    /*
+    embed = new MessageEmbed()
+    .addField(character.name, final_text)
+    .setColor(await TomoEngine.rarityColor(character.gradeInt) as ColorResolvable)*/
+    //.setFooter("Test")
+    //.setTimestamp()
+    //.set(`ㅤ`.repeat(31))
     const payload = {
-      content: `>>> **${
-        this.characters.get(this.nodes[index].character).name
-      }**: ${this.nodes[index].text}`,
+      //embeds: [embed],
       files: [
         this.nodes[index].built
           ? this.nodes[index].built_img
           : await this.buildNode(index),
       ],
+      content: `${character.emoji}「**${
+        this.characters.get(this.nodes[index].character).name
+      }**」${this.nodes[index].text}`,
       attachments: [],
       components: await this.action(),
     };

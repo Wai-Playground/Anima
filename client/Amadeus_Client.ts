@@ -50,6 +50,7 @@ export default class CustomClient extends Client {
         this.loadCog(newPath);
       } else {
         if (file.endsWith(".js")) {
+          console.log(newPath)
           
           const command = require(`.${newPath}`);
           const cmd = new command();

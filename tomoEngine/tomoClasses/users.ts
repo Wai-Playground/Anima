@@ -3,8 +3,9 @@
  */
 
 import Queries from "../queries";
-import { Equations } from "../statics/tomo_dict";
+import Tomo_Dictionaries, { Equations } from "../statics/tomo_dict";
 import { CharacterInUser, ItemInUser, Tomo_Action, UserUniversePayload } from "../statics/types";
+import Character from "./characters";
 import universeBase from "./universeBase";
  
 export default class DBUsers extends universeBase {
@@ -13,6 +14,8 @@ export default class DBUsers extends universeBase {
     _inventory: Array<ItemInUser>
     _level: number;
     _xp: number;
+    _cur: number;
+    _tik: number;
     username: string;
     constructor(_id: number | string, payload: UserUniversePayload) {
         super(_id, 'users', payload.discord_username, "🧍");
@@ -22,6 +25,8 @@ export default class DBUsers extends universeBase {
         this._inventory = payload.inventory;
         this._xp = payload.xp;
         this._level = payload.level;
+        this._cur = payload.money;
+        this._tik = payload.money;
          
  
     }
@@ -41,6 +46,14 @@ export default class DBUsers extends universeBase {
 
     get tomodachis() {
       return this._tomodachis;
+    }
+
+    get currency() {
+      return this._cur
+    }
+
+    get tickets() {
+      return this._tik
     }
 
     getMainTomoDachi() {
@@ -106,6 +119,18 @@ export default class DBUsers extends universeBase {
       this._xp = 0;
     }
 
+    addToUserTickets(amount: number) {
+      this._tik += amount;
+    }
+    removeFromUserTickets(amount: number) {
+      this._tik -= amount;
+    }
+    addToUserCurrency(amount: number) {
+      this._cur += amount;
+    }
+    removeFromUserCurrency(amount: number) {
+      this._cur -= amount;
+    }
 
     addToTomoXP(tomoID: number, amount: number) {
       let tomo = this.getTomoFromDachis(tomoID)
@@ -213,6 +238,20 @@ export default class DBUsers extends universeBase {
 
     }
 
+    async addTomoToUserInventory(tomo: Character) {
+      const payload: CharacterInUser = Tomo_Dictionaries.default_CharInUser(tomo.getId as number, 0);
+      if (this.tomodachis.length >= 5) {
+        if (this._reservedTomo.findIndex(index => index.originalID == tomo.getId) != -1) return;
+        return this._reservedTomo.push(payload)
+      }
+      if (this._tomodachis.findIndex(index => index.originalID == tomo.getId) != -1) return;
+      
+      
+      this._tomodachis.push(payload)
+
+
+    }
+
 
 
 
@@ -255,6 +294,8 @@ export default class DBUsers extends universeBase {
         _id: this._id,
         level: this._level,
         xp: this._xp,
+        tickets: this._tik,
+        money: this._cur,
         discord_username: this.username,
         characters: this._tomodachis,
         reserved: this._reservedTomo,

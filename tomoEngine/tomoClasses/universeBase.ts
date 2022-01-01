@@ -85,6 +85,10 @@ export default abstract class universeBase {
     get formattedName() {
         return this.markUpFormattedName.replace(/\*/g, "")
     }
+
+    get markUpFormattedNamewEmoji() {
+        return this.emoji + " " + this.markUpFormattedName
+    }
     /**
      * 
      * @returns boolean | if the class is a variant or not.
