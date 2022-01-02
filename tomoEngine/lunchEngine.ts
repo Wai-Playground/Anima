@@ -2,14 +2,13 @@
  * @author Jupiternerd
  */
 
-import { time } from "console";
 import { User } from "discord.js";
-import { runInThisContext } from "vm";
 import engineBase from "./base";
 import { AmadeusInteraction } from "./statics/types";
 import Character from "./tomoClasses/characters";
 import LunchBox from "./tomoClasses/lunchBox";
 import universeBase from "./tomoClasses/universeBase";
+import DBUsers from "./tomoClasses/users";
 
 export default class Lunch extends engineBase {
     box: LunchBox
@@ -20,9 +19,20 @@ export default class Lunch extends engineBase {
 
     }
 
+    async checkIfUserIsInPity(user: DBUsers = this.interaction.DBUser, box: LunchBox = this.box) {
+        console.log(box.pity)
+        console.log((user.pities[user.findPityBoxIndex(box.getId as number)].rolled >= box.pity).toString() + "__PITY")
+        if (user.pities[user.findPityBoxIndex(box.getId as number)].rolled >= box.pity) {
+            this.interaction.DBUser.resetPity(box.getId as number);
+            return true;
+        }
+        return false;
+
+    }
+
     async rollBox(): Promise<universeBase> {
         const rolled = await this.box.roll()
-        console.log(rolled.type)
+        
         let ret: universeBase;
         switch (rolled.type) {
             case "items":
@@ -36,6 +46,13 @@ export default class Lunch extends engineBase {
             case "stories":
                 break;
         }
+
+        if (await this.checkIfUserIsInPity()) {
+            console.log("WHYAMIRUNNING")
+            if (ret.gradeInt < this.box.gradeInt) return await this.rollBox()
+        }
+
+        this.interaction.DBUser.addToRoll(this.box.getId as number)
 
         return ret;
 
@@ -55,8 +72,9 @@ export default class Lunch extends engineBase {
 
                 for (const key of amount.keys()) {
                     let item = roll.find(items => items._id == key) 
-                    ret += `${item.markUpFormattedNamewEmoji} x${amount.get(key)}\n`;
+                    ret += `${item.markUpFormattedNamewEmoji} x**${amount.get(key)}**\n`;
                 }
+                
                 z--;
                 interaction.editReply(ret);
                 return clearInterval(intervalID)
@@ -82,6 +100,7 @@ export default class Lunch extends engineBase {
                 else {
                     this.interaction.DBUser.addToUserTickets(10)
                 }
+            
             
             
     

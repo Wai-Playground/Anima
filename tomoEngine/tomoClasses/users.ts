@@ -4,7 +4,7 @@
 
 import Queries from "../queries";
 import Tomo_Dictionaries, { Equations } from "../statics/tomo_dict";
-import { CharacterInUser, ItemInUser, Tomo_Action, UserUniversePayload } from "../statics/types";
+import { CharacterInUser, ItemInUser, pities, Tomo_Action, UserUniversePayload } from "../statics/types";
 import Character from "./characters";
 import universeBase from "./universeBase";
  
@@ -16,6 +16,7 @@ export default class DBUsers extends universeBase {
     _xp: number;
     _cur: number;
     _tik: number;
+    _pities: Array<pities>
     username: string;
     constructor(_id: number | string, payload: UserUniversePayload) {
         super(_id, 'users', payload.discord_username, "🧍");
@@ -24,6 +25,7 @@ export default class DBUsers extends universeBase {
         this._reservedTomo = payload.reserved;
         this._inventory = payload.inventory;
         this._xp = payload.xp;
+        this._pities = payload.pities;
         this._level = payload.level;
         this._cur = payload.money;
         this._tik = payload.tickets;
@@ -37,6 +39,10 @@ export default class DBUsers extends universeBase {
 
     get xp() {
       return this._xp;
+    }
+
+    get pities() {
+      return this._pities;
     }
 
     get inventory() {
@@ -58,6 +64,33 @@ export default class DBUsers extends universeBase {
 
     getMainTomoDachi() {
       return this.tomodachis[0]
+
+    }
+    /**
+     * DONT FORGET TO UPDATE
+     * @param boxID 
+     */
+    addToRoll(boxID: number) {
+      const index = this.findPityBoxIndex(boxID);
+      if (index == -1) {
+        this._pities.push({
+          box_id: boxID,
+          rolled: 1
+        })
+
+      } else {
+        this._pities[index].rolled++;
+      }
+    }
+
+    resetPity(boxID: number) {
+      const index = this.findPityBoxIndex(boxID);
+      if (index == -1) return;
+      this._pities[index].rolled = 0;
+    }
+
+    findPityBoxIndex(boxID: number) {
+      return this._pities.findIndex(box => box.box_id == boxID);
 
     }
 
@@ -299,6 +332,7 @@ export default class DBUsers extends universeBase {
         xp: this._xp,
         tickets: this._tik,
         money: this._cur,
+        pities: this._pities,
         discord_username: this.username,
         characters: this._tomodachis,
         reserved: this._reservedTomo,

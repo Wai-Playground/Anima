@@ -120,6 +120,7 @@ export abstract class Commands extends Amadeus_Base {
           money: 0,
           tickets: 0,
           discord_username: author.username,
+          pities: [],
           characters: [
             Tomo_Dictionaries.default_CharInUser()
           ],

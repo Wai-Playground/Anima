@@ -11,9 +11,11 @@ import Items from "./items";
          _id: number,
          type: BasicUniverseType
      }> = [];
+     pity: number;
      constructor(_id: number | string, payload: BentoPayload) {
          super(_id, {emoji: (payload.emoji == null ? '🍱' : payload.emoji), ...payload})
          this.drops = payload.drops;
+         this.pity = payload.pity;
 
          
      }
@@ -38,6 +40,7 @@ import Items from "./items";
          console.log(rolled)
          return rolled
      }
+
 
 
 

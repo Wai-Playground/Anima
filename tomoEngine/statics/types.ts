@@ -150,9 +150,9 @@ export interface Boxes {
 }
 
 export interface BentoPayload extends ItemsPayload {
-  drops: Array<Boxes>
-  
-  
+  drops: Array<Boxes>;
+  pity: number;
+
 }
 
 export interface BackgroundPayload extends BaseUniversePayload {
@@ -205,6 +205,11 @@ export interface CharacterInUser {
 
 }
 
+export interface pities {
+  box_id: number | string;
+  rolled: number;
+}
+
 export interface UserUniversePayload {
   _id: number | string;
   discord_username: string;
@@ -212,6 +217,7 @@ export interface UserUniversePayload {
   xp: number;
   tickets: number;
   money: number; 
+  pities: Array<pities>
   characters: Array<CharacterInUser>;
   reserved: Array<CharacterInUser>;
   inventory: Array<ItemInUser>
