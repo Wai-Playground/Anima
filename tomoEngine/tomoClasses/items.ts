@@ -9,7 +9,7 @@
    _itemType: Item_Type
      constructor(_id: number | string, payload: ItemsPayload) {
          super(_id, 'items', payload.name, payload.description, payload.class || "any", payload.emoji, payload.spoiler, payload.grade);
-
+         this._itemType = payload.type;
          
        }
 

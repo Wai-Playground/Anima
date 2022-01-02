@@ -422,11 +422,13 @@ class TomoEngine extends engineBase {
 
     // This block is for when the user gives her food.
     if (cur_mood == "hungry") {
-      if (receivedItem.itemType == "edible") {
+      console.log(receivedItem.itemType + "_RECEIVED_ITEM")
+      if (receivedItem.itemType == "edibles") {
         (mood = "happy"), (res = "food");
         this.result_multiplier = 2;
+      } else {
+        (mood = (this.characters.get(card.ch).archetype == "tsun" ? "annoyed" : "sad")), (res = "not_food");
       }
-      else (mood = (this.characters.get(card.ch).archetype == "tsun" ? "annoyed" : "sad")), (res = "not_food");
     }
 
     variantMood = await ch.getVariant(mood); // We get the variant mood again, since there may have been a change in the mood.
