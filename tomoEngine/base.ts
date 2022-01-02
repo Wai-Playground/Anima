@@ -115,22 +115,6 @@ class engineBase extends EventEmitter {
 
   }
 
-  fillStringForEmbedNovel(string: string) {
-    const hiddenW = "ㅤㅤㅤ", length = string.length, total = 26;
-
-    let ret: string = "", minus = total - length;
-    console.log(minus + "__MINUS")
-
-    if (minus <= 0) return string;
-
-    for (minus <= 0; minus--;) ret += hiddenW;
-    
-    return string + ret;
-
-    
-
-  }
-
   capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }

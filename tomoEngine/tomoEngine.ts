@@ -69,6 +69,7 @@ class Cards {
 class TomoEngine extends engineBase {
   item: Items | "broke" = "broke";
   response: keyof Gift_Responses;
+  _mood: Temp_MoodTypeStrings;
   width: number = 564;
   height: number = 670;
   cards: Array<Cards>;
@@ -362,7 +363,7 @@ class TomoEngine extends engineBase {
     // Define variables & defaults. + default response (broke).
     let res: keyof Gift_Responses = "none",
       cur_mood = TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current),
-      mood: Temp_MoodTypeStrings = "sad",
+      mood: Temp_MoodTypeStrings = (this.characters.get(card.ch).archetype == "tsun" ? "annoyed" : "sad"),
       variantMood: Character,
       ch = this.characters.get(card.ch),
       response: Single = {
@@ -378,6 +379,7 @@ class TomoEngine extends engineBase {
       response.character = variantMood.getId; // The response of character's ID is now the variantMood. Since the mood is
       response.script = res;
       this.response = res; // For when we use it in the calc gift rewards section later.
+      this._mood = mood;
 
       return new NodeSingle(response);
     }
@@ -432,6 +434,7 @@ class TomoEngine extends engineBase {
     response.text = ch.getRandomGiftResponse(res); // Random response.
     response.script = res;
     this.response = res;
+    this._mood = mood;
     response.mood = mood; // Mood becomes the moode.
     response.character = variantMood.getId; // The character of the response becomes the mood.
 
@@ -488,6 +491,21 @@ class TomoEngine extends engineBase {
 
   }
 
+  async deployEndingOfGift(card: Cards = this.cards[this.index]) {
+    console.log(this._mood + "_MOOD")
+    const ch = this.characters.get(card.ch), variant_mood = await ch.getVariant(this._mood)
+    console.log(variant_mood)
+    let response: Single = {
+      mood: this._mood,
+      text: variant_mood.getRandFarewells(),
+      backable: false,
+    };
+
+    return new NodeSingle(response)
+
+
+  }
+
   /**
    * Name | gift
    * The gift block where the user can gift items to their tomos.
@@ -534,6 +552,12 @@ class TomoEngine extends engineBase {
           responseIndex,
           true
         ); // Inject the node that has the reaction in it to the response index. True is for destructive.
+        this.novel.deployNode(
+          await this.deployEndingOfGift(card),
+          responseIndex + 1,
+          false
+        ); // Inject the node that has the ending in it to the response index +1. If the char was happy it will be happy, sad if it is sad. 
+
 
         if (this.item != "broke") {
           // If the item is not "broke" as in nothing is being given.

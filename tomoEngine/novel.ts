@@ -230,9 +230,6 @@ export default class Novel extends engineBase {
     this.nodes.splice(index, (destroy ? 1 : 0), node)
     console.log(this.nodes)
     this.buildNode(index)
-    
-
-
 
   }
 
