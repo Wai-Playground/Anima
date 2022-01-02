@@ -440,7 +440,8 @@ class TomoEngine extends engineBase {
     this._mood = mood;
     response.mood = mood; // Mood becomes the moode.
     response.character = variantMood.getId; // The character of the response becomes the mood.
-
+    
+    card.chInUser.moods.current = TomoEngine.convertTempMoodTypeToNumber(mood)
     return new NodeSingle(response); // Return a new NodeSingle of response.
   }
 
