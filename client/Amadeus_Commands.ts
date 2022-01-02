@@ -122,7 +122,6 @@ export abstract class Commands extends Amadeus_Base {
           discord_username: author.username,
           characters: [
             Tomo_Dictionaries.default_CharInUser()
-
           ],
           reserved: [],
           inventory: []

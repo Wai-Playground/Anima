@@ -22,7 +22,7 @@ class interactionCreate extends Listeners {
 
     try {
       let cmd: Commands = bot.commands.get(interaction.commandName);
-
+      //interaction.DBUser = await 
 
       if (
         (await cmd.check(bot, interaction)) &&
