@@ -23,7 +23,7 @@ class Roll extends Commands {
     const menu = new Lunch(interaction.user, interaction, box);
     console.log(interaction.DBUser)
 
-    menu.start()
+    menu.start(5)
     
     
 

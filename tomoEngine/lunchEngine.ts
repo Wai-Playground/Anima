@@ -4,6 +4,7 @@
 
 import { time } from "console";
 import { User } from "discord.js";
+import { runInThisContext } from "vm";
 import engineBase from "./base";
 import { AmadeusInteraction } from "./statics/types";
 import Character from "./tomoClasses/characters";
@@ -41,46 +42,64 @@ export default class Lunch extends engineBase {
     }
 
 
-    async mockRoll(roll: universeBase) {
-        const mock = ["Sike bitch its a dog shit item", "Maybe A book?", "A new Ch?", "Hope it's something good..."]
-        let i = mock.length - 1;
+    async mockRoll(roll: Array<universeBase>) {
+        const mock = ["uwu pwese spend moure monnies =w=", "i prey iz guditem", "sike fuck u its a grade D item"].reverse()
+        let z: number = roll.length, ret: string = "", amount: Map<number, number> = new Map();
         
-        async function callBack(mock: string[], interaction: AmadeusInteraction) {
+        async function callBack(randIntFromZero: Function, mock: string[], interaction: AmadeusInteraction) {
 
-            if (i < 0) {
-                await interaction.editReply("You got • " + roll.markUpFormattedNamewEmoji)
+            if (z <= 0) {
+                for (const item of roll) 
+                    if (amount.has(item.getId as number)) amount.set(item.getId as number, amount.get(item.getId as number) + 1);
+                    else (amount.set(item.getId as number, 1));
+
+                for (const key of amount.keys()) {
+                    let item = roll.find(items => items._id == key) 
+                    ret += `${item.markUpFormattedNamewEmoji} x${amount.get(key)}\n`;
+                }
+                z--;
+                interaction.editReply(ret);
                 return clearInterval(intervalID)
+                
+                
             }
 
-            const str = "Rolling... •" + " " + mock[i]
+            const str = `Rolling \`\`x${z--}\`\` •` + " " + mock[randIntFromZero(mock.length - 1)]
             if (interaction.replied) await interaction.editReply(str); else await interaction.reply(str);
-            i--;
 
         }
         
-        let intervalID = setInterval(async () => {await callBack(mock, this.interaction)}, 1700)
+        let intervalID = setInterval(async () => {await callBack(this.randIntFromZero, mock, this.interaction)}, 1200)
         
         
     }
 
-    async storeRoll(roll: universeBase) {
-        if (roll.getType == "items") this.interaction.DBUser.addToInventory(roll.getId as number, 1);
-        if (roll.getType == "characters") 
-            if (this.interaction.DBUser.getTomoFromDachis(roll.getId as number) == null) this.interaction.DBUser.addTomoToUserInventory(roll as Character)
-            else return this.interaction.DBUser.addToUserTickets(1)
+    async storeRoll(rolls: Array<universeBase>) {
+        for (const roll of rolls) {
+            if (roll.getType == "items") this.interaction.DBUser.addToInventory(roll.getId as number, 1);
+            if (roll.getType == "characters") 
+                if (this.interaction.DBUser.getTomoFromDachis(roll.getId as number) == null) this.interaction.DBUser.addTomoToUserInventory(roll as Character);
+                else {
+                    this.interaction.DBUser.addToUserTickets(10)
+                }
+            
+            
+    
+            await this.interaction.DBUser.update()
+        }
         
-
-        this.interaction.DBUser.update()
     }
 
     
 
-    async start() {
-        const roll = await this.rollBox()
-        console.log(roll)
-        this.storeRoll(roll)
-        this.mockRoll(roll)
+    async start(amount: number = 1) {
+        let rolls = [];
+        for (let i = 1; i <= amount; i++) rolls.push(await this.rollBox())
+
+        this.storeRoll(rolls)
+        this.mockRoll(rolls)
     }
+
 
 
 

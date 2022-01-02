@@ -26,7 +26,7 @@ export default class DBUsers extends universeBase {
         this._xp = payload.xp;
         this._level = payload.level;
         this._cur = payload.money;
-        this._tik = payload.money;
+        this._tik = payload.tickets;
          
  
     }
@@ -121,6 +121,7 @@ export default class DBUsers extends universeBase {
 
     addToUserTickets(amount: number) {
       this._tik += amount;
+      console.log(amount + "_AMOUNT_ADDED")
     }
     removeFromUserTickets(amount: number) {
       this._tik -= amount;

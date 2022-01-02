@@ -27,11 +27,11 @@ class Inventory extends Commands {
 
       for (const items of inv) {
           item = new Items(items.itemID, (await Queries.item(items.itemID)));
-          ret += (i == 0 ? `` : `,`) + `${item.markUpFormattedNamewEmoji} ${(items.amount > 1 ? `x${items.amount}` : ``)}`;
+          ret += (i == 0 ? `` : `,`) + `${item.markUpFormattedNamewEmoji}\`\` ${(items.amount > 1 ? `x${items.amount}\n` : `\n`)}`;
           i++
       }
 
-      ret += "\`\`";
+      ret;
 
       interaction.reply(ret)
   }
