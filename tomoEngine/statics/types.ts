@@ -15,7 +15,10 @@ export enum RPG_Classes {
 }
 
 export type RPG_Classes_Strings = keyof typeof RPG_Classes | "any";
-
+export enum In_House_Assets {
+  characters,
+  backgrounds
+}
 /** Basic types (end) */
 
 /** Tomo Types (start) */

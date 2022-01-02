@@ -6,15 +6,16 @@ const { Routes } = require("discord-api-types/v9");
 import Momonga from "./Amadeus_Mongo"
 import Red from "./Amadeus_Redis"
 import Listeners from "./Amadeus_listeners"
+import { In_House_Assets } from "../tomoEngine/statics/types";
 export default class CustomClient extends Client {
   /**
    * Description | Custom Client.
    * @param {*} name | Name of the bot.
    * @param {*} backup_prefix | Default = "-"
    */
-
+   _total_bgs: number = 0;
+   _total_chs: number = 0;
   constructor(name: string = "Bot", token: string, uri: string) {
-
     super({
       intents: [
         Intents.FLAGS.GUILDS,
@@ -29,6 +30,28 @@ export default class CustomClient extends Client {
 
     this.commands = new Collection();
     this.slashCommands = []; // Make a new arr for commands to forward to discord.
+
+  }
+
+  async verifyBackgrounds(this: CustomClient, path: string = './assets/backgrounds') {
+    const files = fs.readdirSync(path);
+    if (!files) throw Error("No files using the path: " + path)
+    for (const file of files) if (file.endsWith(".png") || file.endsWith(".jpg")) this._total_bgs++;
+    console.log("Verified total of: " + this._total_bgs + " backgrounds.")
+  }
+  async verifyCharacters(this: CustomClient, path: string = './assets/characters') {
+    const files = fs.readdirSync(path);
+    if (!files) throw Error("No files using the path: " + path)
+    for (const file of files) if (file.endsWith(".png") || file.endsWith(".jpg")) this._total_chs++;
+    console.log("Verified total of: " + this._total_chs + " characters.")
+  }
+
+  async verifyAssets(this: CustomClient, aPath: string = './assets') {
+
+    this.verifyCharacters(aPath + "/" + "characters")
+    this.verifyBackgrounds(aPath + "/" + "backgrounds")
+
+
 
   }
 
@@ -180,6 +203,7 @@ export default class CustomClient extends Client {
     this.commandLoader();
     this.loadEvents();
     this.mangoLoader();
+    this.verifyAssets();
     
     await super.login(this.token);
   }
