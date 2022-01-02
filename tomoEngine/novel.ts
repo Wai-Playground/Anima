@@ -237,7 +237,7 @@ export default class Novel extends engineBase {
     //if (this.characters.has(char.getId)) throw new TomoError("Found duplicate char in memory bank.")
     console.log("DEPLOYING CHAR")
     this.characters.set(id, char)
-    this.loaded_ch.set(id, await loadImage(char.link))
+    this.loaded_ch.set(id, await loadImage(`./assets/characters/${char.link}`))
     return;
 
   }
@@ -268,7 +268,7 @@ export default class Novel extends engineBase {
       if (!this.backgrounds.has(single.bg)) {
         // If the background map has this specific background ID already we skip. If not...
         payload = await this.getBackground(single.bg); // we store the payload of the db request
-        this.loaded_bg.set(single.bg, await loadImage(payload.link))
+        this.loaded_bg.set(single.bg, await loadImage(`./assets/backgrounds/${payload.link}`))
         this.backgrounds.set(single.bg, payload);
       }
 
@@ -292,7 +292,7 @@ export default class Novel extends engineBase {
         }
         if (payload.link == null) { // If the link is null:
           if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link; //get from past character if we are index > 0;
-          if (i <= 0) payload.link = "https://i.imgur.com/lqyxFhX.png"// just transparnt png if we we are at index 0;
+          if (i <= 0) payload.link = "loser.png"// just transparnt png if we we are at index 0;
         } 
 
         await this.deployChar(payload, single.character)

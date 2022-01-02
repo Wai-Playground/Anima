@@ -12,6 +12,7 @@ export default abstract class universeBase {
     name: string;
     variant?: boolean;
     link?: string;
+    //physical_link?: string;
     spoiler?: boolean;
     _class: RPG_Classes_Strings
     _grade?: Rarity_Grade_Strings
@@ -34,6 +35,9 @@ export default abstract class universeBase {
         this.spoiler = spoiler;
         this._grade = grade;
         this.emoji = emoji;
+        /*
+        if (this.type == "characters") this.physical_link = `ch_${this._id}`;
+        if (this.type == "backgrounds") this.physical_link = `bg_${this._id}`;*/
 
     }
 

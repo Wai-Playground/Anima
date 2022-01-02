@@ -102,6 +102,7 @@ class TomoEngine extends engineBase {
    * @returns Card object. (will have built image but the original object will also have the built img)
    */
   async buildCharacterCard(card: Cards): Promise<Cards> {
+    const asset = './assets/'
     console.time("build")
     // Prepare canvas.
 
@@ -115,12 +116,12 @@ class TomoEngine extends engineBase {
     // Prepare the image objects.
 
     const bg: Image = await loadImage(
-      this.backgrounds.get(card.bg).link // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
+      asset + `backgrounds/${this.backgrounds.get(card.bg).link}` // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
       // card.bg is the ID of the background.
     );
 
     const ch: Image = await loadImage(
-      chObj.link
+      asset + `characters/${chObj.link}`
     );
 
     // This block draws the image.
@@ -652,7 +653,6 @@ class TomoEngine extends engineBase {
     ch_xp_needed = Equations.calculate_ch_xp(card.chInUser.being.level + 1),
     ch_xp_needed_until = (ch_xp_needed - card.chInUser.being.xp)
     console.log(card.chInUser.being.level + "CH_LVL")
-
   
     // create a rich embed with the character's stats.
     const embed = new MessageEmbed()
@@ -672,13 +672,13 @@ class TomoEngine extends engineBase {
       `${await TomoEngine.convertIntMoodToEmj(card.chInUser.moods.current)} **Current Mood** •「${this.capitalizeFirstLetter(TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current))}」\n`
       )
       .setColor(await TomoEngine.rarityColor(characterObject.gradeInt) as ColorResolvable)
-      .setThumbnail(characterObject.link)
+      .setThumbnail("attachment://" + characterObject.link)
       .setTimestamp()
       .setFooter({text: `${this.interaction.user.username}\'s ${characterObject.formattedName}`, iconURL: this.interaction.user.avatarURL()})
 
-
     return interaction.editReply({
       content: content,
+      files: [{attachment: `assets/characters/` + characterObject.link}],
       attachments: [],
       embeds: [embed],
       components: []
