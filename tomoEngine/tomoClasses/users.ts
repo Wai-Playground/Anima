@@ -6,6 +6,7 @@ import Queries from "../queries";
 import Tomo_Dictionaries, { Equations } from "../statics/tomo_dict";
 import { CharacterInUser, ItemInUser, pities, Tomo_Action, UserUniversePayload } from "../statics/types";
 import Character from "./characters";
+import LunchBox from "./lunchBox";
 import universeBase from "./universeBase";
  
 export default class DBUsers extends universeBase {
@@ -92,6 +93,14 @@ export default class DBUsers extends universeBase {
     findPityBoxIndex(boxID: number) {
       return this._pities.findIndex(box => box.box_id == boxID);
 
+    }
+
+    checkIfUserHasPity(box: LunchBox) {
+      if (this.pities[this.findPityBoxIndex(box.getId as number)].rolled >= box.pity) {
+        this.resetPity(box.getId as number)
+        return true;
+      }
+      return false;
     }
 
     getTomoFromDachis(originalID: number) {

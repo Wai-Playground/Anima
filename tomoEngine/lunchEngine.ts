@@ -19,42 +19,13 @@ export default class Lunch extends engineBase {
 
     }
 
-    async checkIfUserIsInPity(user: DBUsers = this.interaction.DBUser, box: LunchBox = this.box) {
-        console.log(box.pity)
-        console.log((user.pities[user.findPityBoxIndex(box.getId as number)].rolled >= box.pity).toString() + "__PITY")
-        if (user.pities[user.findPityBoxIndex(box.getId as number)].rolled >= box.pity) {
-            this.interaction.DBUser.resetPity(box.getId as number);
-            return true;
-        }
-        return false;
-
-    }
-
     async rollBox(): Promise<universeBase> {
-        const rolled = await this.box.roll()
+        const pity = this.interaction.DBUser.checkIfUserHasPity(this.box);
+        if (pity) {
+            this.interaction.DBUser.resetPity(this.box.getId as number);
+            return await this.box.roll(pity);
+        } else return await this.box.roll();
         
-        let ret: universeBase;
-        switch (rolled.type) {
-            case "items":
-                ret = await this.getItemUniverse(rolled._id)
-                break;
-            case "characters":
-                ret = await this.getCharacter(rolled._id)
-                break;
-            case "backgrounds":
-                break;
-            case "stories":
-                break;
-        }
-
-        if (await this.checkIfUserIsInPity()) {
-            console.log("WHYAMIRUNNING")
-            if (ret.gradeInt < this.box.gradeInt) return await this.rollBox()
-        }
-
-        this.interaction.DBUser.addToRoll(this.box.getId as number)
-
-        return ret;
 
     }
 
@@ -104,7 +75,7 @@ export default class Lunch extends engineBase {
             
             
     
-            await this.interaction.DBUser.update()
+            this.interaction.DBUser.update()
         }
         
     }
@@ -113,7 +84,10 @@ export default class Lunch extends engineBase {
 
     async start(amount: number = 1) {
         let rolls = [];
-        for (let i = 1; i <= amount; i++) rolls.push(await this.rollBox())
+        for (let i = 1; i <= amount; i++) {
+            this.interaction.DBUser.addToRoll(this.box.getId as number);
+            rolls.push(await this.rollBox());
+        }
 
         this.storeRoll(rolls)
         this.mockRoll(rolls)
