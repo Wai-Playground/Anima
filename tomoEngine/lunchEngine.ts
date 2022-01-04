@@ -25,8 +25,6 @@ export default class Lunch extends engineBase {
             this.interaction.DBUser.resetPity(this.box.getId as number);
             return await this.box.roll(pity);
         } else return await this.box.roll();
-        
-
     }
 
 
@@ -68,9 +66,8 @@ export default class Lunch extends engineBase {
             if (roll.getType == "items") this.interaction.DBUser.addToInventory(roll.getId as number, 1);
             if (roll.getType == "characters") 
                 if (this.interaction.DBUser.getTomoFromDachis(roll.getId as number) == null) this.interaction.DBUser.addTomoToUserInventory(roll as Character);
-                else {
-                    this.interaction.DBUser.addToUserTickets(10)
-                }
+                else this.interaction.DBUser.addToUserTickets(10)
+                
             
             
             

@@ -6,6 +6,7 @@ import Queries from "../queries";
 import Tomo_Dictionaries, { Equations } from "../statics/tomo_dict";
 import { CharacterInUser, ItemInUser, pities, Tomo_Action, UserUniversePayload } from "../statics/types";
 import Character from "./characters";
+import Items from "./items";
 import LunchBox from "./lunchBox";
 import universeBase from "./universeBase";
  
@@ -61,6 +62,23 @@ export default class DBUsers extends universeBase {
 
     get tickets() {
       return this._tik
+    }
+
+    async getUserInventoryButWithDBItems() {
+      let inventory: Array<
+      {
+        amount: number,
+        item: Items
+      }>
+      for (const items of this.inventory) {
+        if (items.amount <= 0) return;
+        inventory.push({
+          amount: items.amount,
+          item: new Items(items.itemID, await Queries.item(items.itemID))
+        })
+      }
+
+      return inventory;
     }
 
     getMainTomoDachi() {
