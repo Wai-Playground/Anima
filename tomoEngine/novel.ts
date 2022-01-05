@@ -370,8 +370,8 @@ export default class Novel extends engineBase {
     this.emit("pageChange", this.nodes[index]);
     this.index = index;
     this.selection = undefined;
-    const character = this.characters.get(this.nodes[index].character), text = this.nodes[index].text,
-    final_text = `${text}`
+    const character = this.characters.get(this.nodes[index].character), text = this.nodes[index].text
+    //final_text = `${text}`
     /*
     embed = new MessageEmbed()
     .addField(character.name, final_text)

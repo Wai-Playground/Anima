@@ -8,7 +8,6 @@ import { AmadeusInteraction } from "./statics/types";
 import Character from "./tomoClasses/characters";
 import LunchBox from "./tomoClasses/lunchBox";
 import universeBase from "./tomoClasses/universeBase";
-import DBUsers from "./tomoClasses/users";
 
 export default class Lunch extends engineBase {
     box: LunchBox

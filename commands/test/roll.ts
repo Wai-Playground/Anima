@@ -2,11 +2,7 @@
 import { goAsync } from "fuzzysort";
 import CustomClient from "../../client/Amadeus_Client";
 import { Commands } from "../../client/Amadeus_Commands";
-import Lunch from "../../tomoEngine/lunchEngine";
-import Queries from "../../tomoEngine/queries";
-import { AmadeusInteraction, BentoPayload } from "../../tomoEngine/statics/types";
-import Items from "../../tomoEngine/tomoClasses/items";
-import LunchBox from "../../tomoEngine/tomoClasses/lunchBox";
+import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 class Roll extends Commands {
@@ -35,7 +31,6 @@ class Roll extends Commands {
     banner = fuzzySearch[0]?.target || undefined;
     if (!banner) return interaction.reply("Not found. Retry?")
     lunch_box_inventory.find(box => box.item.name == banner);
-
 
     
     
