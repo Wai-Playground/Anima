@@ -11,9 +11,7 @@ import {
   MessageButton,
   InteractionCollector,
   MessageSelectMenu,
-  MessageSelectOptionData,
-  MessageEmbed,
-  ColorResolvable,
+  MessageSelectOptionData
 } from "discord.js";
 import engineBase from "./base";
 import { Single, Scripts, Temp_MoodTypeStrings, AmadeusInteraction} from "./statics/types";
