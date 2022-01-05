@@ -25,7 +25,7 @@ import {
   createCanvas,
   Image,
   loadImage,
-  NodeCanvasRenderingContext2D,
+  CanvasRenderingContext2D,
 } from "canvas";
 
 import { NovelError, TomoError } from "./statics/errors";
@@ -135,7 +135,7 @@ export default class Novel extends engineBase {
     console.log("RENDERING_NODE_" + index)
     console.time("build_"+index)
     
-    const ctx: NodeCanvasRenderingContext2D = this.canvas.getContext("2d")
+    const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d")
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.quality = "fast";
     ctx.patternQuality = "fast";

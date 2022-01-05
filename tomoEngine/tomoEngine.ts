@@ -16,7 +16,7 @@ import {
   createCanvas,
   Image,
   loadImage,
-  NodeCanvasRenderingContext2D,
+  CanvasRenderingContext2D,
 } from "canvas";
 import engineBase from "./base";
 import Character from "./tomoClasses/characters";
@@ -107,7 +107,7 @@ class TomoEngine extends engineBase {
     // Prepare canvas.
 
     const canvas: Canvas = createCanvas(this.width, this.height); // Create Canvas.
-    const ctx: NodeCanvasRenderingContext2D = canvas.getContext("2d"); // Get context.
+    const ctx: CanvasRenderingContext2D = canvas.getContext("2d"); // Get context.
 
     let chObj: Character = this.characters.get(card.chInUser.originalID), cur_mood = TomoEngine.convertNumberToTempMoodType(card.chInUser.moods.current);
 

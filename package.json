@@ -22,7 +22,7 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "@types/ioredis": "^4.28.1",
     "@types/redis": "^2.8.32",
-    "canvas": "^2.8.0",
+    "canvas": "github:Automattic/node-canvas",
     "console-stamp": "^3.0.3",
     "dayjs": "^1.10.7",
     "discord-api-types": "^0.22.0",
