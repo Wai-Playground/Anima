@@ -2,6 +2,7 @@
 import { goAsync } from "fuzzysort";
 import CustomClient from "../../client/Amadeus_Client";
 import { Commands } from "../../client/Amadeus_Commands";
+import GachaEngine from "../../tomoEngine/gacha/gachaEngine";
 import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
@@ -21,17 +22,11 @@ class Roll extends Commands {
   }
 
   async execute(bot: CustomClient, interaction: AmadeusInteraction) {
-    // init a variable that stores a number
-    let fuzzy: string[], fuzzySearch: Fuzzysort.Results, banner: string;
-    const lunch_box_inventory = (await interaction.DBUser.getUserInventoryButWithDBItems()).filter( box => box.item.itemType == "boxes");
-    if (lunch_box_inventory.length <= 0) return interaction.reply("You got no boxes!");
-    for (const boxes of lunch_box_inventory) fuzzy.push(boxes.item.name);
+    const banner = new GachaEngine(interaction.user, interaction)
+    banner.once("ready", () => {
+      banner.start()
 
-    fuzzySearch = await goAsync(interaction.options.getString("banner"), fuzzy, { allowTypo: true });
-    banner = fuzzySearch[0]?.target || undefined;
-    if (!banner) return interaction.reply("Not found. Retry?")
-    lunch_box_inventory.find(box => box.item.name == banner);
-
+    })
     
     
     //const menu = new Lunch(interaction.user, interaction, );

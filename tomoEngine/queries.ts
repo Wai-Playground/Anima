@@ -1,8 +1,9 @@
 //import user_universe from "../db_schemas/universe/user_universe_type";
 import { UniBaseNotFoundError, UniVariantNotFoundError } from "./statics/errors";
-import { BackgroundPayload, BaseUniversePayload, BasicUniverseType, CharacterInUser, CharacterPayload, Guild, ItemInUser, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
+import { BackgroundPayload, Banner_Payload, BaseUniversePayload, BasicUniverseType, CharacterInUser, CharacterPayload, Guild, ItemInUser, ItemsPayload, StoryPayload, UserUniversePayload } from "./statics/types";
 import Monmonga from "../client/Amadeus_Mongo";
 import Red from "../client/Amadeus_Redis";
+import { FindCursor, WithId } from "mongodb";
 const EXPIRATION = parseInt(process.env.REDISEXPIRATION);
 class Queries {
     /**
@@ -220,6 +221,17 @@ class Queries {
             console.log(e);
         } finally {
             return tomo;
+        }
+    }
+
+    public static async getBanners() {
+        let payload: WithId<Banner_Payload>[]
+        try {
+            payload = await Monmonga.universeDB().collection<Banner_Payload>("banners").find({}).toArray()
+        } catch(e) {
+            console.log(e);
+        } finally {
+            return payload;
         }
     }
 

@@ -49,6 +49,10 @@ export default class Monmonga extends Amadeus_Base {
 
     }
 
+    public static gachaDB() {
+      return momonga.db("gacha_rolls")
+    }
+
     public static statsDB(){
       return momonga.db("statistics")
     }

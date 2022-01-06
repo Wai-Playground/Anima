@@ -27,7 +27,6 @@ import {
 } from "canvas";
 
 import { NovelError, TomoError } from "./statics/errors";
-import TomoEngine from "./tomoEngine";
 
 export class NodeSingle implements Single {
   index: number;

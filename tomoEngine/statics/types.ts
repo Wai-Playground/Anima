@@ -140,20 +140,41 @@ export interface BaseUniversePayload {
 
 export interface ItemsPayload extends BaseUniversePayload {
   type: Item_Type
-  
 }
-
-export interface Boxes {
+export interface Drops {
   drop_rate?: number,
   drop_id: number
   drop_type: BasicUniverseType
 }
 
-export interface BentoPayload extends ItemsPayload {
-  drops: Array<Boxes>;
-  pity: number;
+export enum Economy_Payments {
+  "tickets",
+  "items",
+  "currency"
+}
+
+export type Economy_Payments_String = keyof typeof Economy_Payments;
+export interface Banner_Payload {
+  _id: string | number;  name: string;
+  headers: {
+    bg: number | string;
+    content: string;
+    ch: number | string;
+  }
+  cost: {
+    amount: number,
+    type: Economy_Payments_String,
+    _id?: number | string;
+  }
+  body: string,
+  active: boolean
+  drops: Array<Drops>;
+  pity: number
 
 }
+
+
+
 
 export interface BackgroundPayload extends BaseUniversePayload {
   link: string;

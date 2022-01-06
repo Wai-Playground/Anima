@@ -4,10 +4,9 @@
 
 import Queries from "../queries";
 import Tomo_Dictionaries, { Equations } from "../statics/tomo_dict";
-import { CharacterInUser, ItemInUser, pities, Tomo_Action, UserUniversePayload } from "../statics/types";
+import { Banner_Payload, CharacterInUser, ItemInUser, pities, Tomo_Action, UserUniversePayload } from "../statics/types";
 import Character from "./characters";
 import Items from "./items";
-import LunchBox from "./lunchBox";
 import universeBase from "./universeBase";
  
 export default class DBUsers extends universeBase {
@@ -85,42 +84,6 @@ export default class DBUsers extends universeBase {
       return this.tomodachis[0]
 
     }
-    /**
-     * DONT FORGET TO UPDATE
-     * @param boxID 
-     */
-    addToRoll(boxID: number) {
-      const index = this.findPityBoxIndex(boxID);
-      if (index == -1) {
-        this._pities.push({
-          box_id: boxID,
-          rolled: 1
-        })
-
-      } else {
-        this._pities[index].rolled++;
-      }
-    }
-
-    resetPity(boxID: number) {
-      const index = this.findPityBoxIndex(boxID);
-      if (index == -1) return;
-      this._pities[index].rolled = 0;
-    }
-
-    findPityBoxIndex(boxID: number) {
-      return this._pities.findIndex(box => box.box_id == boxID);
-
-    }
-
-    checkIfUserHasPity(box: LunchBox) {
-      if (this.pities[this.findPityBoxIndex(box.getId as number)].rolled >= box.pity) {
-        this.resetPity(box.getId as number)
-        return true;
-      }
-      return false;
-    }
-
     getTomoFromDachis(originalID: number) {
       let find = this.tomodachis.find(tomo => tomo.originalID == originalID) || null;
       return find;

@@ -445,11 +445,6 @@ class TomoEngine extends engineBase {
     return new NodeSingle(response); // Return a new NodeSingle of response.
   }
 
-  private refreshCoolDown() {
-    if (this.buttonCollector) this.buttonCollector.resetTimer();
-    if (this.selectCollector) this.selectCollector.resetTimer();
-  }
-
   private async disableComponents() {
     if (this.buttonCollector) this.buttonCollector.stop()
     if (this.selectCollector) this.selectCollector.stop()
