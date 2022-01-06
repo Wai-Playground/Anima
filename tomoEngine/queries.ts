@@ -119,6 +119,28 @@ class Queries {
         return await this.getVariantType(originalID, name, "backgrounds") as BackgroundPayload
 
     }
+
+    public static async getBanners() {
+        let payload: WithId<Banner_Payload>[], cache: string, redis = Red.memory();
+        try {
+            cache = await redis.hget("banners", "all");
+            if (cache) {
+                payload = JSON.parse(cache) as WithId<Banner_Payload>[];
+                return payload;
+            }
+            payload = await Monmonga.universeDB().collection<Banner_Payload>("banners").find({}).toArray()
+            if (!payload) throw new UniBaseNotFoundError("all", "items");
+            redis.hset("banners", "all", JSON.stringify(payload));
+            redis.expire("banners", EXPIRATION);
+        } catch(e) {
+            console.log(e);
+            payload = [];
+        } finally {
+            return payload;
+        }
+
+    }
+
     /** 
      * Should not be used outside of this class.
      * @param _id priv
@@ -224,18 +246,6 @@ class Queries {
         }
     }
 
-    public static async getBanners() {
-        let payload: WithId<Banner_Payload>[], cache: string, redis = Red.memory();
-        try {
-            
-            payload = await Monmonga.universeDB().collection<Banner_Payload>("banners").find({}).toArray()
-        } catch(e) {
-            console.log(e);
-        } finally {
-            return payload;
-        }
-
-    }
 
     /**@Statistics | DB Calls*/
 
