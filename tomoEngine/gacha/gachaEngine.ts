@@ -80,7 +80,8 @@ export default class GachaEngine extends engineBase {
         }
 
         ctx.drawImage(bg,0, 0, this.width, this.height)
-        ctx.fillText(content, 0, 0)
+        ctx.font = "120px sans-serif"
+        ctx.fillText(content, this.width / 2, this.height / 2)
         ctx.drawImage(ch, 0, 0)
 
         this.active_banners[index].attachment = new MessageAttachment(

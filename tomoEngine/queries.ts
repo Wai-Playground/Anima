@@ -225,14 +225,16 @@ class Queries {
     }
 
     public static async getBanners() {
-        let payload: WithId<Banner_Payload>[]
+        let payload: WithId<Banner_Payload>[], cache: string, redis = Red.memory();
         try {
+            
             payload = await Monmonga.universeDB().collection<Banner_Payload>("banners").find({}).toArray()
         } catch(e) {
             console.log(e);
         } finally {
             return payload;
         }
+
     }
 
     /**@Statistics | DB Calls*/
