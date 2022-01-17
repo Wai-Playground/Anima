@@ -79,8 +79,6 @@ export class NodeSingle implements Single {
 export default class Novel extends engineBase {
   name: string;
   json: any;
-  backgrounds: Map<number | string, Background>;
-  characters: Map<number | string, Character>;
   loaded_ch: Map<number | string, Image>;
   canvas: Canvas;
   loaded_bg: Map<number | string, Image>;

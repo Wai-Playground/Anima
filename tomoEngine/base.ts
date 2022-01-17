@@ -23,6 +23,8 @@ class engineBase extends EventEmitter {
   interaction: AmadeusInteraction  // Discord Interactions Objects.
   channel: Channel & TextBasedChannel; // Discord Channel Object.
 
+  backgrounds: Map<number | string, Background>;
+  characters: Map<number | string, Character>;
   constructor(
     user: User,
     interaction: any

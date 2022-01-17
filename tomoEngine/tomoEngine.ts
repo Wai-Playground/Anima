@@ -80,8 +80,6 @@ class TomoEngine extends engineBase {
   index: number = 0;
   message: any;
 
-  characters: Map<number, Character>;
-  backgrounds: Map<number, Background>;
   result_multiplier: number = 1;
 
   filter: Function = async (i: any) => {

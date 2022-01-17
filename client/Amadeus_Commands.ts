@@ -98,8 +98,8 @@ export abstract class Commands extends Amadeus_Base {
 
 
   
-  async execute(bot: CustomClient, interaction: AmadeusInteraction): Promise<any> {
-    return;
+  async execute(bot: CustomClient, interaction: AmadeusInteraction): Promise<void> {
+    throw new Error("Command not implemented.");
   }
   
 
