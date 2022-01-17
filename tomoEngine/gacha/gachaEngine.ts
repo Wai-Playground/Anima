@@ -68,14 +68,6 @@ export default class GachaEngine extends engineBase {
   height = 220;
   selection: number = 0;
   canvas = createCanvas(this.width, this.height);
-  characters: Map<number | string, Character> = new Map<
-    number | string,
-    Character
-  >();
-  backgrounds: Map<number | string, Background> = new Map<
-    number | string,
-    Background
-  >();
   loaded_ch: Map<number | string, Image> = new Map();
   loaded_bg: Map<number | string, Image> = new Map();
   banner_messages: Array<Message<boolean>> = [];
