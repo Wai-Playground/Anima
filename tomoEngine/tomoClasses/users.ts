@@ -3,7 +3,7 @@
  */
 
 import Queries from "../queries";
-import Tomo_Dictionaries, { Equations } from "../statics/tomo_dict";
+import Tomo_Dictionaries from "../statics/tomo_dict";
 import { Banner_Payload, CharacterInUser, ItemInUser, pities, Tomo_Action, UserUniversePayload } from "../statics/types";
 import Character from "./characters";
 import Items from "./items";
@@ -107,6 +107,14 @@ export default class DBUsers extends universeBase {
       return tomo.inventory.find(item => item.itemID == itemID);
       
     }
+    static calculate_ch_xp(ch_lvl: number) {
+      return ((7 * (Math.pow(ch_lvl, 2))) + (70 * ch_lvl));
+    }
+
+    static calculate_ch_xp_until(ch_xp: number, ch_lvl: number) {
+      return (this.calculate_ch_xp(ch_lvl) - ch_xp)
+      
+    }
     /**
      * @see REMEMBER TO TOMOUPDATE
      * @param tomoID 
@@ -118,7 +126,7 @@ export default class DBUsers extends universeBase {
 
       if (typeof tomo == "number") tomo = this.getTomoFromDachis(tomo)
       
-      xp_needed = Equations.calculate_ch_xp(tomo.being.level + 1)
+      xp_needed = DBUsers.calculate_ch_xp(tomo.being.level + 1)
       
       if (xp_needed <= tomo.being.xp) {
         tomo.being.level += 1;
@@ -199,6 +207,14 @@ export default class DBUsers extends universeBase {
       
     }
 
+    static calculate_user_xp(user_lvl: number) {
+      return ((5 * (Math.pow(user_lvl, 2))) + (50 * user_lvl));
+    }
+
+    static calculate_user_xp_until(user_xp: number, user_lvl: number) {
+      return (this.calculate_user_xp(user_lvl) - user_xp)
+    }
+
     removeFromTomoInventory(tomoOrigID: number, itemID: number, amount: number) {
       let find = this.tomoInvGetItem(tomoOrigID, itemID), tomo = this.getTomoFromDachis(tomoOrigID), index: number, res: number;
       if (find == null || amount > 100000000) return;
@@ -217,7 +233,7 @@ export default class DBUsers extends universeBase {
 
     userToLevelUp() {
       /**@TODO Better way to do this. Like actually. */
-      let xp_needed = Equations.calculate_user_xp(this.level + 1)//, go_into = (xp_needed / tomo.being.xp);
+      let xp_needed = DBUsers.calculate_user_xp(this.level + 1)//, go_into = (xp_needed / tomo.being.xp);
       if (xp_needed <= this.xp) {
         this._level += 1;
         this.clearUserXP()

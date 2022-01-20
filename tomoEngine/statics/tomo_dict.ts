@@ -1,22 +1,4 @@
 import { Being, CharacterInUser, Char_Archetype_Strings, Char_Flags, Ship_Tree, User_Flags } from "./types";
-export class Equations {
-    static calculate_ch_xp(ch_lvl: number) {
-        return ((7 * (Math.pow(ch_lvl, 2))) + (70 * ch_lvl));
-    }
-
-    static calculate_ch_xp_until(ch_xp: number, ch_lvl: number) {
-        return (Equations.calculate_ch_xp(ch_lvl) - ch_xp)
-        
-    }
-    static calculate_user_xp(user_lvl: number) {
-        return ((5 * (Math.pow(user_lvl, 2))) + (50 * user_lvl));
-    }
-
-    static calculate_user_xp_until(user_xp: number, user_lvl: number) {
-        return (Equations.calculate_user_xp(user_lvl) - user_xp)
-    }
-
-}
 
 export default class Tomo_Dictionaries {
 
