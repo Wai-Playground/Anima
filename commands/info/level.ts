@@ -2,8 +2,8 @@ import { Client, CommandInteraction } from "discord.js";
 import CustomClient from "../../client/Amadeus_Client";
 import { Commands } from "../../client/Amadeus_Commands";
 import Base from "../../tomoEngine/base";
-import { Equations } from "../../tomoEngine/statics/tomo_dict";
 import { AmadeusInteraction } from "../../tomoEngine/statics/types";
+import DBUsers from "../../tomoEngine/tomoClasses/users";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 class Level extends Commands {
@@ -19,7 +19,7 @@ class Level extends Commands {
   
 
   async execute(bot: CustomClient, interaction: AmadeusInteraction) {
-    const eq = Equations.calculate_user_xp(interaction.DBUser.level + 1)
+    const eq = DBUsers.calculate_user_xp(interaction.DBUser.level + 1)
     
 
     return interaction.reply({ content: "Lvl • \`\`" + interaction.DBUser.level + "\`\` | XP • " + await Base.levelGUI(Math.floor((interaction.DBUser.xp / eq) * 10), 10) + " • \`\`" + interaction.DBUser.xp + "\`\` / \`\`" + eq + "\`\`", ephemeral: false });

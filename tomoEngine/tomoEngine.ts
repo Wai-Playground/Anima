@@ -41,7 +41,7 @@ import {
   Mood_States_Strings,
   Scripts,
 } from "./statics/types";
-import Tomo_Dictionaries, { Equations } from "./statics/tomo_dict";
+import Tomo_Dictionaries from "./statics/tomo_dict";
 import Novel from "./novel";
 import { TomoError } from "./statics/errors";
 import Story from "./tomoClasses/story";
@@ -646,7 +646,7 @@ class TomoEngine extends engineBase {
   async stats(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
     const characterObject: Character = this.characters.get(card.ch), content: string = `${characterObject.emoji} ${this.interaction.user.username}\'s Character •`, 
     user_hearts = Math.floor(card.chInUser.moods.overall / 10),
-    ch_xp_needed = Equations.calculate_ch_xp(card.chInUser.being.level + 1),
+    ch_xp_needed = DBUsers.calculate_ch_xp(card.chInUser.being.level + 1),
     ch_xp_needed_until = (ch_xp_needed - card.chInUser.being.xp)
     console.log(card.chInUser.being.level + "CH_LVL")
   

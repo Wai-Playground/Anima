@@ -4,7 +4,6 @@ import { Commands } from "../../client/Amadeus_Commands";
 import engineBase from "../../tomoEngine/base";
 import Base from "../../tomoEngine/base";
 import Queries from "../../tomoEngine/queries";
-import { Equations } from "../../tomoEngine/statics/tomo_dict";
 import { AmadeusInteraction } from "../../tomoEngine/statics/types";
 import Items from "../../tomoEngine/tomoClasses/items";
 const { SlashCommandBuilder } = require("@discordjs/builders");
@@ -22,7 +21,7 @@ class Inventory extends Commands {
   
 
   async execute(bot: CustomClient, interaction: AmadeusInteraction) {
-      let ret:string = `${interaction.user.username}\'s Inventory •\n\`\``, inv = interaction.DBUser.inventory, item: Items, i = 0;
+      let ret: string = `${interaction.user.username}\'s Inventory •\n\`\``, inv = interaction.DBUser.inventory, item: Items, i = 0;
       if (inv.length <= 0) return interaction.reply("You got no items.")
 
       for (const items of inv) {
