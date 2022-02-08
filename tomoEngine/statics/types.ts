@@ -9,9 +9,9 @@ export enum RPG_Classes {
   history,
   sciences,
   arts,
-  home_ed,
+  homeEd,
   music,
-  phys_ed
+  physEd
 }
 
 export type RPG_Classes_Strings = keyof typeof RPG_Classes | "any";
