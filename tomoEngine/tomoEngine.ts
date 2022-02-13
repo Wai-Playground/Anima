@@ -100,7 +100,7 @@ class TomoEngine extends engineBase {
    * @returns Card object. (will have built image but the original object will also have the built img)
    */
   async buildCharacterCard(card: Cards): Promise<Cards> {
-    const asset = './assets/'
+    
     console.time("build")
     // Prepare canvas.
 
@@ -114,12 +114,12 @@ class TomoEngine extends engineBase {
     // Prepare the image objects.
 
     const bg: Image = await loadImage(
-      asset + `backgrounds/${this.backgrounds.get(card.bg).link}` // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
+      this.getPhysicalLink("bg", this.backgrounds.get(card.bg).link, false) // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
       // card.bg is the ID of the background.
     );
 
     const ch: Image = await loadImage(
-      asset + `characters/${chObj.link}`
+      this.getPhysicalLink("ch", chObj.link, false)
     );
 
     // This block draws the image.

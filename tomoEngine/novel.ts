@@ -228,7 +228,7 @@ export default class Novel extends engineBase {
   async deployChar(char: Character, id: number | string = char.getId) {
     //if (this.characters.has(char.getId)) throw new TomoError("Found duplicate char in memory bank.")
     this.characters.set(id, char)
-    this.loaded_ch.set(id, await loadImage(`./assets/characters/${char.link}`))
+    this.loaded_ch.set(id, await loadImage(this.getPhysicalLink("ch", char.link, false)))
     return;
 
   }
@@ -259,7 +259,7 @@ export default class Novel extends engineBase {
       if (!this.backgrounds.has(single.bg)) {
         // If the background map has this specific background ID already we skip. If not...
         payload = await this.getBackground(single.bg); // we store the payload of the db request
-        this.loaded_bg.set(single.bg, await loadImage(`./assets/backgrounds/${payload.link}`))
+        this.loaded_bg.set(single.bg, await loadImage(this.getPhysicalLink("bg", payload.link, false)))
         this.backgrounds.set(single.bg, payload);
       }
 
