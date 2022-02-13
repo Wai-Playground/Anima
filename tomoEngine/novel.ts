@@ -190,9 +190,7 @@ export default class Novel extends engineBase {
   }
 
   parseScript(str: Scripts): void {
-    console.log(str + " STR")
-    console.log(this.index + " INDX")
-    console.log(this.index + 1)
+
     switch (str) {
       case "$flag_b" || "$flag_g":
         this.end()
@@ -207,7 +205,6 @@ export default class Novel extends engineBase {
   }
 
   deployNode(node: NodeSingle, index: number, destroy: boolean = false) {
-    console.log("WORKKKKKKKKKKKKKKKKKKKKKKKKK")
     node.index = index;
     if (!node.character) node.character = this.nodes[index - 1].character;
     if (!node.background) node.background = this.nodes[index - 1].background;
@@ -217,20 +214,19 @@ export default class Novel extends engineBase {
     if (destroy == false) this.nodes.map((tenant) => {
       if (tenant.index >= index) {
         if (typeof tenant.route == "number") tenant.route++;
-        console.log(tenant)
+
         tenant.index++;
       }
     })
 
     this.nodes.splice(index, (destroy ? 1 : 0), node)
-    console.log(this.nodes)
+
     this.buildNode(index)
 
   }
 
   async deployChar(char: Character, id: number | string = char.getId) {
     //if (this.characters.has(char.getId)) throw new TomoError("Found duplicate char in memory bank.")
-    console.log("DEPLOYING CHAR")
     this.characters.set(id, char)
     this.loaded_ch.set(id, await loadImage(`./assets/characters/${char.link}`))
     return;
@@ -295,7 +291,7 @@ export default class Novel extends engineBase {
 
       }
       if (single.text.includes("$")) {
-        console.log(single.text + "_TEXT_TO_PARSE")
+
         single.text = this.parseCharacterScript(single.text, payload as Character)
       }; // If this single has a $ in it we run it through this funcion and replace it with this.
 
@@ -324,40 +320,13 @@ export default class Novel extends engineBase {
    */
 
   async start() {
-    /*
-    const payload = {
-      content:  `「**${
-        this.characters.get(this.nodes[0].character).name
-      }**」•  ${this.nodes[0].text}`,
-      attachments: [],
-      embeds:[],
-      files: [
-        this.nodes[0].built
-          ? this.nodes[0].built_img
-          : await this.buildNode(0),
-      ],
-      //attachments: [build],
-      components: await this.action(),
-    };*/
+
     await this.setPage(0);
-    /*
-    if (this.interaction.isCommand()) {
-      if (this.interaction.deferred) {
-        console.log("deferred");
-        await this.interaction.editReply(payload);
-      } else {
-        await this.interaction.reply(payload);
-      }
-    }
-    if (this.interaction.isButton()) {
-      if ("update" in this.interaction) await this.interaction.update(payload);
-    }
-    */
 
     this.message = await this.interaction.fetchReply();
 
-    if (this.buttonCollector == undefined) this.collectButton(this.filter);
-    if (this.selectCollector == undefined) this.collectSelect(this.filter);
+    if (!this.buttonCollector) this.collectButton(this.filter);
+    if (!this.selectCollector) this.collectSelect(this.filter);
   }
 
   async setPage(index: number = this.index) {

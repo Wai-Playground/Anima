@@ -26,3 +26,7 @@ Thumbs.db
 venv
 node_modules
 .sass-cache
+
+
+# Art Assets
+assets/*
