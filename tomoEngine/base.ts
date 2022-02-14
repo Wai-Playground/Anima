@@ -56,7 +56,7 @@ class engineBase extends EventEmitter {
 
   getPhysicalLink(type: "bg" | "ch", link: string, blurred: boolean): string {
     if (type == "ch" && blurred == true) blurred = false;
-    return `assets/${type}/` + (blurred? `blurred`: `normal`) + link;
+    return `assets/${type}/${(blurred? `blurred`: `normal`)}/` + link;
   }
 
   async getCharacter(_id: number | string): Promise<Character> {

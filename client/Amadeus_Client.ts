@@ -6,7 +6,6 @@ const { Routes } = require("discord-api-types/v9");
 import Momonga from "./Amadeus_Mongo"
 import Red from "./Amadeus_Redis"
 import Listeners from "./Amadeus_listeners"
-import { In_House_Assets } from "../tomoEngine/statics/types";
 export default class CustomClient extends Client {
   /**
    * Description | Custom Client.
@@ -48,8 +47,8 @@ export default class CustomClient extends Client {
 
   async verifyAssets(this: CustomClient, aPath: string = './assets') {
 
-    this.verifyCharacters(aPath + "/" + "characters")
-    this.verifyBackgrounds(aPath + "/" + "backgrounds")
+    this.verifyCharacters(aPath + "/" + "ch")
+    this.verifyBackgrounds(aPath + "/" + "bg")
 
 
 

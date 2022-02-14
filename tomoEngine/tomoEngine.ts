@@ -47,8 +47,6 @@ import { TomoError } from "./statics/errors";
 import Story from "./tomoClasses/story";
 import { NodeSingle } from "./novel";
 import Items from "./tomoClasses/items";
-import Background from "./tomoClasses/backgrounds";
-import { timingSafeEqual } from "crypto";
 
 class Cards {
   ch: number;
@@ -92,6 +90,7 @@ class TomoEngine extends engineBase {
     super(interaction.user, interaction);
     this.interaction = interaction as AmadeusInteraction;
     this.prepareAsset();
+    
   }
 
   /**
@@ -114,7 +113,7 @@ class TomoEngine extends engineBase {
     // Prepare the image objects.
 
     const bg: Image = await loadImage(
-      this.getPhysicalLink("bg", this.backgrounds.get(card.bg).link, false) // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
+      this.getPhysicalLink("bg", this.backgrounds.get(card.bg).link, true) // Property "backgrounds" is an internal cache of the Backgrounds objects with their IDs as the key. -
       // card.bg is the ID of the background.
     );
 
@@ -482,9 +481,6 @@ class TomoEngine extends engineBase {
 
     this.DBUser.updateTomoState(chInUser)
     this.DBUser.update()
-
-
-
 
   }
 
