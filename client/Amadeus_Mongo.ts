@@ -42,17 +42,13 @@ export default class Monmonga extends Amadeus_Base {
 
     public static universeDB() {
         return momonga.db("universe")
-
     }
     public static discordDB() {
         return momonga.db("discord")
-
     }
-
     public static gachaDB() {
       return momonga.db("gacha_rolls")
     }
-
     public static statsDB(){
       return momonga.db("statistics")
     }

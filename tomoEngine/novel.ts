@@ -123,10 +123,12 @@ export default class Novel extends engineBase {
     this.nodes = [];
     this.prepareAssets();
   }
-
-
-
+  /**
+   *  Creates an image data that can be sent with a message. This is a helper function.
+   *  @param index | Index of the node to build.
+   */
   async buildNode(index: number = this.index): Promise<MessageAttachment> {
+    // get ready for some optimizations
     console.log("RENDERING_NODE_" + index)
     console.time("build_"+index)
     
@@ -151,7 +153,6 @@ export default class Novel extends engineBase {
     }
     if (this.loaded_bg.has(this.nodes[index].background)) {
       bg = this.loaded_bg.get(this.nodes[index].background)
-
     }
 
     if (this.loaded_ch.has(this.nodes[index].character)) {
@@ -162,21 +163,6 @@ export default class Novel extends engineBase {
     ctx.drawImage(bg, 0, 0, this.width, this.height);
     //ctx.clearRect(0, 0, this.width, this.height)
     ctx.drawImage(ch, 0, 0);
-
-    /** Draw pfp */
-    /*
-
-    ctx.beginPath();
-
-    ctx.arc(80, 405, 60, 0, Math.PI * 2, true);
-
-    ctx.closePath();
-
-    ctx.clip();
-
-    const avatar = await loadImage(this.interaction.user.displayAvatarURL({ format: 'jpg' }));
-		ctx.drawImage(avatar, 20, 345, 120, 120);
-    */
 
     this.nodes[index].built = true;
     this.nodes[index].built_img = new MessageAttachment(
@@ -189,6 +175,10 @@ export default class Novel extends engineBase {
     return this.nodes[index].built_img;
   }
 
+  /**
+   * Helper function to parse strings into functions.
+   * @param str | String to parse.
+   */
   parseScript(str: Scripts): void {
 
     switch (str) {
@@ -204,7 +194,13 @@ export default class Novel extends engineBase {
     }
   }
 
-  deployNode(node: NodeSingle, index: number, destroy: boolean = false) {
+  /**
+   * Name | deployNode
+   * @param node | Node to deploy.
+   * @param index | Index of the node to deploy.
+   * @param destroy | Destroy the node to replace or .
+   */
+  public deployNode(node: NodeSingle, index: number, destroy: boolean = false) {
     node.index = index;
     if (!node.character) node.character = this.nodes[index - 1].character;
     if (!node.background) node.background = this.nodes[index - 1].background;
@@ -282,7 +278,7 @@ export default class Novel extends engineBase {
           single.character = payload.getId;
         }
         if (payload.link == null) { // If the link is null:
-          if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link; //get from past character if we are index > 0;
+          if (i > 0) payload.link = this.characters.get(this.nodes[i - 1].character).link; // get from past character if we are index > 0;
           if (i <= 0) payload.link = "loser.png"// just transparnt png if we we are at index 0;
         } 
 
@@ -295,11 +291,11 @@ export default class Novel extends engineBase {
         single.text = this.parseCharacterScript(single.text, payload as Character)
       }; // If this single has a $ in it we run it through this funcion and replace it with this.
 
-      this.nodes.push(new NodeSingle(single, i)); // Push it into our arra of nodes.
+      this.nodes.push(new NodeSingle(single, i)); // Push it into our array of nodes.
 
       i++;
     }
-    // Build the node length if the legnth is less than or equal to 10.
+    // Build the node if the legnth is less than or equal to 10.
     if (this.nodes.length <= 10) {
       for (const node of this.nodes) {
         // for every node in here

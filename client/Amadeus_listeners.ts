@@ -1,4 +1,3 @@
-import { AmadeusInteraction } from "../tomoEngine/statics/types";
 import Amadeus_Base from "./Amadeus_Base";
 import CustomClient from "./Amadeus_Client";
 

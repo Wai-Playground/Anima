@@ -190,28 +190,6 @@ class TomoEngine extends engineBase {
   }
 
   /**
-   * Name | convertNumberToTempMoodType.
-   * @param mood | int of the mood you want to turn into a string.
-   * @returns | string representation of the temp mood.
-   */
-  static convertNumberToTempMoodType(mood: number) {
-    if (mood > Object.keys(Temp_MoodType).length / 2) return; // Since the enums have both int and string representations, we cut down the length of it by half.
-    console.log(Temp_MoodType[mood] + "MOOD")
-    return Temp_MoodType[mood] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it.
-  }
-
-  static convertTempMoodTypeToNumber(mood: Temp_MoodTypeStrings) {
-    return Temp_MoodType[mood] as number || -1;
-  }
-
-  static convertNumberToMainType(points: number) {
-    points = Math.floor(points / 10);
-    if (points > Object.keys(Mood_States).length / 2) return Mood_States[Object.keys(Mood_States).length - 1] as Mood_States_Strings;
-    return Mood_States[points] as Mood_States_Strings;
-
-  }
-
-  /**
    * Name | getStoryJSON.
    * @param card | Card to get the ch story of.
    * @param action | Action to perform. (Tomo_Action)
@@ -234,7 +212,7 @@ class TomoEngine extends engineBase {
 
     try {
       idOfStory = this.characters.get(card.ch).getRandInterStoryId(action); // Get a random story from the character's object.
-      if (idOfStory == -1)
+      if (idOfStory == -1) // If the idOfStory is -1, we throw error.
         throw new TomoError(
           "No story found for this action." +
             `Ch: ${card.ch}, User: ${this.DBUser._id}`
@@ -255,6 +233,7 @@ class TomoEngine extends engineBase {
     }
 
     if (curMood == "hungry" && action == "gift") {
+      // Special moods.
       try {
         story = await story.getVariant("hungry");
       } catch(e) {
@@ -442,11 +421,19 @@ class TomoEngine extends engineBase {
     return new NodeSingle(response); // Return a new NodeSingle of response.
   }
 
+  /**
+   * Name | disableComponents.
+   * The function disables the message components if they exist.
+   */
   private async disableComponents() {
     if (this.buttonCollector) this.buttonCollector.stop()
     if (this.selectCollector) this.selectCollector.stop()
   }
 
+  /**
+   * This is so bad it hurts. Make it better. Please.
+   * @param Arr | Array of items to be given.
+   */
   private async appendEndScreen(Arr: Array<number>) {
     let embed = new MessageEmbed()
     .addField("Gained XP", Arr[0].toString())
@@ -464,6 +451,8 @@ class TomoEngine extends engineBase {
 
   /**
    * ":)"
+   * literal pain.
+   * 
    */
   private async moodChanger9000(chInUser: CharacterInUser) {
     const HOUR = 1000 * 60 * 60, DAY = 1000 * HOUR * 24, TICK_DATE = chInUser._last_tick, NOW = Date.now(), NOW_DATE = new Date(),
@@ -526,7 +515,7 @@ class TomoEngine extends engineBase {
       this.novel.start(); // Start the novel when ready.
     });
 
-    this.OnNovelEnd("gift")
+    this.onNovelEnd("gift")
 
 
     // This block is the main part of the gifting sequence, this:
@@ -573,6 +562,12 @@ class TomoEngine extends engineBase {
     );
   }
 
+
+  /**
+   * Name | interact
+   * @param interaction | The interaction object.
+   * @param card | card to use to create the interact function.
+   */
   async interact(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
     // Declare block.
     let story: Story;
@@ -592,7 +587,7 @@ class TomoEngine extends engineBase {
       this.novel.start(); // When ready, start the novel.
     });
 
-    this.OnNovelEnd("interact")
+    this.onNovelEnd("interact")
   }
 
   async start(index: number = 0) {
@@ -616,27 +611,6 @@ class TomoEngine extends engineBase {
     
   }
 
-  static async rarityColor(grade: number) {
-    if (grade > 8) throw new TomoError("Rarity color grade bigger than total rarity level (8).");
-    console.log(grade)
-    return Rarity_Color[grade];
-  }
-
-  static async convertIntMoodToEmj(mood: number) {
-    return Mood_Emojis[mood];
-  }
-
-  static async convertIntGradeToEmj(rarity: Rarity_Grade) {
-    return Rarity_Emoji[rarity]
-  }
-
-  static async converIntHealthToEmj(healthArr: Array<number> = [0, 100]) {
-    const converted_health_ratio = (healthArr[0] / healthArr[1]) * 100;
-
-    if (converted_health_ratio > 50) return "🟢"
-    else if (converted_health_ratio < 30) return "🔴"
-    else if (converted_health_ratio <= 50) return "🟡"
-  }
 
   // Interaction Block.
   async stats(interaction: AmadeusInteraction = this.interaction, card: Cards = this.cards[this.index]) {
@@ -654,9 +628,6 @@ class TomoEngine extends engineBase {
       .addField("Relationship", 
       `💕 「**${this.capitalizeFirstLetter(TomoEngine.convertNumberToMainType(card.chInUser.moods.overall))}**」 • \n` + await TomoEngine.levelGUI(user_hearts, 10) + `「**${Math.floor(card.chInUser.moods.overall / 10)}** ♡」\n`,
       true)
-      //.addField("Combat Stats", 
-      //`${await TomoEngine.converIntHealthToEmj(card.chInUser.being.health)} **HP** • ` + await TomoEngine.levelGUI((Math.floor(card.chInUser.being.health[0] / card.chInUser.being.health[1]) * 100), 10) +`\n[**${card.chInUser.being.health[0]}**/**${card.chInUser.being.health[1]}** hp]`,
-      //true)
       .addField("Advancements", 
       `🆙 **XP** •「${card.chInUser.being.xp}」\n` + await TomoEngine.levelGUI(Math.floor((card.chInUser.being.xp <= 0 ? 0 : (card.chInUser.being.xp / ch_xp_needed)* 10)), 10) + `\n**${ch_xp_needed_until}** XP needed to level up.\n「Current Level • **__${card.chInUser.being.level}__**」`,
       true)
@@ -670,13 +641,18 @@ class TomoEngine extends engineBase {
 
     return interaction.editReply({
       content: content,
-      files: [{attachment: `assets/characters/` + characterObject.link}],
+      files: [this.getPhysicalLink("ch", characterObject.link, false)],
       attachments: [],
       embeds: [embed],
       components: []
     })
   }
 
+  /**
+   * Name | collectButton.
+   * Does | Button collector to bring functionality to them.
+   * @param filter Function to filter the buttons.
+   */
   private async collectButton(filter: Function) {
     this.buttonCollector = this.message.createMessageComponentCollector({
       filter,
@@ -709,6 +685,11 @@ class TomoEngine extends engineBase {
       this.emit("end");
     });
   }
+  /**
+   * Name | collectSelect.
+   * Does | Select collector to bring functionality to select drop down box.
+   * @param filter 
+   */
   private async collectSelect(filter: Function) {
     this.selectCollector = this.message.createMessageComponentCollector({
       filter,
@@ -718,10 +699,8 @@ class TomoEngine extends engineBase {
     this.selectCollector.on(
       "collect",
       async (interaction: SelectMenuInteraction) => {
-        let value = parseInt(interaction.values[0]); // value[1] = selection
+        let value = parseInt(interaction.values[0]);
         if (value == this.index) return;
-
-        //this.selection = parseInt(value);
 
         this.emit("selectCollected", value);
         this.setPage(value)
@@ -820,6 +799,12 @@ class TomoEngine extends engineBase {
     return ret;
   }
 
+  /**
+   * VERY EARLY ALPHA TYPE FUNCTION. DO NOT TOUCH.
+   * @param action 
+   * @param card 
+   * @returns 
+   */
   async calculateRewards(action: Tomo_Action, card: Cards = this.cards[this.index]) {
     /**@TODO Finish this. USE THIS IN CONJECTURE WITH THE TOMO TYPE (TSUN ETC..)*/
     let user_reward_xp: number = 20, ch_reward_xp: number = 0, ch_reward_lp: number = 0//, characterObj = this.characters.get(card.chInUser.originalID);
@@ -918,7 +903,7 @@ class TomoEngine extends engineBase {
     });
   }
 
-  async OnNovelEnd(action: Tomo_Action, novel: Novel = this.novel, card: Cards = this.cards[this.index]) {
+  async onNovelEnd(action: Tomo_Action, novel: Novel = this.novel, card: Cards = this.cards[this.index]) {
     novel.once("end", async (reason) => {
       if (reason == "timed_out") return;
       this.DBUser.setUserLastInteraction(card.chInUser.originalID, action)
@@ -928,6 +913,65 @@ class TomoEngine extends engineBase {
 
   }
 
+  /** Helper Functions */
+
+  /**
+   * Name | convertNumberToTempMoodType.
+   * @param mood | int of the mood you want to turn into a string.
+   * @returns | string representation of the temp mood.
+   */
+   static convertNumberToTempMoodType(mood: number) {
+    if (mood > Object.keys(Temp_MoodType).length / 2) return; // Since the enums have both int and string representations, we cut down the length of it by half.
+    return Temp_MoodType[mood] as Temp_MoodTypeStrings; // Then we use the mood int to convert it into a tempMoodType by subbing it.
+  }
+
+  static convertTempMoodTypeToNumber(mood: Temp_MoodTypeStrings) {
+    return Temp_MoodType[mood] as number || -1;
+  }
+
+  /**
+   * Name | convertNumberToMoodType.
+   * @param points | int of the points you want to turn into a string.
+   * @returns | string representation of the mood state.
+   */
+  static convertNumberToMainType(points: number) {
+    points = Math.floor(points / 10);
+    if (points > Object.keys(Mood_States).length / 2) return Mood_States[Object.keys(Mood_States).length - 1] as Mood_States_Strings;
+    return Mood_States[points] as Mood_States_Strings;
+  }
+  
+  /**
+   * Name | rarityColor.
+   * @param grade int grade of the item.
+   * @returns hex string representation of the rarity color.
+   */
+  static async rarityColor(grade: number) {
+    if (grade > 8) throw new TomoError("Rarity color grade bigger than total rarity level (8).");
+    return Rarity_Color[grade];
+  }
+
+  /**
+   * Name | convertIntMoodToEmj.
+   * @param mood int mood.
+   * @returns emoji of the mood.
+   */
+  static async convertIntMoodToEmj(mood: number) {
+    return Mood_Emojis[mood];
+  }
+
+  /**
+   * Name | convertIntMoodToString.
+   * @param rarity int grade.
+   * @returns rarity emoji of the grade.
+   */
+  static async convertIntGradeToEmj(rarity: Rarity_Grade) {
+    return Rarity_Emoji[rarity]
+  }
+
+
 }
+
+
+
 
 export = TomoEngine;

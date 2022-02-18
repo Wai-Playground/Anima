@@ -1,4 +1,3 @@
-import { Client, CommandInteraction } from "discord.js";
 import Queries from "../tomoEngine/queries";
 import Tomo_Dictionaries from "../tomoEngine/statics/tomo_dict";
 import { AmadeusInteraction, UserUniversePayload } from "../tomoEngine/statics/types";
