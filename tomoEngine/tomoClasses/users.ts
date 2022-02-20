@@ -155,13 +155,15 @@ export default class DBUsers extends universeBase {
       console.log(amount + "_AMOUNT_ADDED")
     }
     removeFromUserTickets(amount: number) {
-      this._tik -= amount;
+      let ret = this.tickets - amount;
+      this._tik = (ret < 0) ? 0 : ret;
     }
     addToUserCurrency(amount: number) {
       this._cur += amount;
     }
     removeFromUserCurrency(amount: number) {
-      this._cur -= amount;
+      let ret = this.currency - amount;
+      this._cur = (ret < 0) ? 0 : ret;
     }
 
     addToTomoXP(tomoID: number, amount: number) {
@@ -174,11 +176,12 @@ export default class DBUsers extends universeBase {
     }
 
     addToTomoLP(tomoID: number, amount: number) {
-      let tomo = this.getTomoFromDachis(tomoID)
+      let tomo = this.getTomoFromDachis(tomoID), ret: number;
       if (!tomo) return;
-      console.log("TOMO IS GETTING LP: " + amount)
+      ret = tomo.moods.overall += amount;
+      // if the final mood is less than 0, set it to 0. If not then set the mood as the final mood.
+      tomo.moods.overall = (ret <= 0) ?  0 : ret;
 
-      tomo.moods.overall += amount;
     }
 
     setUserLastInteraction(tomoID: number, action: Tomo_Action) {
