@@ -8,9 +8,6 @@ export enum RPG_Classes {
   literature,
   history,
   sciences,
-  arts,
-  homeEd,
-  music,
   physEd
 }
 
