@@ -788,7 +788,7 @@ class TomoEngine extends engineBase {
             this.interaction.user.id
         )
         .setPlaceholder(
-          "SELECT YO B"
+          "Select someone"
         )
         .addOptions(await this.fillSelectWithUserTomos())
         
