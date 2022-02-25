@@ -46,7 +46,6 @@ export default class CustomClient extends Client {
   }
 
   async verifyAssets(this: CustomClient, aPath: string = './assets') {
-
     this.verifyCharacters(aPath + "/" + "ch")
     this.verifyBackgrounds(aPath + "/" + "bg")
 
